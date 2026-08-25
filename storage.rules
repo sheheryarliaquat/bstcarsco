@@ -1,0 +1,300 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDriver() {
+      return isAuthenticated() &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'driver';
+    }
+
+    function isOperator() {
+      return isAuthenticated() &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'operator';
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isPdf() {
+      return request.resource.contentType == 'application/pdf';
+    }
+
+    function isDocument() {
+      return request.resource.contentType.matches('image/.*') ||
+        request.resource.contentType == 'application/pdf';
+    }
+
+    function fileSizeUnder10MB() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    function fileSizeUnder5MB() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    function fileSizeUnder2MB() {
+      return request.resource.size < 2 * 1024 * 1024;
+    }
+
+    // ============================================================
+    // ROOT LEVEL ACCESS
+    // ============================================================
+
+    match /{allPaths=**} {
+      // Admin can do everything
+      allow read, write: if isAdmin();
+    }
+
+    // ============================================================
+    // USER PROFILE PHOTOS
+    // Path: /users/{userId}/profile/{fileName}
+    // ============================================================
+
+    match /users/{userId}/profile/{fileName} {
+      // Anyone can read profile photos (public)
+      allow read: if true;
+
+      // Owner can upload their own profile photo
+      allow write: if isOwner(userId) &&
+        isImage() &&
+        fileSizeUnder2MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // USER DOCUMENTS (general user documents)
+    // Path: /users/{userId}/documents/{fileName}
+    // ============================================================
+
+    match /users/{userId}/documents/{fileName} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      allow write: if isOwner(userId) &&
+        isDocument() &&
+        fileSizeUnder10MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // DRIVER DOCUMENTS
+    // Path: /drivers/{driverId}/documents/{docType}/{fileName}
+    // ============================================================
+
+    match /drivers/{driverId}/documents/{docType}/{fileName} {
+      // Driver can read their own documents, operators can read their drivers' documents, admins can read all
+      allow read: if isOwner(driverId) || isAdmin() ||
+        (isOperator() && firestore.get(/databases/(default)/documents/drivers/$(driverId)).data.operatorId == request.auth.uid);
+
+      // Driver can upload documents for themselves
+      allow create: if isOwner(driverId) &&
+        isDocument() &&
+        fileSizeUnder10MB() &&
+        request.resource.size > 0 &&
+        docType in [
+          'driving_licence', 'insurance', 'mot_certificate',
+          'pco_licence', 'dbs_check', 'vehicle_registration',
+          'profile_photo', 'vehicle_photo', 'other'
+        ];
+
+      // Driver can update (replace) their own documents
+      allow update: if isOwner(driverId) &&
+        isDocument() &&
+        fileSizeUnder10MB() &&
+        request.resource.size > 0;
+
+      // Driver can delete their own documents
+      allow delete: if isOwner(driverId) || isAdmin();
+    }
+
+    // ============================================================
+    // DRIVER PROFILE PHOTOS
+    // Path: /drivers/{driverId}/profile/{fileName}
+    // ============================================================
+
+    match /drivers/{driverId}/profile/{fileName} {
+      // Public read for driver profile photos
+      allow read: if true;
+
+      // Driver can upload their own profile photo
+      allow write: if isOwner(driverId) &&
+        isImage() &&
+        fileSizeUnder2MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // OPERATOR DOCUMENTS
+    // Path: /operators/{operatorId}/documents/{fileName}
+    // ============================================================
+
+    match /operators/{operatorId}/documents/{fileName} {
+      allow read: if isOwner(operatorId) || isAdmin();
+
+      allow write: if isOwner(operatorId) &&
+        isDocument() &&
+        fileSizeUnder10MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // OPERATOR LOGOS
+    // Path: /operators/{operatorId}/logo/{fileName}
+    // ============================================================
+
+    match /operators/{operatorId}/logo/{fileName} {
+      // Public read for operator logos
+      allow read: if true;
+
+      // Operator can upload their own logo
+      allow write: if isOwner(operatorId) &&
+        isImage() &&
+        fileSizeUnder5MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // OPERATOR BANNERS
+    // Path: /operators/{operatorId}/banners/{fileName}
+    // ============================================================
+
+    match /operators/{operatorId}/banners/{fileName} {
+      allow read: if true;
+
+      allow write: if isOwner(operatorId) &&
+        isImage() &&
+        fileSizeUnder5MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // BOOKING RECEIPTS & INVOICES
+    // Path: /bookings/{bookingId}/receipts/{fileName}
+    // ============================================================
+
+    match /bookings/{bookingId}/receipts/{fileName} {
+      allow read: if isAuthenticated() &&
+        (firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.passengerId == request.auth.uid ||
+         firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.driverId == request.auth.uid ||
+         firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.operatorId == request.auth.uid ||
+         isAdmin());
+
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // BOOKING ATTACHMENTS (photos, etc.)
+    // Path: /bookings/{bookingId}/attachments/{fileName}
+    // ============================================================
+
+    match /bookings/{bookingId}/attachments/{fileName} {
+      allow read: if isAuthenticated() &&
+        (firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.passengerId == request.auth.uid ||
+         firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.driverId == request.auth.uid ||
+         firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.operatorId == request.auth.uid ||
+         isAdmin());
+
+      allow create: if isAuthenticated() &&
+        isImage() &&
+        fileSizeUnder10MB() &&
+        request.resource.size > 0;
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // SUPPORT TICKET ATTACHMENTS
+    // Path: /support_tickets/{ticketId}/attachments/{fileName}
+    // ============================================================
+
+    match /support_tickets/{ticketId}/attachments/{fileName} {
+      allow read: if isAuthenticated() &&
+        (firestore.get(/databases/(default)/documents/support_tickets/$(ticketId)).data.userId == request.auth.uid ||
+         isAdmin());
+
+      allow create: if isAuthenticated() &&
+        (firestore.get(/databases/(default)/documents/support_tickets/$(ticketId)).data.userId == request.auth.uid ||
+         isAdmin()) &&
+        isDocument() &&
+        fileSizeUnder10MB() &&
+        request.resource.size > 0;
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // VEHICLE PHOTOS
+    // Path: /vehicles/{vehicleId}/photos/{fileName}
+    // ============================================================
+
+    match /vehicles/{vehicleId}/photos/{fileName} {
+      // Public read for vehicle photos
+      allow read: if true;
+
+      // Driver who owns the vehicle can upload photos
+      allow write: if isAuthenticated() &&
+        firestore.get(/databases/(default)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid &&
+        isImage() &&
+        fileSizeUnder5MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // PROMO CODE IMAGES
+    // Path: /promo_codes/{promoId}/images/{fileName}
+    // ============================================================
+
+    match /promo_codes/{promoId}/images/{fileName} {
+      allow read: if true;
+
+      allow write: if isAdmin() &&
+        isImage() &&
+        fileSizeUnder5MB() &&
+        request.resource.size > 0;
+    }
+
+    // ============================================================
+    // EMAIL TEMPLATES (admin only)
+    // Path: /email_templates/{templateId}/{fileName}
+    // ============================================================
+
+    match /email_templates/{templateId}/{fileName} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // REPORTS (admin only)
+    // Path: /reports/{reportType}/{fileName}
+    // ============================================================
+
+    match /reports/{reportType}/{fileName} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // PUBLIC ASSETS (app logos, etc.)
+    // Path: /public/{fileName}
+    // ============================================================
+
+    match /public/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

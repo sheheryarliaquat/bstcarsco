@@ -1,0 +1,598 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    function isDriver() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'driver';
+    }
+
+    function isOperator() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'operator';
+    }
+
+    function isPassenger() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'passenger';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isOwnerOfBooking(bookingId) {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/bookings/$(bookingId)).data.passengerId == request.auth.uid;
+    }
+
+    function isAssignedDriverOfBooking(bookingId) {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/bookings/$(bookingId)).data.driverId == request.auth.uid;
+    }
+
+    function isOperatorOfBooking(bookingId) {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/bookings/$(bookingId)).data.operatorId == request.auth.uid;
+    }
+
+    function isVerified() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.emailVerified == true;
+    }
+
+    function isDriverApproved() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/drivers/$(request.auth.uid)).data.approvalStatus == 'approved';
+    }
+
+    function isOperatorApproved() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/operators/$(request.auth.uid)).data.approvalStatus == 'approved';
+    }
+
+    function hasMinimumRole(minRole) {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == minRole ||
+         (minRole == 'driver' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin') ||
+         (minRole == 'operator' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin']) ||
+         (minRole == 'admin' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin'));
+    }
+
+    function validBookingStatus(status) {
+      return status in [
+        'pending', 'quoted', 'confirmed', 'driver_assigned',
+        'driver_en_route', 'arrived', 'in_progress',
+        'completed', 'cancelled', 'no_show'
+      ];
+    }
+
+    function validPaymentStatus(status) {
+      return status in [
+        'pending', 'processing', 'completed', 'failed',
+        'refunded', 'partially_refunded', 'cancelled'
+      ];
+    }
+
+    function validDocumentType(docType) {
+      return docType in [
+        'driving_licence', 'insurance', 'mot_certificate',
+        'pco_licence', 'dbs_check', 'vehicle_registration',
+        'profile_photo', 'vehicle_photo', 'operator_licence'
+      ];
+    }
+
+    // ============================================================
+    // USERS COLLECTION
+    // ============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      allow create: if isAuthenticated() &&
+        request.auth.uid == userId &&
+        request.resource.data.keys().hasAll(['email', 'role', 'displayName', 'createdAt', 'updatedAt', 'emailVerified', 'active']) &&
+        request.resource.data.role in ['passenger', 'driver', 'operator', 'admin', 'super_admin'] &&
+        request.resource.data.email is string &&
+        request.resource.data.displayName is string &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp &&
+        request.resource.data.emailVerified is bool &&
+        request.resource.data.active is bool;
+
+      allow update: if isOwner(userId) || isAdmin();
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // ============================================================
+    // PASSENGERS COLLECTION
+    // ============================================================
+
+    match /passengers/{passengerId} {
+      allow read: if isOwner(passengerId) || isAdmin() || isOperator();
+
+      allow create: if isAuthenticated() &&
+        request.auth.uid == passengerId &&
+        request.resource.data.keys().hasAll([
+          'userId', 'displayName', 'email', 'phone',
+          'createdAt', 'updatedAt', 'active', 'totalBookings',
+          'totalSpent', 'averageRating'
+        ]) &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow update: if isOwner(passengerId) || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // DRIVERS COLLECTION
+    // ============================================================
+
+    match /drivers/{driverId} {
+      allow read: if isAuthenticated() || isOperator();
+
+      allow create: if isOwner(driverId) &&
+        request.resource.data.keys().hasAll([
+          'userId', 'displayName', 'email', 'phone',
+          'approvalStatus', 'createdAt', 'updatedAt', 'active',
+          'averageRating', 'totalTrips', 'totalEarnings',
+          'vehicleId', 'operatorId', 'licensed', 'insured'
+        ]) &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow update: if isOwner(driverId) || isAdmin() || (isOperator() && isOperatorApproved());
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // OPERATORS COLLECTION
+    // ============================================================
+
+    match /operators/{operatorId} {
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow create: if isOwner(operatorId) &&
+        request.resource.data.keys().hasAll([
+          'userId', 'companyName', 'email', 'phone',
+          'approvalStatus', 'createdAt', 'updatedAt', 'active',
+          'averageRating', 'totalBookings', 'totalRevenue',
+          'commissionRate', 'driverCount'
+        ]) &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow update: if isOwner(operatorId) || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // VEHICLES COLLECTION
+    // ============================================================
+
+    match /vehicles/{vehicleId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isDriver() &&
+        request.resource.data.keys().hasAll([
+          'driverId', 'make', 'model', 'year', 'colour',
+          'registrationNumber', 'vehicleType', 'createdAt',
+          'updatedAt', 'active', 'insuranceValid',
+          'motValid', 'pcoValid'
+        ]);
+
+      allow update: if (isDriver() &&
+        get(/databases/$(database)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid) || isAdmin();
+
+      allow delete: if (isDriver() &&
+        get(/databases/$(database)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid) || isAdmin();
+    }
+
+    // ============================================================
+    // BOOKINGS COLLECTION - CRITICAL SECURITY
+    // ============================================================
+
+    match /bookings/{bookingId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/bookings/$(bookingId)).data.passengerId) ||
+        (isAssignedDriverOfBooking(bookingId)) ||
+        (isOperatorOfBooking(bookingId) && isOperatorApproved()) ||
+        isAdmin();
+
+      allow create: if isPassenger() && isVerified() &&
+        request.resource.data.keys().hasAll([
+          'passengerId', 'pickupLocation', 'dropoffLocation',
+          'pickupTime', 'vehicleType', 'status', 'bookingStatus',
+          'createdAt', 'updatedAt', 'passengerCount',
+          'luggage', 'specialRequirements', 'estimatedDistance',
+          'estimatedDuration', 'estimatedPrice'
+        ]) &&
+        request.resource.data.passengerId == request.auth.uid &&
+        validBookingStatus(request.resource.data.status) &&
+        request.resource.data.passengerCount is int &&
+        request.resource.data.estimatedDistance is number &&
+        request.resource.data.estimatedDuration is int &&
+        request.resource.data.estimatedPrice is number;
+
+      allow update: if (isOwner(get(/databases/$(database)/documents/bookings/$(bookingId)).data.passengerId) &&
+        // Passengers can only cancel bookings in certain statuses
+        (request.resource.data.status == 'cancelled' ||
+         (request.resource.data.keys().hasAll(['status']) &&
+          request.resource.data.status in ['pending', 'quoted', 'cancelled']))) ||
+        (isAssignedDriverOfBooking(bookingId) &&
+         // Drivers can update status for assigned bookings
+         request.resource.data.status in [
+           'driver_en_route', 'arrived', 'in_progress', 'completed', 'no_show'
+         ]) ||
+        (isOperatorOfBooking(bookingId) && isOperatorApproved() &&
+         validBookingStatus(request.resource.data.status)) ||
+        isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // QUOTES COLLECTION
+    // ============================================================
+
+    match /quotes/{quoteId} {
+      allow read: if (isOwner(get(/databases/$(database)/documents/quotes/$(quoteId)).data.passengerId)) ||
+        (isOperatorOfBooking(get(/databases/$(database)/documents/quotes/$(quoteId)).data.bookingId) && isOperatorApproved()) ||
+        isAdmin();
+
+      allow create: if (isOperator() && isOperatorApproved()) ||
+        (isAdmin()) &&
+        request.resource.data.keys().hasAll([
+          'bookingId', 'operatorId', 'driverId', 'price',
+          'currency', 'estimatedDuration', 'estimatedDistance',
+          'vehicleType', 'createdAt', 'expiresAt', 'status'
+        ]);
+
+      allow update: if (isOperator() &&
+        get(/databases/$(database)/documents/quotes/$(quoteId)).data.operatorId == request.auth.uid) || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // PAYMENTS COLLECTION
+    // ============================================================
+
+    match /payments/{paymentId} {
+      allow read: if (isOwner(get(/databases/$(database)/documents/payments/$(paymentId)).data.userId)) ||
+        (isOperatorOfBooking(get(/databases/$(database)/documents/payments/$(paymentId)).data.bookingId) && isOperatorApproved()) ||
+        isAdmin();
+
+      allow create: if isPassenger() || isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'bookingId', 'userId', 'amount', 'currency',
+          'paymentMethod', 'status', 'createdAt', 'updatedAt',
+          'stripePaymentIntentId', 'refundAmount'
+        ]) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.amount is number &&
+        request.resource.data.amount > 0;
+
+      allow update: if isAdmin() ||
+        (isOperator() && isOperatorApproved() &&
+         request.resource.data.keys().hasAll(['status', 'updatedAt']));
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // REVIEWS COLLECTION
+    // ============================================================
+
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.keys().hasAll([
+          'bookingId', 'reviewerId', 'revieweeId',
+          'rating', 'comment', 'createdAt', 'updatedAt',
+          'reviewerType', 'revieweeType'
+        ]) &&
+        request.resource.data.reviewerId == request.auth.uid &&
+        request.resource.data.rating is int &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5 &&
+        request.resource.data.reviewerType in ['passenger', 'driver'];
+
+      allow update: if isOwner(get(/databases/$(database)/documents/reviews/$(reviewId)).data.reviewerId) || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // NOTIFICATIONS COLLECTION
+    // ============================================================
+
+    match /notifications/{notificationId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/notifications/$(notificationId)).data.userId) || isAdmin();
+
+      allow create: if isAdmin() || isOperator() || isDriver() &&
+        request.resource.data.keys().hasAll([
+          'userId', 'type', 'title', 'body', 'data',
+          'createdAt', 'read', 'readAt'
+        ]);
+
+      allow update: if isOwner(get(/databases/$(database)/documents/notifications/$(notificationId)).data.userId) || isAdmin();
+
+      allow delete: if isOwner(get(/databases/$(database)/documents/notifications/$(notificationId)).data.userId) || isAdmin();
+    }
+
+    // ============================================================
+    // DOCUMENTS COLLECTION
+    // ============================================================
+
+    match /documents/{documentId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/documents/$(documentId)).data.driverId) ||
+        (isOperator() && isOperatorApproved()) ||
+        isAdmin();
+
+      allow create: if isDriver() &&
+        request.resource.data.keys().hasAll([
+          'driverId', 'documentType', 'fileName', 'fileUrl',
+          'uploadedAt', 'status', 'expiryDate', 'verifiedAt',
+          'verifiedBy', 'rejectionReason'
+        ]) &&
+        request.resource.data.driverId == request.auth.uid &&
+        validDocumentType(request.resource.data.documentType);
+
+      allow update: if (isDriver() &&
+        get(/databases/$(database)/documents/documents/$(documentId)).data.driverId == request.auth.uid &&
+        // Drivers can only update if document is pending review
+        get(/databases/$(database)/documents/documents/$(documentId)).data.status == 'pending') ||
+        isAdmin() ||
+        (isOperator() && isOperatorApproved());
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // SUPPORT TICKETS COLLECTION
+    // ============================================================
+
+    match /support_tickets/{ticketId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/support_tickets/$(ticketId)).data.userId) ||
+        isAdmin() ||
+        (isOperator() && isOperatorApproved());
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.keys().hasAll([
+          'userId', 'subject', 'description', 'priority',
+          'status', 'createdAt', 'updatedAt', 'assignedTo',
+          'category', 'bookingId'
+        ]) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.priority in ['low', 'medium', 'high', 'urgent'] &&
+        request.resource.data.status in ['open', 'in_progress', 'resolved', 'closed'] &&
+        request.resource.data.category in [
+          'booking_issue', 'payment_issue', 'driver_issue',
+          'vehicle_issue', 'account_issue', 'complaint', 'other'
+        ];
+
+      allow update: if isOwner(get(/databases/$(database)/documents/support_tickets/$(ticketId)).data.userId) ||
+        isAdmin() ||
+        (isOperator() && isOperatorApproved());
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // PRICING RULES COLLECTION
+    // ============================================================
+
+    match /pricing_rules/{ruleId} {
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'name', 'vehicleType', 'basePrice', 'perMile',
+          'perMinute', 'minimumPrice', 'surgeMultiplier',
+          'createdAt', 'updatedAt', 'active', 'operatorId',
+          'schedule', 'maxSurge'
+        ]);
+
+      allow update: if isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // DRIVER LOCATIONS COLLECTION
+    // ============================================================
+
+    match /driver_locations/{driverId} {
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow write: if isDriver() && request.auth.uid == driverId &&
+        request.resource.data.keys().hasAll([
+          'location', 'heading', 'speed', 'updatedAt',
+          'available', 'currentBookingId'
+        ]) &&
+        request.resource.data.location is geopoint;
+    }
+
+    // ============================================================
+    // SAVED LOCATIONS COLLECTION
+    // ============================================================
+
+    match /saved_locations/{locationId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/saved_locations/$(locationId)).data.userId) || isAdmin();
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.keys().hasAll([
+          'userId', 'label', 'address', 'location',
+          'createdAt', 'updatedAt', 'isDefault'
+        ]) &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow update: if isOwner(get(/databases/$(database)/documents/saved_locations/$(locationId)).data.userId) || isAdmin();
+
+      allow delete: if isOwner(get(/databases/$(database)/documents/saved_locations/$(locationId)).data.userId) || isAdmin();
+    }
+
+    // ============================================================
+    // PROMO CODES COLLECTION
+    // ============================================================
+
+    match /promo_codes/{promoId} {
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'code', 'description', 'discountType', 'discountValue',
+          'maxDiscount', 'minBookingValue', 'usageLimit',
+          'usedCount', 'validFrom', 'validUntil', 'isActive',
+          'createdAt', 'updatedAt', 'operatorId'
+        ]) &&
+        request.resource.data.discountType in ['percentage', 'fixed'] &&
+        request.resource.data.discountValue is number;
+
+      allow update: if isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // PAYOUTS COLLECTION
+    // ============================================================
+
+    match /payouts/{payoutId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/payouts/$(payoutId)).data.userId) || isAdmin();
+
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'userId', 'userType', 'amount', 'currency',
+          'status', 'createdAt', 'processedAt', 'periodStart',
+          'periodEnd', 'bookingIds', 'totalEarnings',
+          'commission', 'netAmount', 'paymentMethod',
+          'transactionId'
+        ]) &&
+        request.resource.data.userType in ['driver', 'operator'] &&
+        request.resource.data.amount is number;
+
+      allow update: if isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // AUDIT LOGS COLLECTION (ADMIN ONLY)
+    // ============================================================
+
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if false;
+      allow delete: if isSuperAdmin();
+    }
+
+    // ============================================================
+    // SETTINGS COLLECTION (ADMIN ONLY)
+    // ============================================================
+
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // ============================================================
+    // FARE CALCULATIONS COLLECTION
+    // ============================================================
+
+    match /fare_calculations/{calcId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/fare_calculations/$(calcId)).data.userId) || isAdmin();
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // ZONES COLLECTION (Service areas)
+    // ============================================================
+
+    match /zones/{zoneId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // SCHEDULED RIDES COLLECTION
+    // ============================================================
+
+    match /scheduled_rides/{rideId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/scheduled_rides/$(rideId)).data.passengerId) ||
+        isAssignedDriverOfBooking(get(/databases/$(database)/documents/scheduled_rides/$(rideId)).data.bookingId) ||
+        isAdmin();
+
+      allow create: if isPassenger() && isVerified() &&
+        request.resource.data.keys().hasAll([
+          'passengerId', 'bookingId', 'scheduledDate',
+          'recurrence', 'createdAt', 'updatedAt', 'active'
+        ]) &&
+        request.resource.data.passengerId == request.auth.uid;
+
+      allow update: if isOwner(get(/databases/$(database)/documents/scheduled_rides/$(rideId)).data.passengerId) || isAdmin();
+
+      allow delete: if isOwner(get(/databases/$(database)/documents/scheduled_rides/$(rideId)).data.passengerId) || isAdmin();
+    }
+
+    // ============================================================
+    // DRIVER EARNINGS COLLECTION
+    // ============================================================
+
+    match /driver_earnings/{earningId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/driver_earnings/$(earningId)).data.driverId) || isAdmin();
+
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'driverId', 'bookingId', 'operatorId', 'earnings',
+          'commission', 'netEarnings', 'createdAt', 'paidOut'
+        ]);
+
+      allow update: if isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // OPERATOR EARNINGS COLLECTION
+    // ============================================================
+
+    match /operator_earnings/{earningId} {
+      allow read: if isOwner(get(/databases/$(database)/documents/operator_earnings/$(earningId)).data.operatorId) || isAdmin();
+
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll([
+          'operatorId', 'bookingId', 'earnings', 'driverPayment',
+          'commission', 'netEarnings', 'createdAt', 'paidOut'
+        ]);
+
+      allow update: if isAdmin();
+
+      allow delete: if isAdmin();
+    }
+  }
+}
