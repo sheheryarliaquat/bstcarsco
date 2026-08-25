@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build --no-turbo",
+    "build": "NEXT_TURBOPACK=0 next build",
     "start": "node server.js",
     "lint": "eslint"
   },
