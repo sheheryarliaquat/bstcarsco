@@ -58,7 +58,7 @@ export function LocationAutocomplete({
       return
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyCptLq80ZFFeBZNl1l1uJjR4IHeO4j41Xw"
     if (!apiKey) return
 
     // Module-level singleton promise to ensure setOptions is called only once
