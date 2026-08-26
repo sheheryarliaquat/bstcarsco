@@ -42,45 +42,7 @@ export function LocationAutocomplete({
   const [loading, setLoading] = useState(false)
   const [geoLoading, setGeoLoading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const autocompleteServiceRef =
-    useRef<google.maps.places.AutocompleteService | null>(null)
-  const geocoderRef = useRef<google.maps.Geocoder | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const loadGoogleMaps = useCallback(async () => {
-    if (typeof window === "undefined") return
-    if (window.google?.maps?.places?.AutocompleteService) {
-      if (!autocompleteServiceRef.current) {
-        autocompleteServiceRef.current =
-          new window.google.maps.places.AutocompleteService()
-        geocoderRef.current = new window.google.maps.Geocoder()
-      }
-      return
-    }
-
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyCptLq80ZFFeBZNl1l1uJjR4IHeO4j41Xw"
-    if (!apiKey) return
-
-    // Module-level singleton promise to ensure setOptions is called only once
-    if (!(window as any).__googleMapsPromise) {
-      ;(window as any).__googleMapsPromise = (async () => {
-        const { setOptions, importLibrary } = await import("@googlemaps/js-api-loader")
-        setOptions({ key: apiKey })
-        await importLibrary("places")
-      })()
-    }
-    await (window as any).__googleMapsPromise
-
-    if (window.google?.maps?.places?.AutocompleteService) {
-      autocompleteServiceRef.current =
-        new window.google.maps.places.AutocompleteService()
-      geocoderRef.current = new window.google.maps.Geocoder()
-    }
-  }, [])
-
-  useEffect(() => {
-    loadGoogleMaps()
-  }, [loadGoogleMaps])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -95,44 +57,47 @@ export function LocationAutocomplete({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const fetchSuggestions = useCallback((query: string) => {
-    if (!autocompleteServiceRef.current || query.length < 3) {
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (query.length < 3) {
       setSuggestions([])
       return
     }
 
     setLoading(true)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const request: any = {
-      input: query,
-      componentRestrictions: { country: "gb" },
-      types: ["geocode", "establishment"],
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=gb&addressdetails=1&limit=6`
+      const res = await fetch(url, {
+        headers: { "User-Agent": "BlueStarCars/1.0 (bstcars.co)" },
+      })
+      const data = await res.json()
+
+      setSuggestions(
+        data.map((item: any) => {
+          const addr = item.address || {}
+          const parts: string[] = []
+          if (addr.road) parts.push(addr.road)
+          if (addr.city || addr.town || addr.village) parts.push(addr.city || addr.town || addr.village)
+          if (addr.state) parts.push(addr.state)
+          if (addr.postcode) parts.push(addr.postcode)
+          const secondaryText = parts.join(", ") || item.display_name?.split(",").slice(1, 3).join(",") || ""
+
+          const types: string[] = []
+          if (item.type === "aerodrome" || item.class === "aeroway") types.push("airport")
+          if (item.type === "railway" || item.class === "railway") types.push("transit_station")
+
+          return {
+            description: item.display_name || "",
+            placeId: String(item.place_id || item.osm_id || ""),
+            mainText: parts[0] || item.display_name?.split(",")[0] || "",
+            secondaryText,
+            types,
+          }
+        })
+      )
+    } catch {
+      setSuggestions([])
     }
-    autocompleteServiceRef.current.getQueryPredictions(
-      request,
-      (results, status) => {
-        setLoading(false)
-        if (
-          status === google.maps.places.PlacesServiceStatus.OK &&
-          results
-        ) {
-          setSuggestions(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            results.map((r: any) => ({
-              description: r.description ?? "",
-              placeId: r.place_id ?? "",
-              mainText:
-                r.structured_formatting?.main_text ?? "",
-              secondaryText:
-                r.structured_formatting?.secondary_text ?? "",
-              types: r.types ?? [],
-            }))
-          )
-        } else {
-          setSuggestions([])
-        }
-      }
-    )
+    setLoading(false)
   }, [])
 
   function debouncedFetch(query: string) {
@@ -151,36 +116,31 @@ export function LocationAutocomplete({
     onChange(suggestion.description)
     setShowSuggestions(false)
 
-    if (geocoderRef.current) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const request: any = { placeId: suggestion.placeId }
-      geocoderRef.current.geocode(request, (results, status) => {
-        if (status === "OK" && results?.[0]) {
-          const r = results[0]
-          const loc = r.geometry?.location
-          const components = r.address_components ?? []
-          const postcode =
-            components.find((c) => c.types.includes("postal_code"))
-              ?.long_name ?? ""
-          const city =
-            components.find((c) => c.types.includes("locality"))
-              ?.long_name ?? ""
-          const country =
-            components.find((c) => c.types.includes("country"))
-              ?.long_name ?? "United Kingdom"
+    const parts = suggestion.description.split(",")
+    const query = parts.slice(0, 2).join(",").trim()
+
+    fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=gb&limit=1`,
+      { headers: { "User-Agent": "BlueStarCars/1.0 (bstcars.co)" } }
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.[0]) {
+          const item = data[0]
+          const addr = item.address || {}
 
           onLocationSelect?.({
-            formattedAddress: r.formatted_address ?? suggestion.description,
-            latitude: loc?.lat() ?? UK_CENTER.lat,
-            longitude: loc?.lng() ?? UK_CENTER.lng,
+            formattedAddress: suggestion.description,
+            latitude: parseFloat(item.lat),
+            longitude: parseFloat(item.lon),
             placeId: suggestion.placeId,
-            postcode,
-            city,
-            country,
+            postcode: addr.postcode || "",
+            city: addr.city || addr.town || addr.village || "",
+            country: addr.country || "United Kingdom",
           })
         }
       })
-    }
+      .catch(() => {})
   }
 
   function handleUseMyLocation() {
@@ -188,43 +148,30 @@ export function LocationAutocomplete({
     setGeoLoading(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setGeoLoading(false)
-        if (geocoderRef.current) {
-          const latlng = new google.maps.LatLng(
-            pos.coords.latitude,
-            pos.coords.longitude
-          )
-          geocoderRef.current.geocode(
-            { location: latlng },
-            (results, status) => {
-              if (status === "OK" && results?.[0]) {
-                const r = results[0]
-                const components = r.address_components ?? []
-                const postcode =
-                  components.find((c) => c.types.includes("postal_code"))
-                    ?.long_name ?? ""
-                const city =
-                  components.find((c) => c.types.includes("locality"))
-                    ?.long_name ?? ""
-                const country =
-                  components.find((c) => c.types.includes("country"))
-                    ?.long_name ?? "United Kingdom"
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=18`,
+          { headers: { "User-Agent": "BlueStarCars/1.0 (bstcars.co)" } }
+        )
+          .then((r) => r.json())
+          .then((data) => {
+            setGeoLoading(false)
+            const addr = data.address || {}
+            const formattedAddress = data.display_name || ""
+            onChange(formattedAddress)
 
-                const addr = r.formatted_address ?? ""
-                onChange(addr)
-                onLocationSelect?.({
-                  formattedAddress: addr,
-                  latitude: pos.coords.latitude,
-                  longitude: pos.coords.longitude,
-                  placeId: r.place_id ?? "",
-                  postcode,
-                  city,
-                  country,
-                })
-              }
-            }
-          )
-        }
+            onLocationSelect?.({
+              formattedAddress,
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              placeId: String(data.place_id || ""),
+              postcode: addr.postcode || "",
+              city: addr.city || addr.town || addr.village || "",
+              country: addr.country || "United Kingdom",
+            })
+          })
+          .catch(() => {
+            setGeoLoading(false)
+          })
       },
       () => {
         setGeoLoading(false)
