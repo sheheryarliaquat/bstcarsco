@@ -29,6 +29,18 @@ jobs:
       - name: Build static site (next export -> out/)
         run: npm run build
 
+      - name: Diagnose FTP connectivity from runner
+        run: |
+          echo "--- DNS ---"
+          getent hosts ${{ secrets.FTP_SERVER }}
+          echo "--- TCP 21 with 15s timeout ---"
+          timeout 15 bash -c 'exec 3<>/dev/tcp/${{ secrets.FTP_SERVER }}/21' && echo "TCP-21-OK" || echo "TCP-21-FAILED"
+          echo "--- FTP banner (plain) ---"
+          timeout 15 curl -sS --connect-timeout 10 ftp://${{ secrets.FTP_SERVER }}/ 2>&1 | head -5
+          echo "--- FTP banner (FTPS explicit) ---"
+          timeout 15 curl -sS --connect-timeout 10 --ssl-reqd ftp://${{ secrets.FTP_SERVER }}/ 2>&1 | head -5
+        shell: bash
+
       - name: Deploy out/ to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
