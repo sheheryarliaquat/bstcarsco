@@ -811,6 +811,7 @@ export const DEMO_DATA = {
       isHybrid: true,
       photoURL: '/vehicles/toyota-prius-2024.jpg',
       isApproved: true,
+      availabilityStatus: 'available',
     },
     {
       id: 'veh-002',
@@ -829,6 +830,7 @@ export const DEMO_DATA = {
       isHybrid: false,
       photoURL: '/vehicles/mercedes-eclass-2023.jpg',
       isApproved: true,
+      availabilityStatus: 'in_use',
     },
     {
       id: 'veh-003',
@@ -847,6 +849,7 @@ export const DEMO_DATA = {
       isHybrid: true,
       photoURL: '/vehicles/ford-mondeo-2024.jpg',
       isApproved: true,
+      availabilityStatus: 'available',
     },
     {
       id: 'veh-004',
@@ -865,6 +868,8 @@ export const DEMO_DATA = {
       isHybrid: false,
       photoURL: '/vehicles/vw-touran-2023.jpg',
       isApproved: true,
+      availabilityStatus: 'out_of_service',
+      availabilityNote: 'Scheduled service — back Monday',
     },
     {
       id: 'veh-005',
@@ -883,6 +888,7 @@ export const DEMO_DATA = {
       isHybrid: false,
       photoURL: '/vehicles/citroen-berlingo-2024.jpg',
       isApproved: true,
+      availabilityStatus: 'available',
     },
     {
       id: 'veh-006',
@@ -901,6 +907,7 @@ export const DEMO_DATA = {
       isHybrid: false,
       photoURL: '/vehicles/hyundai-ioniq5-2025.jpg',
       isApproved: true,
+      availabilityStatus: 'available',
     },
   ] as Vehicle[],
 

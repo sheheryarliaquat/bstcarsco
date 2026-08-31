@@ -19,8 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { signIn, getUserData } from "@/lib/firebase/auth"
-import { DEFAULT_ADMIN } from "@/constants"
+import { signIn, getUserData, signOutUser } from "@/lib/firebase/auth"
 
 const loginSchema = z.object({
   email: z
@@ -47,10 +46,6 @@ export default function AdminLoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: DEFAULT_ADMIN.email,
-      password: DEFAULT_ADMIN.password,
-    },
   })
 
   async function onSubmit(data: LoginFormData) {
@@ -60,9 +55,11 @@ export default function AdminLoginPage() {
       const result = await signIn(data.email, data.password)
       const userData = await getUserData(result.user.uid)
       const role = userData?.role || "passenger"
-      if (role === "admin") {
+      if (role === "admin" || role === "super_admin") {
         router.push("/admin/dashboard")
       } else {
+        // Don't leave a non-admin session signed in on the admin portal.
+        await signOutUser()
         setError("You do not have admin access. Please use the admin credentials.")
       }
     } catch (err: unknown) {
@@ -221,12 +218,6 @@ export default function AdminLoginPage() {
                 )}
               </Button>
             </form>
-
-            <div className="mt-4 rounded-lg bg-[#F5F7FA] p-3 text-xs text-[#6B7280]">
-              <p className="font-semibold text-[#172033]">Demo Credentials:</p>
-              <p className="mt-1">Email: {DEFAULT_ADMIN.email}</p>
-              <p>Password: {DEFAULT_ADMIN.password}</p>
-            </div>
           </div>
 
           <div className="mt-6 text-center">

@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   ClipboardList,
@@ -25,6 +25,7 @@ import {
   Bell,
   Route,
   DollarSign,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -36,6 +37,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useAuth } from "@/hooks/useAuth"
+import type { User as AppUser } from "@/types"
+
+const ADMIN_ROLES = ["admin", "super_admin"]
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -58,8 +63,22 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings", path: "/admin/settings", icon: Settings },
 ] as const
 
-function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
+function SidebarContent({
+  onNavClick,
+  userData,
+  onLogout,
+}: {
+  onNavClick?: () => void
+  userData: AppUser | null
+  onLogout: () => void
+}) {
   const pathname = usePathname()
+  const displayName = userData
+    ? `${userData.firstName} ${userData.lastName}`.trim() || "Admin"
+    : "Admin"
+  const initials = userData
+    ? `${userData.firstName?.[0] ?? ""}${userData.lastName?.[0] ?? ""}`.toUpperCase() || "A"
+    : "A"
 
   return (
     <div className="flex h-full flex-col bg-[#172F52]">
@@ -113,7 +132,10 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
       <Separator className="mx-5 bg-white/10" />
 
       <div className="px-3 py-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-red-500/20 hover:text-red-400">
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-red-500/20 hover:text-red-400"
+        >
           <LogOut className="h-[18px] w-[18px] shrink-0" />
           <span>Logout</span>
         </button>
@@ -124,18 +146,26 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
           <AvatarFallback className="bg-[#D4145A] text-sm font-semibold text-white">
-            SA
+            {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-white">
-            Super Admin
+            {displayName}
           </p>
           <p className="truncate text-[11px] text-white/50">
-            admin@bstcars.co
+            {userData?.email ?? ""}
           </p>
         </div>
       </div>
+    </div>
+  )
+}
+
+function FullScreenLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
     </div>
   )
 }
@@ -146,12 +176,42 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user, userData, loading, signOut } = useAuth()
+
+  const isLoginPage = pathname === "/admin/login"
+  const isAdmin = !!user && !!userData && ADMIN_ROLES.includes(userData.role)
+
+  useEffect(() => {
+    if (isLoginPage) return
+    if (!loading && !isAdmin) {
+      router.replace("/admin/login")
+    }
+  }, [isLoginPage, loading, isAdmin, router])
+
+  async function handleLogout() {
+    await signOut()
+    router.replace("/admin/login")
+  }
+
+  // The login page renders its own full-screen layout (branding panel +
+  // form) and must never be nested inside the authenticated dashboard shell.
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  // Block rendering of any admin page until we've confirmed the visitor is
+  // a logged-in admin — otherwise the dashboard briefly flashes for anyone.
+  if (loading || !isAdmin) {
+    return <FullScreenLoader />
+  }
 
   return (
     <div className="flex min-h-screen bg-[#F5F7FA]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <SidebarContent />
+        <SidebarContent userData={userData} onLogout={handleLogout} />
       </aside>
 
       {/* Mobile header */}
@@ -167,7 +227,11 @@ export default function AdminLayout({
           />
           <SheetContent side="left" className="w-72 p-0">
             <SheetTitle className="sr-only">Admin navigation</SheetTitle>
-            <SidebarContent onNavClick={() => setMobileOpen(false)} />
+            <SidebarContent
+              onNavClick={() => setMobileOpen(false)}
+              userData={userData}
+              onLogout={handleLogout}
+            />
           </SheetContent>
         </Sheet>
 
@@ -206,10 +270,12 @@ export default function AdminLayout({
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-[#172F52] text-xs font-semibold text-white">
-                  SA
+                  {`${userData?.firstName?.[0] ?? ""}${userData?.lastName?.[0] ?? ""}`.toUpperCase() || "A"}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium text-[#172F52]">Super Admin</span>
+              <span className="text-sm font-medium text-[#172F52]">
+                {`${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`.trim() || "Admin"}
+              </span>
             </div>
           </div>
         </div>

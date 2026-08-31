@@ -41,7 +41,7 @@ import { PaymentForm } from "@/components/shared/PaymentForm";
 import { DEMO_DATA } from "@/constants";
 import { BookingStatus, type Booking, type PaymentStatus } from "@/types";
 import { createBooking } from "@/lib/services/booking-service";
-import { getAuth } from "firebase/auth";
+import { auth as getFirebaseAuth } from "@/lib/firebase/config";
 import { format } from "date-fns";
 
 const passengerSchema = z.object({
@@ -119,9 +119,15 @@ export default function CheckoutPage() {
     setPaymentError("");
 
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      const passengerId = user?.uid || "guest-" + Date.now();
+      let passengerId = "guest-" + Date.now();
+      try {
+        // Firebase Auth is optional here — a signed-out guest paying by
+        // cash should never be blocked by an auth/Firestore hiccup.
+        const currentUser = getFirebaseAuth().currentUser;
+        if (currentUser) passengerId = currentUser.uid;
+      } catch {
+        // Proceed as guest.
+      }
 
       const bookingData: Omit<Booking, 'bookingNumber' | 'createdAt' | 'updatedAt'> = {
         passengerId,

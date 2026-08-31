@@ -27,6 +27,8 @@ export type TripType = 'one_way' | 'return';
 
 export type VehicleType = 'saloon' | 'executive' | 'estate' | 'mpv' | 'minibus' | 'electric' | 'wheelchair_accessible';
 
+export type VehicleAvailabilityStatus = 'available' | 'in_use' | 'out_of_service';
+
 export type DocumentStatus = 'pending' | 'approved' | 'rejected' | 'expired';
 
 export type SupportStatus = 'open' | 'in_progress' | 'waiting' | 'resolved' | 'closed';
@@ -189,6 +191,10 @@ export interface Vehicle {
   isHybrid: boolean;
   photoURL?: string;
   isApproved: boolean;
+  /** Current fleet availability, set by admins. Defaults to 'available' when absent. */
+  availabilityStatus?: VehicleAvailabilityStatus;
+  availabilityNote?: string;
+  availabilityUpdatedAt?: string;
 }
 
 export interface Booking {

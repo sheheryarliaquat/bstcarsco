@@ -14,6 +14,8 @@ import {
   XCircle,
   Save,
   DollarSign,
+  Wrench,
+  Clock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -24,7 +26,21 @@ import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { VEHICLE_TYPES } from "@/constants"
 import { DEMO_DATA } from "@/constants"
-import type { Vehicle, VehicleType } from "@/types"
+import { updateVehicle } from "@/lib/services/vehicle-service"
+import type { Vehicle, VehicleType, VehicleAvailabilityStatus } from "@/types"
+
+const AVAILABILITY_META: Record<
+  VehicleAvailabilityStatus,
+  { label: string; badgeClass: string; icon: typeof CheckCircle }
+> = {
+  available: { label: "Available", badgeClass: "bg-green-50 text-green-700", icon: CheckCircle },
+  in_use: { label: "In Use", badgeClass: "bg-amber-50 text-amber-700", icon: Clock },
+  out_of_service: { label: "Out of Service", badgeClass: "bg-red-50 text-red-700", icon: Wrench },
+}
+
+function getAvailability(v: Vehicle): VehicleAvailabilityStatus {
+  return v.availabilityStatus ?? "available"
+}
 
 interface VehicleRate {
   vehicleType: VehicleType
@@ -80,6 +96,7 @@ export default function AdminVehiclesPage() {
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [availabilityFilter, setAvailabilityFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
   const [pageSize] = useState(10)
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
@@ -118,8 +135,11 @@ export default function AdminVehiclesPage() {
     if (statusFilter !== "all") {
       result = result.filter((v) => (statusFilter === "approved" ? v.isApproved : !v.isApproved))
     }
+    if (availabilityFilter !== "all") {
+      result = result.filter((v) => getAvailability(v) === availabilityFilter)
+    }
     return result
-  }, [search, typeFilter, statusFilter, vehicles])
+  }, [search, typeFilter, statusFilter, availabilityFilter, vehicles])
 
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
@@ -146,6 +166,7 @@ export default function AdminVehiclesPage() {
       isElectric: newVehicle.isElectric,
       isHybrid: newVehicle.isHybrid,
       isApproved: false,
+      availabilityStatus: "available",
     }
     setVehicles((prev) => [vehicle, ...prev])
     setNewVehicle(EMPTY_VEHICLE)
@@ -162,6 +183,21 @@ export default function AdminVehiclesPage() {
     setVehicles((prev) =>
       prev.map((v) => (v.id === vehicle.id ? { ...v, isApproved: true } : v))
     )
+  }
+
+  function handleSetAvailability(vehicle: Vehicle, status: VehicleAvailabilityStatus) {
+    const availabilityUpdatedAt = new Date().toISOString()
+    setVehicles((prev) =>
+      prev.map((v) =>
+        v.id === vehicle.id ? { ...v, availabilityStatus: status, availabilityUpdatedAt } : v
+      )
+    )
+    setSelectedVehicle((prev) =>
+      prev && prev.id === vehicle.id ? { ...prev, availabilityStatus: status, availabilityUpdatedAt } : prev
+    )
+    // Best-effort sync to Firestore; the demo fleet keeps working from local
+    // state even when there's no live backend to write to.
+    updateVehicle(vehicle.id, { availabilityStatus: status, availabilityUpdatedAt }).catch(() => {})
   }
 
   function updateRate(index: number, field: keyof VehicleRate, value: number) {
@@ -253,6 +289,36 @@ export default function AdminVehiclesPage() {
             {v.isApproved ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
             {v.isApproved ? "Approved" : "Pending"}
           </span>
+        )
+      },
+    },
+    {
+      key: "availability",
+      header: "Availability",
+      render: (row) => {
+        const v = row as unknown as Vehicle
+        const current = getAvailability(v)
+        const meta = AVAILABILITY_META[current]
+        const Icon = meta.icon
+        return (
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold", meta.badgeClass)}>
+              <Icon className="h-3 w-3" />
+              {meta.label}
+            </span>
+            <select
+              aria-label={`Change availability for ${v.make} ${v.model}`}
+              value={current}
+              onChange={(e) => handleSetAvailability(v, e.target.value as VehicleAvailabilityStatus)}
+              className="h-7 rounded-md border border-[#D9E0E8] bg-white px-1.5 text-xs text-[#172F52] outline-none focus:border-[#D4145A]"
+            >
+              {(Object.keys(AVAILABILITY_META) as VehicleAvailabilityStatus[]).map((status) => (
+                <option key={status} value={status}>
+                  {AVAILABILITY_META[status].label}
+                </option>
+              ))}
+            </select>
+          </div>
         )
       },
     },
@@ -406,6 +472,16 @@ export default function AdminVehiclesPage() {
             <option value="all">All Statuses</option>
             <option value="approved">Approved</option>
             <option value="pending">Pending</option>
+          </select>
+          <select
+            value={availabilityFilter}
+            onChange={(e) => { setAvailabilityFilter(e.target.value); setPage(1) }}
+            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+          >
+            <option value="all">All Availability</option>
+            {(Object.keys(AVAILABILITY_META) as VehicleAvailabilityStatus[]).map((status) => (
+              <option key={status} value={status}>{AVAILABILITY_META[status].label}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -644,6 +720,35 @@ export default function AdminVehiclesPage() {
                   {selectedVehicle.isApproved ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                   {selectedVehicle.isApproved ? "Approved" : "Pending Approval"}
                 </span>
+              </div>
+              <div className="rounded-lg bg-[#F5F7FA] p-3 sm:col-span-2">
+                <p className="mb-1.5 text-xs font-semibold uppercase text-[#6B7280]">Fleet Availability</p>
+                <div className="flex flex-wrap gap-2">
+                  {(Object.keys(AVAILABILITY_META) as VehicleAvailabilityStatus[]).map((status) => {
+                    const meta = AVAILABILITY_META[status]
+                    const Icon = meta.icon
+                    const isCurrent = getAvailability(selectedVehicle) === status
+                    return (
+                      <button
+                        key={status}
+                        type="button"
+                        onClick={() => handleSetAvailability(selectedVehicle, status)}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
+                          isCurrent
+                            ? cn(meta.badgeClass, "border-transparent")
+                            : "border-[#D9E0E8] bg-white text-[#6B7280] hover:bg-[#F5F7FA]"
+                        )}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {meta.label}
+                      </button>
+                    )
+                  })}
+                </div>
+                {selectedVehicle.availabilityNote && (
+                  <p className="mt-2 text-xs text-[#6B7280]">{selectedVehicle.availabilityNote}</p>
+                )}
               </div>
             </div>
           </div>
