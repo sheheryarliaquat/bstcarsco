@@ -73,11 +73,11 @@ export function Footer() {
             </p>
             <div className="flex flex-col gap-2 text-sm text-gray-300">
               <a
-                href="tel:+44800123456"
+                href="tel:+442030029067"
                 className="flex items-center gap-2 hover:text-white"
               >
                 <Phone className="h-4 w-4" />
-                0800 123 456
+                020 3002 9067
               </a>
               <a
                 href="mailto:support@bstcars.co"

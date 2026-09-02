@@ -11,7 +11,7 @@ const CONTACT_INFO = [
   {
     icon: Phone,
     title: "Phone",
-    details: ["0800 123 456", "Mon – Fri: 8am – 8pm", "Sat – Sun: 9am – 6pm"],
+    details: ["020 3002 9067", "Mon – Fri: 8am – 8pm", "Sat – Sun: 9am – 6pm"],
   },
   {
     icon: Mail,
