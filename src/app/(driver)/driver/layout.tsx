@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   ClipboardList,
@@ -16,8 +16,8 @@ import {
   Star,
   Clock,
   Menu,
-  X,
   ChevronRight,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Switch } from "@/components/ui/switch"
-import { RatingStars } from "@/components/shared/RatingStars"
+import { useAuth } from "@/hooks/useAuth"
+import type { User as AppUser } from "@/types"
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/driver/dashboard", icon: LayoutDashboard },
@@ -49,12 +50,22 @@ function DriverSidebarContent({
   isOnline,
   setIsOnline,
   onNavClick,
+  userData,
+  onLogout,
 }: {
   isOnline: boolean
   setIsOnline: (v: boolean) => void
   onNavClick?: () => void
+  userData: AppUser | null
+  onLogout: () => void
 }) {
   const pathname = usePathname()
+  const displayName = userData
+    ? `${userData.firstName} ${userData.lastName}`.trim() || "Driver"
+    : "Driver"
+  const initials = userData
+    ? `${userData.firstName?.[0] ?? ""}${userData.lastName?.[0] ?? ""}`.toUpperCase() || "D"
+    : "D"
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -123,7 +134,10 @@ function DriverSidebarContent({
       <Separator className="mx-5" />
 
       <div className="px-3 py-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600">
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600"
+        >
           <LogOut className="h-5 w-5 shrink-0" />
           <span>Logout</span>
         </button>
@@ -134,16 +148,26 @@ function DriverSidebarContent({
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
           <AvatarFallback className="bg-[#172F52] text-sm font-semibold text-white">
-            MH
+            {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[#172F52]">
-            Mohammed Hassan
+            {displayName}
           </p>
-          <RatingStars rating={4.9} size="sm" count={847} />
+          <p className="truncate text-[11px] text-[#6B7280]">
+            {userData?.email ?? ""}
+          </p>
         </div>
       </div>
+    </div>
+  )
+}
+
+function FullScreenLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
     </div>
   )
 }
@@ -155,6 +179,39 @@ export default function DriverLayout({
 }) {
   const [isOnline, setIsOnline] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user, userData, loading, signOut } = useAuth()
+
+  // Tolerate a trailing slash so this never mismatches and traps the
+  // login page in its own guard (see the same pattern in the admin layout).
+  const isLoginPage = pathname?.replace(/\/$/, "") === "/driver/login"
+  const isDriver = !!user && !!userData && userData.role === "driver"
+
+  useEffect(() => {
+    if (isLoginPage) return
+    if (!loading && !isDriver) {
+      router.replace("/driver/login")
+    }
+  }, [isLoginPage, loading, isDriver, router])
+
+  async function handleLogout() {
+    await signOut()
+    router.replace("/driver/login")
+  }
+
+  // The login page renders its own full-screen layout and must never be
+  // nested inside the authenticated driver dashboard shell.
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  // Block rendering of any driver page until we've confirmed the visitor
+  // is a logged-in driver — otherwise the dashboard briefly flashes for
+  // anyone who isn't.
+  if (loading || !isDriver) {
+    return <FullScreenLoader />
+  }
 
   return (
     <div className="flex min-h-screen bg-[#F5F7FA]">
@@ -163,6 +220,8 @@ export default function DriverLayout({
         <DriverSidebarContent
           isOnline={isOnline}
           setIsOnline={setIsOnline}
+          userData={userData}
+          onLogout={handleLogout}
         />
       </aside>
 
@@ -183,6 +242,8 @@ export default function DriverLayout({
               isOnline={isOnline}
               setIsOnline={setIsOnline}
               onNavClick={() => setMobileOpen(false)}
+              userData={userData}
+              onLogout={handleLogout}
             />
           </SheetContent>
         </Sheet>

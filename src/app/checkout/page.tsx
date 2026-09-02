@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,6 @@ import {
   Mail,
   Phone,
   Lock,
-  MessageSquare,
   Tag,
   MapPin,
   Calendar,
@@ -27,7 +26,7 @@ import {
   ChevronUp,
   Banknote,
   CheckCircle2,
-  ShieldCheck,
+  SearchX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,13 +34,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "@/components/booking/BookingProgress";
 import { PaymentForm } from "@/components/shared/PaymentForm";
-import { DEMO_DATA } from "@/constants";
-import { BookingStatus, type Booking, type PaymentStatus } from "@/types";
+import { BookingStatus, type Booking } from "@/types";
 import { createBooking } from "@/lib/services/booking-service";
 import { auth as getFirebaseAuth } from "@/lib/firebase/config";
+import { getBookingDraft, clearBookingDraft, type BookingDraft } from "@/lib/booking-draft";
 import { format } from "date-fns";
 
 const passengerSchema = z.object({
@@ -73,11 +71,21 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState("");
   const [specialOpen, setSpecialOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+  const [draft, setDraft] = useState<BookingDraft | null>(null);
+  const [draftChecked, setDraftChecked] = useState(false);
 
-  const quote = DEMO_DATA.quotes[0];
-  const booking = DEMO_DATA.bookings[3];
+  useEffect(() => {
+    setDraft(getBookingDraft());
+    setDraftChecked(true);
+  }, []);
 
-  const basePrice = quote.price;
+  const quote = draft?.quote;
+
+  // Pre-tax subtotal (fare + fees + surcharges) from the real quote —
+  // VAT is applied on top of this, once, below. The old version priced
+  // off DEMO_DATA.quotes[0].price (already tax-inclusive) and then added
+  // another 20% on top of it, effectively double-taxing every booking.
+  const basePrice = quote?.breakdown.subtotal ?? 0;
   const discount = promoDiscount;
   const tax = (basePrice - discount) * 0.2;
   const total = basePrice - discount + tax;
@@ -115,6 +123,8 @@ export default function CheckoutPage() {
   }
 
   async function handlePayment() {
+    if (!draft || !quote) return;
+
     setPaymentLoading(true);
     setPaymentError("");
 
@@ -133,18 +143,19 @@ export default function CheckoutPage() {
         passengerId,
         operatorId: quote.operatorId,
         driverId: "",
-        vehicleId: "",
-        tripType: "one_way",
-        pickup: booking.pickup,
-        destination: booking.destination,
-        viaStops: booking.viaStops || [],
-        date: booking.date,
-        pickupTime: booking.pickupTime,
-        passengers: booking.passengers,
-        luggage: booking.luggage,
+        vehicleId: quote.vehicleId,
+        tripType: draft.tripType,
+        pickup: draft.pickup,
+        destination: draft.destination,
+        viaStops: [],
+        date: draft.date,
+        pickupTime: draft.time,
+        passengers: draft.passengers,
+        luggage: draft.luggage,
+        specialRequirements: draft.specialRequirements,
         vehicleType: quote.vehicleType,
-        distanceMiles: booking.distanceMiles,
-        estimatedDuration: booking.estimatedDuration,
+        distanceMiles: draft.distanceMiles,
+        estimatedDuration: quote.estimatedDuration,
         price: basePrice,
         discount,
         tax,
@@ -157,9 +168,10 @@ export default function CheckoutPage() {
           : BookingStatus.Confirmed,
       };
 
-      await createBooking(bookingData);
+      const bookingId = await createBooking(bookingData);
+      clearBookingDraft();
 
-      router.push(`/booking-confirmation?payment=${paymentMethod}`);
+      router.push(`/booking-confirmation?payment=${paymentMethod}&bookingId=${encodeURIComponent(bookingId)}`);
     } catch (err) {
       setPaymentError(err instanceof Error ? err.message : "Failed to create booking. Please try again.");
     } finally {
@@ -169,6 +181,38 @@ export default function CheckoutPage() {
 
   function onSubmit(_data: PassengerFormData) {
     handlePayment();
+  }
+
+  if (!draftChecked) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+      </div>
+    );
+  }
+
+  if (!draft || !quote) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA] px-4">
+        <div className="max-w-md rounded-xl border border-[#D9E0E8] bg-white p-8 text-center">
+          <SearchX className="mx-auto mb-4 h-12 w-12 text-[#D9E0E8]" />
+          <h1 className="text-lg font-bold text-[#172F52]">
+            No booking selected
+          </h1>
+          <p className="mt-2 text-sm text-[#6B7280]">
+            Your quote selection has expired or wasn&apos;t found. Please
+            search again and pick a quote to continue.
+          </p>
+          <Button
+            render={<Link href="/" />}
+            nativeButton={false}
+            className="mt-5 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          >
+            Start a new search
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -550,7 +594,7 @@ export default function CheckoutPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-[#6B7280]">Pickup</p>
                       <p className="truncate text-sm font-medium text-[#172033]">
-                        {booking.pickup.formattedAddress}
+                        {draft.pickup.formattedAddress}
                       </p>
                     </div>
                   </div>
@@ -560,7 +604,7 @@ export default function CheckoutPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-[#6B7280]">Destination</p>
                       <p className="truncate text-sm font-medium text-[#172033]">
-                        {booking.destination.formattedAddress}
+                        {draft.destination.formattedAddress}
                       </p>
                     </div>
                   </div>
@@ -571,11 +615,11 @@ export default function CheckoutPage() {
                 <div className="mb-3 space-y-2 text-sm">
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Calendar className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {format(new Date(booking.date), "dd MMMM yyyy")}
+                    {format(new Date(draft.date), "dd MMMM yyyy")}
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Clock className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {booking.pickupTime}
+                    {draft.time}
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Car className="h-3.5 w-3.5 text-[#6B7280]" />
@@ -587,13 +631,13 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Users className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {booking.passengers}{" "}
-                    {booking.passengers === 1 ? "Passenger" : "Passengers"}
+                    {draft.passengers}{" "}
+                    {draft.passengers === 1 ? "Passenger" : "Passengers"}
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Briefcase className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {booking.luggage}{" "}
-                    {booking.luggage === 1 ? "Luggage" : "Luggage items"}
+                    {draft.luggage}{" "}
+                    {draft.luggage === 1 ? "Luggage" : "Luggage items"}
                   </div>
                 </div>
 

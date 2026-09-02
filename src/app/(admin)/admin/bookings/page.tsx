@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import React from "react"
 import {
   Search,
@@ -8,31 +8,34 @@ import {
   Filter,
   Eye,
   X,
-  RefreshCw,
   Printer,
   ChevronDown,
   ChevronUp,
   MapPin,
-  Clock,
-  User,
-  Car,
-  CreditCard,
   CheckCircle2,
-  Banknote,
+  Loader2,
+  AlertCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTable, type Column } from "@/components/shared/DataTable"
+import type { Column } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { DEMO_DATA } from "@/constants"
 import { BOOKING_STATUSES, PAYMENT_STATUSES, UK_CITIES } from "@/constants"
-import type { Booking } from "@/types"
+import type { Booking, User as AppUser, Vehicle } from "@/types"
 import { BookingStatus } from "@/types"
+import { listenToAllBookings, updateBooking } from "@/lib/services/booking-service"
+import { listenToUsersByRole, getUsersByRole } from "@/lib/services/user-service"
+import { listenToVehicles } from "@/lib/services/vehicle-service"
 
-const ALL_BOOKINGS = DEMO_DATA.bookings
+// Firestore documents carry their doc id alongside the typed fields (see
+// queryDocuments/onSnapshotListener in lib/firebase/firestore.ts) even
+// though the Booking type itself doesn't declare `id` — this is the id
+// needed for updateBooking() writes below.
+type BookingRow = Booking & { id: string }
 
 const PAGE_SIZES = [10, 25, 50, 100]
 
@@ -43,13 +46,59 @@ export default function AdminBookingsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [paymentFilter, setPaymentFilter] = useState<string>("all")
   const [showFilters, setShowFilters] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [cancelBooking, setCancelBooking] = useState<Booking | null>(null)
+  const [cancelBooking, setCancelBooking] = useState<BookingRow | null>(null)
   const [expandedRow, setExpandedRow] = useState<string | null>(null)
-  const [cashActionBooking, setCashActionBooking] = useState<Booking | null>(null)
+  const [cashActionBooking, setCashActionBooking] = useState<BookingRow | null>(null)
   const [cashActionType, setCashActionType] = useState<"approve" | "reject">("approve")
-  const [bookings, setBookings] = useState<Booking[]>(ALL_BOOKINGS)
+  const [bookings, setBookings] = useState<BookingRow[]>([])
+  const [bookingsLoading, setBookingsLoading] = useState(true)
+  const [loadError, setLoadError] = useState("")
+  const [drivers, setDrivers] = useState<AppUser[]>([])
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [passengers, setPassengers] = useState<AppUser[]>([])
+
+  useEffect(() => {
+    const unsubscribe = listenToAllBookings(
+      (data) => {
+        setBookings(data as BookingRow[])
+        setBookingsLoading(false)
+        setLoadError("")
+      },
+      (err) => {
+        console.error("AdminBookingsPage: listenToAllBookings failed —", err)
+        setLoadError("Could not load bookings from the database.")
+        setBookingsLoading(false)
+      }
+    )
+    return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = listenToUsersByRole(
+      "driver",
+      (users) => setDrivers(users),
+      (err) => console.error("AdminBookingsPage: listenToUsersByRole(driver) failed —", err)
+    )
+    return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = listenToVehicles(
+      (data) => setVehicles(data),
+      (err) => console.error("AdminBookingsPage: listenToVehicles failed —", err)
+    )
+    return unsubscribe
+  }, [])
+
+  useEffect(() => {
+    // One-time load (not a live listener) — passenger names here are a
+    // display convenience, not the primary data this page manages.
+    getUsersByRole("passenger")
+      .then(setPassengers)
+      .catch((err) => console.error("AdminBookingsPage: getUsersByRole(passenger) failed —", err))
+  }, [])
 
   const filtered = useMemo(() => {
     let result = [...bookings]
@@ -73,57 +122,76 @@ export default function AdminBookingsPage() {
     }
 
     return result
-  }, [search, statusFilter, paymentFilter])
+  }, [bookings, search, statusFilter, paymentFilter])
 
-  const totalPages = Math.ceil(filtered.length / pageSize)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
 
   const getPassengerName = (passengerId: string) => {
-    const p = DEMO_DATA.passengers.find((p) => p.uid === passengerId)
-    return p ? `${p.firstName} ${p.lastName}` : "Unknown"
+    if (!passengerId) return "Unknown"
+    if (passengerId.startsWith("guest-")) return "Guest"
+    const p = passengers.find((p) => p.uid === passengerId)
+    return p ? `${p.firstName} ${p.lastName}` : "Guest"
   }
 
   const getOperatorName = (operatorId: string) => {
+    if (!operatorId) return "-"
     const o = DEMO_DATA.operators.find((o) => o.uid === operatorId)
     return o?.companyName ?? "Unknown"
   }
 
-  const getDriverName = (driverId: string) => {
-    if (!driverId) return "Unassigned"
-    const d = DEMO_DATA.drivers.find((d) => d.uid === driverId)
-    return d ? `${d.firstName} ${d.lastName}` : "Unknown"
-  }
-
   const getVehicleInfo = (vehicleId: string) => {
     if (!vehicleId) return "-"
-    const v = DEMO_DATA.vehicles.find((v) => v.id === vehicleId)
+    const v = vehicles.find((v) => v.id === vehicleId)
     return v ? `${v.make} ${v.model}` : "Unknown"
   }
 
-  function handleViewBooking(booking: Booking) {
+  function handleViewBooking(booking: BookingRow) {
     setSelectedBooking(booking)
     setDetailOpen(true)
   }
 
-  function handleCashAction(booking: Booking, action: "approve" | "reject") {
+  function handleCashAction(booking: BookingRow, action: "approve" | "reject") {
     setCashActionBooking(booking)
     setCashActionType(action)
   }
 
-  function confirmCashAction() {
+  async function confirmCashAction() {
     if (!cashActionBooking) return
-    setBookings((prev) =>
-      prev.map((b) =>
-        b.bookingNumber === cashActionBooking.bookingNumber
-          ? {
-              ...b,
-              bookingStatus: cashActionType === "approve" ? BookingStatus.Confirmed : BookingStatus.CancelledByAdmin,
-              paymentStatus: cashActionType === "approve" ? ("pending" as const) : ("refunded" as const),
-            }
-          : b
-      )
-    )
-    setCashActionBooking(null)
+    try {
+      await updateBooking(cashActionBooking.id, {
+        bookingStatus: cashActionType === "approve" ? BookingStatus.Confirmed : BookingStatus.CancelledByAdmin,
+        paymentStatus: cashActionType === "approve" ? "pending" : "refunded",
+      })
+    } catch (err) {
+      console.error("confirmCashAction failed —", err)
+    } finally {
+      setCashActionBooking(null)
+    }
+  }
+
+  async function handleAssignDriver(booking: BookingRow, driverId: string) {
+    try {
+      await updateBooking(booking.id, {
+        driverId,
+        ...(driverId && booking.bookingStatus === BookingStatus.Confirmed
+          ? { bookingStatus: BookingStatus.DriverAssigned }
+          : {}),
+      })
+    } catch (err) {
+      console.error("handleAssignDriver failed —", err)
+    }
+  }
+
+  async function handleCancelBooking() {
+    if (!cancelBooking) return
+    try {
+      await updateBooking(cancelBooking.id, { bookingStatus: BookingStatus.CancelledByAdmin })
+    } catch (err) {
+      console.error("handleCancelBooking failed —", err)
+    } finally {
+      setCancelBooking(null)
+    }
   }
 
   const columns: Column<Record<string, unknown>>[] = [
@@ -192,11 +260,21 @@ export default function AdminBookingsPage() {
       key: "driverId",
       header: "Driver",
       render: (row) => {
-        const name = getDriverName(row.driverId as string)
+        const b = row as unknown as BookingRow
         return (
-          <span className={cn("text-sm", name === "Unassigned" ? "italic text-[#6B7280]" : "text-[#172F52]")}>
-            {name}
-          </span>
+          <div onClick={(e) => e.stopPropagation()}>
+            <select
+              aria-label={`Assign driver for ${b.bookingNumber}`}
+              value={b.driverId || ""}
+              onChange={(e) => handleAssignDriver(b, e.target.value)}
+              className="h-8 max-w-[150px] rounded-md border border-[#D9E0E8] bg-white px-1.5 text-xs text-[#172F52] outline-none focus:border-[#D4145A]"
+            >
+              <option value="">Unassigned</option>
+              {drivers.map((d) => (
+                <option key={d.uid} value={d.uid}>{d.firstName} {d.lastName}</option>
+              ))}
+            </select>
+          </div>
         )
       },
     },
@@ -245,6 +323,13 @@ export default function AdminBookingsPage() {
           </Button>
         </div>
       </div>
+
+      {loadError && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {loadError}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
@@ -327,6 +412,11 @@ export default function AdminBookingsPage() {
       </div>
 
       {/* Data Table */}
+      {bookingsLoading ? (
+        <div className="flex items-center justify-center rounded-xl border border-[#D9E0E8] bg-white py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-[#D4145A]" />
+        </div>
+      ) : (
       <div className="rounded-xl border border-[#D9E0E8] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -507,6 +597,7 @@ export default function AdminBookingsPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Booking Detail Modal */}
       <Modal
@@ -572,7 +663,7 @@ export default function AdminBookingsPage() {
         description={`Are you sure you want to cancel booking ${cancelBooking?.bookingNumber}? This action cannot be undone.`}
         confirmText="Cancel Booking"
         variant="destructive"
-        onConfirm={() => setCancelBooking(null)}
+        onConfirm={handleCancelBooking}
       />
 
       <ConfirmDialog

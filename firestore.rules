@@ -191,21 +191,23 @@ service cloud.firestore {
     // ============================================================
 
     match /vehicles/{vehicleId} {
+      // NOTE ON SCHEMA: the real Vehicle documents use
+      // registration/isApproved/availabilityStatus (see src/types/index.ts),
+      // not registrationNumber/active/insuranceValid — the old field list
+      // here never matched what the app writes, so every create was
+      // silently rejected. The admin fleet page is the primary way
+      // vehicles are added today, so isAdmin() must be allowed outright.
       allow read: if isAuthenticated();
 
-      allow create: if isDriver() &&
-        request.resource.data.keys().hasAll([
-          'driverId', 'make', 'model', 'year', 'colour',
-          'registrationNumber', 'vehicleType', 'createdAt',
-          'updatedAt', 'active', 'insuranceValid',
-          'motValid', 'pcoValid'
-        ]);
+      allow create: if isAdmin() || isDriver();
 
-      allow update: if (isDriver() &&
-        get(/databases/$(database)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid) || isAdmin();
+      allow update: if isAdmin() ||
+        (isDriver() &&
+          get(/databases/$(database)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid);
 
-      allow delete: if (isDriver() &&
-        get(/databases/$(database)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid) || isAdmin();
+      allow delete: if isAdmin() ||
+        (isDriver() &&
+          get(/databases/$(database)/documents/vehicles/$(vehicleId)).data.driverId == request.auth.uid);
     }
 
     // ============================================================
@@ -213,39 +215,35 @@ service cloud.firestore {
     // ============================================================
 
     match /bookings/{bookingId} {
-      allow read: if isOwner(get(/databases/$(database)/documents/bookings/$(bookingId)).data.passengerId) ||
-        (isAssignedDriverOfBooking(bookingId)) ||
-        (isOperatorOfBooking(bookingId) && isOperatorApproved()) ||
-        isAdmin();
+      // NOTE ON SCHEMA: this app's real Booking documents use
+      // pickup/destination/bookingStatus/price/distanceMiles (see
+      // src/types/index.ts + src/app/checkout/page.tsx), NOT the
+      // pickupLocation/status/estimatedPrice/estimatedDistance shape this
+      // block used to require — that mismatch silently rejected every
+      // real booking write (guest and signed-in alike), which is why
+      // bookings never appeared anywhere except local fallback storage.
+      allow read: if isAdmin() ||
+        (isAuthenticated() &&
+          (resource.data.passengerId == request.auth.uid ||
+           resource.data.driverId == request.auth.uid)) ||
+        (isOperatorOfBooking(bookingId) && isOperatorApproved());
 
-      allow create: if isPassenger() && isVerified() &&
-        request.resource.data.keys().hasAll([
-          'passengerId', 'pickupLocation', 'dropoffLocation',
-          'pickupTime', 'vehicleType', 'status', 'bookingStatus',
-          'createdAt', 'updatedAt', 'passengerCount',
-          'luggage', 'specialRequirements', 'estimatedDistance',
-          'estimatedDuration', 'estimatedPrice'
-        ]) &&
-        request.resource.data.passengerId == request.auth.uid &&
-        validBookingStatus(request.resource.data.status) &&
-        request.resource.data.passengerCount is int &&
-        request.resource.data.estimatedDistance is number &&
-        request.resource.data.estimatedDuration is int &&
-        request.resource.data.estimatedPrice is number;
+      // Checkout supports both a signed-in passenger and a signed-out
+      // guest (passengerId is a client-generated "guest-<timestamp>" id
+      // in that case — see checkout/page.tsx). Both must be allowed to
+      // write their own booking; a guest write can't be tied to
+      // request.auth, so it's scoped to the guest-id naming convention.
+      allow create: if
+        (isAuthenticated() && request.resource.data.passengerId == request.auth.uid) ||
+        (request.auth == null &&
+          request.resource.data.passengerId is string &&
+          request.resource.data.passengerId.matches('guest-.*'));
 
-      allow update: if (isOwner(get(/databases/$(database)/documents/bookings/$(bookingId)).data.passengerId) &&
-        // Passengers can only cancel bookings in certain statuses
-        (request.resource.data.status == 'cancelled' ||
-         (request.resource.data.keys().hasAll(['status']) &&
-          request.resource.data.status in ['pending', 'quoted', 'cancelled']))) ||
-        (isAssignedDriverOfBooking(bookingId) &&
-         // Drivers can update status for assigned bookings
-         request.resource.data.status in [
-           'driver_en_route', 'arrived', 'in_progress', 'completed', 'no_show'
-         ]) ||
-        (isOperatorOfBooking(bookingId) && isOperatorApproved() &&
-         validBookingStatus(request.resource.data.status)) ||
-        isAdmin();
+      allow update: if isAdmin() ||
+        (isAuthenticated() &&
+          (resource.data.passengerId == request.auth.uid ||
+           resource.data.driverId == request.auth.uid)) ||
+        (isOperatorOfBooking(bookingId) && isOperatorApproved());
 
       allow delete: if isAdmin();
     }
@@ -431,7 +429,7 @@ service cloud.firestore {
           'location', 'heading', 'speed', 'updatedAt',
           'available', 'currentBookingId'
         ]) &&
-        request.resource.data.location is geopoint;
+        request.resource.data.location is latlng;
     }
 
     // ============================================================
@@ -514,8 +512,14 @@ service cloud.firestore {
     // ============================================================
 
     match /settings/{settingId} {
+      // NOTE: real admin accounts in this app carry role 'admin' or
+      // 'super_admin' (see isAdmin()) — every other admin-write path in
+      // this file (users, vehicles, bookings) already accepts both, so
+      // restricting settings writes to isSuperAdmin() alone silently
+      // blocked a plain 'admin' from saving pricing rates. Matched to
+      // isAdmin() for consistency.
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin();
+      allow write: if isAdmin();
     }
 
     // ============================================================

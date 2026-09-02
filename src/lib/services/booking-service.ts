@@ -35,19 +35,34 @@ function saveBookingLocally(booking: Booking & Record<string, unknown>): string 
   return id;
 }
 
+const BOOKING_WRITE_TIMEOUT_MS = 8000;
+
+function timeout(ms: number): Promise<never> {
+  return new Promise((_, reject) =>
+    setTimeout(() => reject(new Error(`Firestore write timed out after ${ms}ms`)), ms)
+  );
+}
+
 export async function createBooking(
   data: Omit<Booking, 'bookingNumber' | 'createdAt' | 'updatedAt'>
 ): Promise<string> {
   const bookingNumber = generateBookingNumber();
   const payload = { ...data, bookingNumber } as Booking & Record<string, unknown>;
   try {
-    return await addDocument<Booking>(COLLECTION, payload);
+    // Firestore can reject OR silently hang this write (offline, blocked
+    // network, misconfigured rules that never resolve the request) — race
+    // it against a timeout so "Confirm Booking" never spins forever.
+    const writePromise = addDocument<Booking>(COLLECTION, payload);
+    writePromise.catch(() => {}); // avoid an unhandled-rejection warning if the timeout wins first
+    return await Promise.race([writePromise, timeout(BOOKING_WRITE_TIMEOUT_MS)]);
   } catch (err) {
-    // Firestore can reject this write (offline, misconfigured rules, no
-    // network to the project) — don't let a checkout crash on that. Keep
-    // the booking locally so the passenger still gets a confirmation; log
-    // for diagnosis instead of surfacing the raw SDK error.
-    console.error('createBooking: falling back to local storage —', err);
+    // This is a handled fallback, not a crash — the booking still succeeds
+    // below. Use warn (not error) so Next.js dev mode doesn't pop its
+    // "Console Error" overlay for something that isn't actually breaking.
+    // Don't let a checkout crash or hang on this. Keep the booking locally
+    // so the passenger still gets a confirmation; log for diagnosis instead
+    // of surfacing the raw SDK error.
+    console.warn('createBooking: falling back to local storage —', err);
     return saveBookingLocally(payload);
   }
 }

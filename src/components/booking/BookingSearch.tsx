@@ -13,6 +13,7 @@ import {
   Baby,
   Accessibility,
   UserCheck,
+  AlertCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -78,6 +79,7 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
   const [meetGreet, setMeetGreet] = useState(false)
   const [flightNumber, setFlightNumber] = useState("")
   const [dateOpen, setDateOpen] = useState(false)
+  const [searchError, setSearchError] = useState("")
 
   useEffect(() => {
     setDate(new Date())
@@ -95,6 +97,24 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
   }
 
   function handleSearch() {
+    // pickup/destination are only set when a suggestion is actually
+    // clicked from the autocomplete dropdown (see LocationAutocomplete's
+    // onLocationSelect) — typing an address without selecting one leaves
+    // these null, and navigating anyway used to silently dump the
+    // customer on /quotes' empty "Start a new search" state with no
+    // explanation. Catch it here instead.
+    if (!pickup || !destination) {
+      setSearchError(
+        !pickup && !destination
+          ? "Please select a pickup and destination from the dropdown suggestions."
+          : !pickup
+            ? "Please select a pickup location from the dropdown suggestions."
+            : "Please select a destination from the dropdown suggestions."
+      )
+      return
+    }
+    setSearchError("")
+
     if (onSearch) {
       onSearch({
         pickup,
@@ -339,6 +359,13 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
           Meet &amp; Greet
         </label>
       </div>
+
+      {searchError && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {searchError}
+        </div>
+      )}
 
       <Button
         onClick={handleSearch}

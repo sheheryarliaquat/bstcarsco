@@ -180,7 +180,9 @@ export default function AdminLayout({
   const router = useRouter()
   const { user, userData, loading, signOut } = useAuth()
 
-  const isLoginPage = pathname === "/admin/login"
+  // Tolerate a trailing slash (e.g. trailingSlash: true in next.config.ts)
+  // so this never mismatches and traps the login page in its own guard.
+  const isLoginPage = pathname?.replace(/\/$/, "") === "/admin/login"
   const isAdmin = !!user && !!userData && ADMIN_ROLES.includes(userData.role)
 
   useEffect(() => {

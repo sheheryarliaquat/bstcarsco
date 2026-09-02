@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   CheckCircle2,
@@ -20,22 +20,118 @@ import {
   ExternalLink,
   User,
   Banknote,
-  ShieldCheck,
+  Loader2,
+  SearchX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BookingProgress } from "@/components/booking/BookingProgress";
-import { DEMO_DATA } from "@/constants";
+import { getBooking } from "@/lib/services/booking-service";
+import { getUser } from "@/lib/services/user-service";
+import { getVehicle } from "@/lib/services/vehicle-service";
+import type { Booking } from "@/types";
 import { format } from "date-fns";
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
-  const paymentMethod = searchParams.get("payment") || "card";
-  const isCash = paymentMethod === "cash";
+  const bookingId = searchParams.get("bookingId");
+  const paymentMethodParam = searchParams.get("payment") || "card";
 
-  const booking = DEMO_DATA.bookings[3];
-  const quote = DEMO_DATA.quotes[0];
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [operatorName, setOperatorName] = useState<string>("");
+  const [vehicleDescription, setVehicleDescription] = useState<string>("");
+  const [loading, setLoading] = useState(!!bookingId);
+  const [notFound, setNotFound] = useState(!bookingId);
+
+  useEffect(() => {
+    if (!bookingId) {
+      // Nothing to fetch — `loading`/`notFound`'s initial values already
+      // account for this case.
+      return;
+    }
+
+    let cancelled = false;
+
+    getBooking(bookingId)
+      .then(async (data) => {
+        if (cancelled) return;
+        if (!data) {
+          setNotFound(true);
+          return;
+        }
+        setBooking(data);
+
+        const [operator, vehicle] = await Promise.all([
+          data.operatorId ? getUser(data.operatorId).catch(() => null) : Promise.resolve(null),
+          data.vehicleId ? getVehicle(data.vehicleId).catch(() => null) : Promise.resolve(null),
+        ]);
+        if (cancelled) return;
+        if (operator) {
+          const companyName = (operator as unknown as { companyName?: string }).companyName;
+          setOperatorName(companyName || `${operator.firstName} ${operator.lastName}`.trim());
+        }
+        if (vehicle) {
+          setVehicleDescription(`${vehicle.make} ${vehicle.model}`.trim());
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setNotFound(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bookingId]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+        <div className="text-center">
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-[#D4145A]" />
+          <p className="text-sm text-[#6B7280]">Loading booking details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound || !booking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA] px-4">
+        <div className="max-w-md rounded-xl border border-[#D9E0E8] bg-white p-8 text-center">
+          <SearchX className="mx-auto mb-4 h-12 w-12 text-[#D9E0E8]" />
+          <h1 className="text-lg font-bold text-[#172F52]">
+            We couldn&apos;t find that booking
+          </h1>
+          <p className="mt-2 text-sm text-[#6B7280]">
+            If you just completed a booking, check your account or your
+            email for confirmation. Otherwise, please contact support.
+          </p>
+          <div className="mt-5 flex justify-center gap-3">
+            <Button
+              render={<Link href="/help" />}
+              nativeButton={false}
+              variant="outline"
+            >
+              Contact Support
+            </Button>
+            <Button
+              render={<Link href="/" />}
+              nativeButton={false}
+              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+            >
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isCash = (booking.paymentMethod || paymentMethodParam) === "cash";
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -136,7 +232,7 @@ function ConfirmationContent() {
               <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
                 <Car className="h-3.5 w-3.5 text-[#6B7280]" />
                 <span className="font-medium">
-                  {quote.vehicleDescription}
+                  {vehicleDescription || booking.vehicleType}
                 </span>
               </div>
             </div>
@@ -144,7 +240,7 @@ function ConfirmationContent() {
               <p className="text-xs text-[#6B7280]">Operator</p>
               <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
                 <Building2 className="h-3.5 w-3.5 text-[#6B7280]" />
-                <span className="font-medium">{quote.operatorName}</span>
+                <span className="font-medium">{operatorName || "Assigned operator"}</span>
               </div>
             </div>
             <div>

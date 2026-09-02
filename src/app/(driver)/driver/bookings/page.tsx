@@ -1,142 +1,88 @@
 "use client"
 
-import { useState } from "react"
-import { Eye, Calendar, Filter } from "lucide-react"
+import { useState, useEffect, useMemo } from "react"
+import { Eye, Calendar, Filter, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DataTable, type Column } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { useAuth } from "@/hooks/useAuth"
+import { listenToDriverBookings } from "@/lib/services/booking-service"
+import { getUsersByRole } from "@/lib/services/user-service"
 import { BookingStatus } from "@/types"
+import type { Booking, User as AppUser } from "@/types"
 import Link from "next/link"
+
+type BookingRow = Booking & { id: string }
 
 interface TripRow {
   id: string
+  bookingNumber: string
   date: string
   time: string
   from: string
   to: string
   passenger: string
   status: BookingStatus
-  earnings: string
-  _raw: typeof DEMO_TRIPS[number]
+  earnings: number
 }
 
-const DEMO_TRIPS = [
-  {
-    id: "UKTB-2026-000001",
-    date: "25 Aug 2026",
-    time: "06:30",
-    from: "221B Baker Street, London NW1 6XE",
-    to: "Heathrow Airport, Terminal 5",
-    passenger: "James Wilson",
-    status: BookingStatus.TripCompleted,
-    earnings: "£51.00",
-  },
-  {
-    id: "UKTB-2026-000002",
-    date: "25 Aug 2026",
-    time: "14:00",
-    from: "1 Manchester Square, London W1U 3PH",
-    to: "10 Downing Street, London SW1A 2AA",
-    passenger: "Emma Thompson",
-    status: BookingStatus.DriverEnRoute,
-    earnings: "£11.52",
-  },
-  {
-    id: "UKTB-2026-000005",
-    date: "25 Aug 2026",
-    time: "09:00",
-    from: "Waverley Station, Edinburgh EH1 1BZ",
-    to: "Glasgow Central Station, Glasgow G1 1AE",
-    passenger: "David Morgan",
-    status: BookingStatus.TripStarted,
-    earnings: "£410.40",
-  },
-  {
-    id: "UKTB-2026-000003",
-    date: "27 Aug 2026",
-    time: "10:00",
-    from: "Birmingham New Street, Birmingham B2 4QA",
-    to: "Manchester Airport, Manchester M90 1QX",
-    passenger: "Raj Patel",
-    status: BookingStatus.Confirmed,
-    earnings: "£102.60",
-  },
-  {
-    id: "UKTB-2026-000006",
-    date: "25 Aug 2026",
-    time: "18:30",
-    from: "221B Baker Street, London NW1 6XE",
-    to: "10 Downing Street, London SW1A 2AA",
-    passenger: "James Wilson",
-    status: BookingStatus.PaymentFailed,
-    earnings: "£13.80",
-  },
-  {
-    id: "UKTB-2026-000007",
-    date: "24 Aug 2026",
-    time: "12:15",
-    from: "Liverpool ONE, Liverpool L1 8JQ",
-    to: "Bristol Temple Meads, Bristol BS1 6QF",
-    passenger: "Sophie Clarkson",
-    status: BookingStatus.TripCompleted,
-    earnings: "£98.40",
-  },
-  {
-    id: "UKTB-2026-000008",
-    date: "23 Aug 2026",
-    time: "08:00",
-    from: "Cardiff Central Station, Cardiff CF10 1EP",
-    to: "Birmingham New Street, Birmingham B2 4QA",
-    passenger: "Linda Nguyen",
-    status: BookingStatus.CancelledByDriver,
-    earnings: "£0.00",
-  },
-  {
-    id: "UKTB-2026-000009",
-    date: "22 Aug 2026",
-    time: "16:45",
-    from: "The O2 Arena, London SE10 0DX",
-    to: "Heathrow Airport, Terminal 5",
-    passenger: "David Morgan",
-    status: BookingStatus.TripCompleted,
-    earnings: "£67.50",
-  },
-  {
-    id: "UKTB-2026-000010",
-    date: "21 Aug 2026",
-    time: "07:30",
-    from: "221B Baker Street, London NW1 6XE",
-    to: "Glasgow Central Station, Glasgow G1 1AE",
-    passenger: "James Wilson",
-    status: BookingStatus.TripCompleted,
-    earnings: "£385.20",
-  },
-  {
-    id: "UKTB-2026-000011",
-    date: "20 Aug 2026",
-    time: "15:00",
-    from: "Manchester Airport, Manchester M90 1QX",
-    to: "Waverley Station, Edinburgh EH1 1BZ",
-    passenger: "Emma Thompson",
-    status: BookingStatus.NoShow,
-    earnings: "£0.00",
-  },
-] as const
-
-const ALL_TRIPS: TripRow[] = DEMO_TRIPS.map((t) => ({
-  ...t,
-  _raw: t,
-}))
-
 export default function DriverBookingsPage() {
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState("all")
+  const [bookings, setBookings] = useState<BookingRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [passengers, setPassengers] = useState<AppUser[]>([])
 
-  const filteredTrips = ALL_TRIPS.filter((trip) => {
+  useEffect(() => {
+    if (!user) return
+    const unsubscribe = listenToDriverBookings(
+      user.uid,
+      (data) => {
+        setBookings(data as BookingRow[])
+        setLoading(false)
+      },
+      (err) => {
+        console.error("DriverBookingsPage: listenToDriverBookings failed —", err)
+        setLoading(false)
+      }
+    )
+    return unsubscribe
+  }, [user])
+
+  useEffect(() => {
+    getUsersByRole("passenger")
+      .then(setPassengers)
+      .catch((err) => console.error("DriverBookingsPage: getUsersByRole(passenger) failed —", err))
+  }, [])
+
+  const allTrips: TripRow[] = useMemo(() => {
+    function getPassengerName(passengerId: string) {
+      if (!passengerId) return "Unknown"
+      if (passengerId.startsWith("guest-")) return "Guest"
+      const p = passengers.find((p) => p.uid === passengerId)
+      return p ? `${p.firstName} ${p.lastName}` : "Guest"
+    }
+
+    return bookings.map((b) => ({
+      id: b.id,
+      bookingNumber: b.bookingNumber,
+      date: b.date,
+      time: b.pickupTime,
+      from: b.pickup?.formattedAddress ?? "",
+      to: b.destination?.formattedAddress ?? "",
+      passenger: getPassengerName(b.passengerId),
+      status: b.bookingStatus,
+      earnings: b.total || 0,
+    }))
+  }, [bookings, passengers])
+
+  const filteredTrips = allTrips.filter((trip) => {
     switch (activeTab) {
       case "active":
         return [
+          BookingStatus.DriverAssigned,
           BookingStatus.DriverAccepted,
           BookingStatus.DriverEnRoute,
           BookingStatus.DriverArrived,
@@ -150,6 +96,7 @@ export default function DriverBookingsPage() {
           BookingStatus.CancelledByDriver,
           BookingStatus.CancelledByPassenger,
           BookingStatus.CancelledByOperator,
+          BookingStatus.CancelledByAdmin,
           BookingStatus.NoShow,
         ].includes(trip.status)
       default:
@@ -197,7 +144,7 @@ export default function DriverBookingsPage() {
       header: "Earnings",
       sortable: true,
       render: (row) => (
-        <span className="font-semibold text-[#172F52]">{row.earnings}</span>
+        <span className="font-semibold text-[#172F52]">£{row.earnings.toFixed(2)}</span>
       ),
     },
     {
@@ -233,46 +180,56 @@ export default function DriverBookingsPage() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white border border-[#E5E7EB]">
-          <TabsTrigger value="all" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
-            All ({ALL_TRIPS.length})
-          </TabsTrigger>
-          <TabsTrigger value="active" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
-            Active
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
-            Completed
-          </TabsTrigger>
-          <TabsTrigger value="cancelled" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
-            Cancelled
-          </TabsTrigger>
-        </TabsList>
+      {loading ? (
+        <div className="flex items-center justify-center rounded-xl border border-[#D9E0E8] bg-white py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-[#D4145A]" />
+        </div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="bg-white border border-[#E5E7EB]">
+            <TabsTrigger value="all" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+              All ({allTrips.length})
+            </TabsTrigger>
+            <TabsTrigger value="active" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+              Active
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+              Completed
+            </TabsTrigger>
+            <TabsTrigger value="cancelled" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+              Cancelled
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value={activeTab} className="mt-4">
-          {filteredTrips.length === 0 ? (
-            <EmptyState
-              icon={<Car className="h-16 w-16" />}
-              title="No trips found"
-              description="No trips match the selected filter."
-            />
-          ) : (
-            <DataTable
-              columns={columns as unknown as Column<Record<string, unknown>>[]}
-              data={filteredTrips as unknown as Record<string, unknown>[]}
-              searchable
-              searchPlaceholder="Search trips..."
-              keyExtractor={(row) => row.id as string}
-              pagination={{
-                page: 1,
-                pageSize: 10,
-                total: filteredTrips.length,
-                onPageChange: () => {},
-              }}
-            />
-          )}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value={activeTab} className="mt-4">
+            {filteredTrips.length === 0 ? (
+              <EmptyState
+                icon={<Car className="h-16 w-16" />}
+                title="No trips found"
+                description={
+                  allTrips.length === 0
+                    ? "No trips have been assigned to you yet."
+                    : "No trips match the selected filter."
+                }
+              />
+            ) : (
+              <DataTable
+                columns={columns as unknown as Column<Record<string, unknown>>[]}
+                data={filteredTrips as unknown as Record<string, unknown>[]}
+                searchable
+                searchPlaceholder="Search trips..."
+                keyExtractor={(row) => row.id as string}
+                pagination={{
+                  page: 1,
+                  pageSize: 10,
+                  total: filteredTrips.length,
+                  onPageChange: () => {},
+                }}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   )
 }

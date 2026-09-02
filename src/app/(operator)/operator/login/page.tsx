@@ -34,7 +34,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-export default function DriverLoginPage() {
+export default function OperatorLoginPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -59,12 +59,12 @@ export default function DriverLoginPage() {
       const result = await signIn(data.email, data.password)
       const userData = await getUserData(result.user.uid)
       const role = userData?.role
-      if (role === "driver") {
-        router.push("/driver/dashboard")
+      if (role === "operator") {
+        router.push("/operator/dashboard")
       } else {
-        // Don't leave a non-driver session signed in on the driver portal.
+        // Don't leave a non-operator session signed in on the operator portal.
         await signOutUser()
-        setError("You do not have driver access. Please use your driver credentials.")
+        setError("You do not have operator access. Please use your operator credentials.")
       }
     } catch {
       setError("Invalid email or password.")
@@ -85,26 +85,11 @@ export default function DriverLoginPage() {
             <span className="text-2xl font-bold text-white">Blue Star Airport Transfers LTD</span>
           </div>
           <h1 className="mb-4 text-3xl font-bold text-white">
-            Driver Portal
+            Operator Portal
           </h1>
           <p className="text-lg text-white/70">
-            Sign in to manage your trips, track your earnings, and stay on the
-            road.
+            Sign in to manage your fleet, drivers, bookings, and payouts.
           </p>
-          <div className="mt-12 grid grid-cols-3 gap-6 text-center">
-            <div>
-              <p className="text-2xl font-bold text-[#D4145A]">156+</p>
-              <p className="mt-1 text-sm text-white/60">Trips This Month</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#D4145A]">4.9</p>
-              <p className="mt-1 text-sm text-white/60">Your Rating</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#D4145A]">£1.6k</p>
-              <p className="mt-1 text-sm text-white/60">Monthly Earnings</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -126,10 +111,10 @@ export default function DriverLoginPage() {
           <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
             <div className="mb-6 text-center">
               <h1 className="text-2xl font-bold text-[#172F52]">
-                Welcome back, Driver
+                Welcome back
               </h1>
               <p className="mt-1 text-sm text-[#6B7280]">
-                Sign in to your driver account
+                Sign in to your operator account
               </p>
             </div>
 
@@ -153,7 +138,7 @@ export default function DriverLoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="you@driver.uk"
+                    placeholder="you@operator.co.uk"
                     className="h-11 pl-10"
                     {...register("email")}
                   />

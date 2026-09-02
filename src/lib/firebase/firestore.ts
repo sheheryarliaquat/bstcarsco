@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  setDoc,
   deleteDoc,
   query,
   where,
@@ -73,6 +74,28 @@ export async function updateDocument<T extends DocumentData>(
     ...data,
     updatedAt: new Date().toISOString(),
   });
+}
+
+/**
+ * Writes to a fixed-ID document, creating it if it doesn't exist yet
+ * (unlike updateDocument, which throws on a missing doc). Used for
+ * singleton config docs like settings/pricingRates.
+ */
+export async function setDocument<T extends DocumentData>(
+  collectionName: string,
+  id: string,
+  data: Partial<T>,
+  merge: boolean = true
+): Promise<void> {
+  const docRef = doc(getDb(), collectionName, id);
+  await setDoc(
+    docRef,
+    {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    },
+    { merge }
+  );
 }
 
 export async function deleteDocument(

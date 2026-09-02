@@ -15,9 +15,25 @@ interface QuoteParams {
   pickupDateTime: Date
   operatorId: string
   passengerCount: number
+  /** Real per-vehicle-type rates (from settings/pricingRates), merged over the built-in defaults. */
+  rateOverride?: Partial<
+    Pick<
+      PricingRule,
+      | 'baseFare'
+      | 'perMile'
+      | 'perMinute'
+      | 'minimumFare'
+      | 'bookingFee'
+      | 'airportFee'
+      | 'nightSurchargePercent'
+      | 'weekendSurchargePercent'
+      | 'peakTimeSurchargePercent'
+      | 'congestionCharge'
+    >
+  >
 }
 
-interface PriceBreakdown {
+export interface PriceBreakdown {
   baseFare: number
   distanceCharge: number
   timeCharge: number
@@ -34,8 +50,8 @@ interface PriceBreakdown {
 }
 
 export function calculateQuote(params: QuoteParams): PriceBreakdown {
-  const { pickup, destination, distanceMiles, vehicleType, pickupDateTime, operatorId } = params
-  const rules = getPricingRules(operatorId, vehicleType)
+  const { pickup, destination, distanceMiles, vehicleType, pickupDateTime, operatorId, rateOverride } = params
+  const rules = getPricingRules(operatorId, vehicleType, rateOverride)
 
   const baseFare = rules.baseFare
   const distanceCharge = distanceMiles * rules.perMile
@@ -140,9 +156,13 @@ export function getDefaultPricingRules(): PricingRule[] {
   ]
 }
 
-function getPricingRules(operatorId: string, vehicleType: VehicleType): PricingRule {
+function getPricingRules(
+  operatorId: string,
+  vehicleType: VehicleType,
+  override?: QuoteParams['rateOverride']
+): PricingRule {
   const defaults = getDefaultPricingRules()[0]
-  return { ...defaults, operatorId, vehicleType }
+  return { ...defaults, ...override, operatorId, vehicleType }
 }
 
 function calculateAirportFee(pickup: Location, destination: Location): boolean {

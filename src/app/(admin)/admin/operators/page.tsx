@@ -1,34 +1,58 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Search,
   Eye,
-  Edit,
   UserX,
+  UserCheck,
   Plus,
   Building,
   Car,
   ClipboardList,
   Banknote,
-  Star,
-  Wallet,
-  Mail,
-  Phone,
   Users,
+  Loader2,
+  AlertCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { DataTable, type Column } from "@/components/shared/DataTable"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { DashboardCard } from "@/components/shared/DashboardCard"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
-import type { Operator } from "@/types"
+import { useAuth } from "@/hooks/useAuth"
+import { listenToUsersByRole, updateUser } from "@/lib/services/user-service"
+import { listenToVehicles } from "@/lib/services/vehicle-service"
+import { listenToAllBookings } from "@/lib/services/booking-service"
+import type { Operator, User as AppUser, Vehicle, Booking } from "@/types"
+
+type BookingRow = Booking & { id: string }
+
+const EMPTY_ADD_FORM = {
+  companyName: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  password: "",
+  commissionPercent: "15",
+  commissionFlatFee: "0",
+  description: "",
+}
 
 export default function AdminOperatorsPage() {
+  const { user } = useAuth()
+  const [operators, setOperators] = useState<Operator[]>([])
+  const [drivers, setDrivers] = useState<AppUser[]>([])
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [bookings, setBookings] = useState<BookingRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState("")
+
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
@@ -37,45 +61,137 @@ export default function AdminOperatorsPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [suspendTarget, setSuspendTarget] = useState<Operator | null>(null)
 
-  const operatorStats = useMemo(() => {
-    const total = DEMO_DATA.operators.length
-    const totalDrivers = DEMO_DATA.drivers.length
-    const totalVehicles = DEMO_DATA.vehicles.length
-    const totalBookings = DEMO_DATA.bookings.length
-    const totalRevenue = DEMO_DATA.bookings.reduce((sum, b) => sum + b.total, 0)
-    return { total, totalDrivers, totalVehicles, totalBookings, totalRevenue }
+  const [addOpen, setAddOpen] = useState(false)
+  const [addForm, setAddForm] = useState(EMPTY_ADD_FORM)
+  const [addError, setAddError] = useState("")
+  const [addLoading, setAddLoading] = useState(false)
+
+  useEffect(() => {
+    const unsubscribe = listenToUsersByRole(
+      "operator",
+      (users) => {
+        setOperators(users as Operator[])
+        setLoading(false)
+        setLoadError("")
+      },
+      (err) => {
+        console.error("AdminOperatorsPage: listenToUsersByRole(operator) failed —", err)
+        setLoadError("Could not load operators from the database.")
+        setLoading(false)
+      }
+    )
+    return unsubscribe
   }, [])
 
-  const getOperatorDrivers = (operatorId: string) => {
-    return DEMO_DATA.drivers.filter((d) => d.operatorId === operatorId)
-  }
+  useEffect(() => {
+    const unsubscribe = listenToUsersByRole(
+      "driver",
+      (users) => setDrivers(users),
+      (err) => console.error("AdminOperatorsPage: listenToUsersByRole(driver) failed —", err)
+    )
+    return unsubscribe
+  }, [])
 
-  const getOperatorVehicles = (operatorId: string) => {
-    return DEMO_DATA.vehicles.filter((v) => v.operatorId === operatorId)
-  }
+  useEffect(() => {
+    const unsubscribe = listenToVehicles(
+      (data) => setVehicles(data),
+      (err) => console.error("AdminOperatorsPage: listenToVehicles failed —", err)
+    )
+    return unsubscribe
+  }, [])
 
-  const getOperatorBookings = (operatorId: string) => {
-    return DEMO_DATA.bookings.filter((b) => b.operatorId === operatorId)
-  }
+  useEffect(() => {
+    const unsubscribe = listenToAllBookings(
+      (data) => setBookings(data as BookingRow[]),
+      (err) => console.error("AdminOperatorsPage: listenToAllBookings failed —", err)
+    )
+    return unsubscribe
+  }, [])
 
-  const getOperatorRevenue = (operatorId: string) => {
-    return getOperatorBookings(operatorId).reduce((sum, b) => sum + b.total, 0)
-  }
+  const operatorStats = useMemo(() => {
+    const total = operators.length
+    const totalDrivers = drivers.length
+    const totalVehicles = vehicles.length
+    const totalBookings = bookings.length
+    const totalRevenue = bookings.reduce((sum, b) => sum + (b.total || 0), 0)
+    return { total, totalDrivers, totalVehicles, totalBookings, totalRevenue }
+  }, [operators, drivers, vehicles, bookings])
+
+  const getOperatorDrivers = (operatorId: string) => drivers.filter((d) => (d as unknown as { operatorId?: string }).operatorId === operatorId)
+  const getOperatorVehicles = (operatorId: string) => vehicles.filter((v) => v.operatorId === operatorId)
+  const getOperatorBookings = (operatorId: string) => bookings.filter((b) => b.operatorId === operatorId)
+  const getOperatorRevenue = (operatorId: string) => getOperatorBookings(operatorId).reduce((sum, b) => sum + (b.total || 0), 0)
 
   const filtered = useMemo(() => {
-    if (!search) return DEMO_DATA.operators
-    const q = search.toLowerCase()
-    return DEMO_DATA.operators.filter(
-      (o) =>
-        o.companyName.toLowerCase().includes(q) ||
-        o.firstName.toLowerCase().includes(q) ||
-        o.lastName.toLowerCase().includes(q) ||
-        o.email.toLowerCase().includes(q)
-    )
-  }, [search])
+    let result = [...operators]
+    if (search) {
+      const q = search.toLowerCase()
+      result = result.filter(
+        (o) =>
+          o.companyName?.toLowerCase().includes(q) ||
+          o.firstName?.toLowerCase().includes(q) ||
+          o.lastName?.toLowerCase().includes(q) ||
+          o.email?.toLowerCase().includes(q)
+      )
+    }
+    if (statusFilter !== "all") {
+      result = result.filter((o) => (o.status || "active") === statusFilter)
+    }
+    return result
+  }, [operators, search, statusFilter])
 
-  const totalPages = Math.ceil(filtered.length / pageSize)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
+
+  async function handleAddOperator(e: React.FormEvent) {
+    e.preventDefault()
+    setAddError("")
+
+    if (!user) {
+      setAddError("Your session has expired. Please sign in again.")
+      return
+    }
+
+    setAddLoading(true)
+    try {
+      const idToken = await user.getIdToken()
+      const res = await fetch("/api/admin/operators", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          ...addForm,
+          commissionPercent: parseFloat(addForm.commissionPercent) || 0,
+          commissionFlatFee: parseFloat(addForm.commissionFlatFee) || 0,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setAddError(data.error || "Could not create the operator account.")
+        return
+      }
+      setAddOpen(false)
+      setAddForm(EMPTY_ADD_FORM)
+    } catch (err) {
+      console.error("handleAddOperator failed —", err)
+      setAddError("Network error — please try again.")
+    } finally {
+      setAddLoading(false)
+    }
+  }
+
+  async function handleToggleSuspend(operator: Operator) {
+    const nextStatus = (operator.status || "active") === "suspended" ? "active" : "suspended"
+    try {
+      await updateUser(operator.uid, { status: nextStatus })
+    } catch (err) {
+      console.error("handleToggleSuspend failed —", err)
+    } finally {
+      setSuspendTarget(null)
+    }
+  }
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -87,7 +203,7 @@ export default function AdminOperatorsPage() {
         return (
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#172F52] text-xs font-bold text-white">
-              {o.companyName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+              {(o.companyName || "?").split(" ").map((w) => w[0]).join("").slice(0, 2)}
             </div>
             <div>
               <span className="font-medium text-[#172F52]">{o.companyName}</span>
@@ -152,7 +268,7 @@ export default function AdminOperatorsPage() {
       sortable: true,
       render: (row) => {
         const o = row as unknown as Operator
-        return <RatingStars rating={o.rating} size="sm" count={o.totalReviews} />
+        return <RatingStars rating={o.rating || 0} size="sm" count={o.totalReviews || 0} />
       },
     },
     {
@@ -160,14 +276,15 @@ export default function AdminOperatorsPage() {
       header: "Status",
       render: (row) => {
         const o = row as unknown as Operator
+        const status = o.status || "active"
         return (
           <span
             className={cn(
               "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-              o.status === "active" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+              status === "active" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
             )}
           >
-            {o.status}
+            {status}
           </span>
         )
       },
@@ -177,19 +294,18 @@ export default function AdminOperatorsPage() {
       header: "Actions",
       render: (row) => {
         const o = row as unknown as Operator
+        const isSuspended = (o.status || "active") === "suspended"
         return (
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); setSelectedOperator(o); setDetailOpen(true) }}>
               <Eye className="h-3.5 w-3.5 text-[#6B7280]" />
             </Button>
-            <Button variant="ghost" size="icon-xs" onClick={(e) => e.stopPropagation()}>
-              <Edit className="h-3.5 w-3.5 text-[#6B7280]" />
-            </Button>
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); setSuspendTarget(o) }}>
-              <UserX className="h-3.5 w-3.5 text-amber-600" />
-            </Button>
-            <Button variant="ghost" size="icon-xs" onClick={(e) => e.stopPropagation()}>
-              <Wallet className="h-3.5 w-3.5 text-[#6B7280]" />
+              {isSuspended ? (
+                <UserCheck className="h-3.5 w-3.5 text-green-600" />
+              ) : (
+                <UserX className="h-3.5 w-3.5 text-amber-600" />
+              )}
             </Button>
           </div>
         )
@@ -204,18 +320,25 @@ export default function AdminOperatorsPage() {
           <h1 className="text-2xl font-bold text-[#172F52]">Operators</h1>
           <p className="text-sm text-[#6B7280]">Manage all platform operators</p>
         </div>
-        <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+        <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90" onClick={() => setAddOpen(true)}>
           <Plus className="mr-1.5 h-4 w-4" />
           Add Operator
         </Button>
       </div>
+
+      {loadError && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {loadError}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <DashboardCard title="Total Operators" value={operatorStats.total} icon={<Building className="h-5 w-5" />} />
         <DashboardCard title="Total Drivers" value={operatorStats.totalDrivers} icon={<Users className="h-5 w-5" />} />
         <DashboardCard title="Total Vehicles" value={operatorStats.totalVehicles} icon={<Car className="h-5 w-5" />} />
         <DashboardCard title="Total Bookings" value={operatorStats.totalBookings} icon={<ClipboardList className="h-5 w-5" />} />
-        <DashboardCard title="Total Revenue" value={`£${operatorStats.totalRevenue.toFixed(0)}`} icon={<Banknote className="h-5 w-5" />} trend="up" change={10} />
+        <DashboardCard title="Total Revenue" value={`£${operatorStats.totalRevenue.toFixed(0)}`} icon={<Banknote className="h-5 w-5" />} />
       </div>
 
       <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
@@ -241,26 +364,33 @@ export default function AdminOperatorsPage() {
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={paginated as unknown as Record<string, unknown>[]}
-        emptyMessage="No operators found"
-        keyExtractor={(row) => (row as unknown as Operator).uid}
-      />
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-[#6B7280]">
-          Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length}
-        </span>
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(1)}>«</Button>
-          <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
-          <span className="px-2 text-sm font-medium text-[#172F52]">{page} / {totalPages || 1}</span>
-          <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>›</Button>
-          <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</Button>
+      {loading ? (
+        <div className="flex items-center justify-center rounded-xl border border-[#D9E0E8] bg-white py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-[#D4145A]" />
         </div>
-      </div>
+      ) : (
+        <>
+          <DataTable
+            columns={columns}
+            data={paginated as unknown as Record<string, unknown>[]}
+            emptyMessage="No operators yet — click Add Operator to create the first one"
+            keyExtractor={(row) => (row as unknown as Operator).uid}
+          />
+
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-[#6B7280]">
+              Showing {filtered.length === 0 ? 0 : (page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(1)}>«</Button>
+              <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
+              <span className="px-2 text-sm font-medium text-[#172F52]">{page} / {totalPages}</span>
+              <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>›</Button>
+              <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</Button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Operator Detail Modal */}
       <Modal
@@ -273,15 +403,17 @@ export default function AdminOperatorsPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#172F52] text-lg font-bold text-white">
-                {selectedOperator.companyName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                {(selectedOperator.companyName || "?").split(" ").map((w) => w[0]).join("").slice(0, 2)}
               </div>
               <div>
                 <p className="text-lg font-bold text-[#172F52]">{selectedOperator.companyName}</p>
-                <RatingStars rating={selectedOperator.rating} size="sm" count={selectedOperator.totalReviews} />
+                <RatingStars rating={selectedOperator.rating || 0} size="sm" count={selectedOperator.totalReviews || 0} />
               </div>
             </div>
 
-            <p className="text-sm text-[#6B7280]">{selectedOperator.description}</p>
+            {selectedOperator.description && (
+              <p className="text-sm text-[#6B7280]">{selectedOperator.description}</p>
+            )}
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg bg-[#F5F7FA] p-3">
@@ -290,7 +422,7 @@ export default function AdminOperatorsPage() {
               </div>
               <div className="rounded-lg bg-[#F5F7FA] p-3">
                 <p className="text-xs font-semibold uppercase text-[#6B7280]">Phone</p>
-                <p className="text-sm text-[#172F52]">{selectedOperator.phone}</p>
+                <p className="text-sm text-[#172F52]">{selectedOperator.phone || "—"}</p>
               </div>
               <div className="rounded-lg bg-[#F5F7FA] p-3">
                 <p className="text-xs font-semibold uppercase text-[#6B7280]">Email</p>
@@ -298,7 +430,9 @@ export default function AdminOperatorsPage() {
               </div>
               <div className="rounded-lg bg-[#F5F7FA] p-3">
                 <p className="text-xs font-semibold uppercase text-[#6B7280]">Commission</p>
-                <p className="text-sm font-semibold text-[#172F52]">{selectedOperator.commission.percent}% + £{selectedOperator.commission.flatFee}</p>
+                <p className="text-sm font-semibold text-[#172F52]">
+                  {selectedOperator.commission?.percent ?? 0}% + £{selectedOperator.commission?.flatFee ?? 0}
+                </p>
               </div>
             </div>
 
@@ -324,14 +458,145 @@ export default function AdminOperatorsPage() {
         )}
       </Modal>
 
+      {/* Add Operator Modal */}
+      <Modal
+        open={addOpen}
+        onOpenChange={(open) => { setAddOpen(open); if (!open) setAddError("") }}
+        title="Add Operator"
+        size="md"
+      >
+        <form onSubmit={handleAddOperator} className="space-y-4">
+          <p className="text-sm text-[#6B7280]">
+            This creates a real login the operator can use to manage their fleet.
+          </p>
+
+          {addError && (
+            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              {addError}
+            </div>
+          )}
+
+          <div>
+            <Label htmlFor="companyName">Company name</Label>
+            <Input
+              id="companyName"
+              required
+              className="mt-1.5 h-10"
+              value={addForm.companyName}
+              onChange={(e) => setAddForm((f) => ({ ...f, companyName: e.target.value }))}
+            />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="firstName">Contact first name</Label>
+              <Input
+                id="firstName"
+                required
+                className="mt-1.5 h-10"
+                value={addForm.firstName}
+                onChange={(e) => setAddForm((f) => ({ ...f, firstName: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="lastName">Contact last name</Label>
+              <Input
+                id="lastName"
+                required
+                className="mt-1.5 h-10"
+                value={addForm.lastName}
+                onChange={(e) => setAddForm((f) => ({ ...f, lastName: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              type="email"
+              required
+              className="mt-1.5 h-10"
+              value={addForm.email}
+              onChange={(e) => setAddForm((f) => ({ ...f, email: e.target.value }))}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              className="mt-1.5 h-10"
+              value={addForm.phone}
+              onChange={(e) => setAddForm((f) => ({ ...f, phone: e.target.value }))}
+            />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="commissionPercent">Commission %</Label>
+              <Input
+                id="commissionPercent"
+                type="number"
+                step="0.5"
+                min="0"
+                max="100"
+                className="mt-1.5 h-10"
+                value={addForm.commissionPercent}
+                onChange={(e) => setAddForm((f) => ({ ...f, commissionPercent: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="commissionFlatFee">Flat fee (£)</Label>
+              <Input
+                id="commissionFlatFee"
+                type="number"
+                step="0.1"
+                min="0"
+                className="mt-1.5 h-10"
+                value={addForm.commissionFlatFee}
+                onChange={(e) => setAddForm((f) => ({ ...f, commissionFlatFee: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="password">Temporary password</Label>
+            <Input
+              id="password"
+              type="text"
+              required
+              minLength={8}
+              placeholder="At least 8 characters"
+              className="mt-1.5 h-10"
+              value={addForm.password}
+              onChange={(e) => setAddForm((f) => ({ ...f, password: e.target.value }))}
+            />
+            <p className="mt-1 text-xs text-[#6B7280]">Share this with the operator — they can change it after signing in.</p>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={addLoading} className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+              {addLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Operator"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       <ConfirmDialog
         open={!!suspendTarget}
         onOpenChange={(open) => { if (!open) setSuspendTarget(null) }}
-        title="Suspend Operator"
-        description={`Are you sure you want to suspend ${suspendTarget?.companyName}? All their drivers will be affected.`}
-        confirmText="Suspend"
-        variant="destructive"
-        onConfirm={() => setSuspendTarget(null)}
+        title={(suspendTarget?.status || "active") === "suspended" ? "Reactivate Operator" : "Suspend Operator"}
+        description={
+          (suspendTarget?.status || "active") === "suspended"
+            ? `Reactivate ${suspendTarget?.companyName}? They will regain access to manage their fleet.`
+            : `Are you sure you want to suspend ${suspendTarget?.companyName}? All their drivers will be affected.`
+        }
+        confirmText={(suspendTarget?.status || "active") === "suspended" ? "Reactivate" : "Suspend"}
+        variant={(suspendTarget?.status || "active") === "suspended" ? "default" : "destructive"}
+        onConfirm={() => suspendTarget && handleToggleSuspend(suspendTarget)}
       />
     </div>
   )

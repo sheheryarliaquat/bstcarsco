@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   ClipboardList,
@@ -11,13 +11,13 @@ import {
   DollarSign,
   BarChart2,
   Wallet,
-  User,
   Bell,
   LogOut,
   Menu,
   ChevronRight,
   Settings,
   FileText,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -29,8 +29,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { DEMO_DATA } from "@/constants"
 import { RatingStars } from "@/components/shared/RatingStars"
+import { useAuth } from "@/hooks/useAuth"
+import type { Operator } from "@/types"
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/operator/dashboard", icon: LayoutDashboard },
@@ -45,9 +46,15 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings", path: "/operator/settings", icon: Settings },
 ] as const
 
-const operator = DEMO_DATA.operators[0]
-
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarContent({
+  onNavigate,
+  operator,
+  onLogout,
+}: {
+  onNavigate?: () => void
+  operator: Operator
+  onLogout: () => void
+}) {
   const pathname = usePathname()
 
   return (
@@ -67,13 +74,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="mx-4 mt-4 rounded-xl bg-[#172F52]/5 p-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52] text-white text-xs font-bold">
-            {operator.companyName.split(" ").map(w => w[0]).join("").slice(0, 2)}
+            {(operator.companyName || "?").split(" ").map(w => w[0]).join("").slice(0, 2)}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-[#172F52]">
               {operator.companyName}
             </p>
-            <RatingStars rating={operator.rating} size="sm" count={operator.totalReviews} />
+            <RatingStars rating={operator.rating || 0} size="sm" count={operator.totalReviews || 0} />
           </div>
         </div>
       </div>
@@ -107,7 +114,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <Separator className="bg-[#F5F7FA]" />
 
       <div className="px-3 py-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#DC2626] transition-colors hover:bg-red-50">
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#DC2626] transition-colors hover:bg-red-50"
+        >
           <LogOut className="h-[18px] w-[18px]" />
           Logout
         </button>
@@ -118,7 +128,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
           <AvatarFallback className="bg-[#172F52] text-xs font-semibold text-white">
-            {operator.firstName[0]}{operator.lastName[0]}
+            {(operator.firstName?.[0] ?? "?")}{(operator.lastName?.[0] ?? "")}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
@@ -134,18 +144,61 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
+function FullScreenLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+    </div>
+  )
+}
+
 export default function OperatorLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const [sheetOpen, setSheetOpen] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user, userData, loading, signOut } = useAuth()
+
+  // Tolerate a trailing slash so this never mismatches and traps the
+  // login page in its own guard (same pattern as the admin/driver layouts).
+  const isLoginPage = pathname?.replace(/\/$/, "") === "/operator/login"
+  const isOperator = !!user && !!userData && userData.role === "operator"
+
+  useEffect(() => {
+    if (isLoginPage) return
+    if (!loading && !isOperator) {
+      router.replace("/operator/login")
+    }
+  }, [isLoginPage, loading, isOperator, router])
+
+  async function handleLogout() {
+    await signOut()
+    router.replace("/operator/login")
+  }
+
+  // The login page renders its own full-screen layout and must never be
+  // nested inside the authenticated operator dashboard shell.
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  // Block rendering of any operator page until we've confirmed the
+  // visitor is a logged-in operator — this portal previously had NO auth
+  // guard at all and rendered demo data for anyone who reached the URL.
+  if (loading || !isOperator) {
+    return <FullScreenLoader />
+  }
+
+  const operator = userData as unknown as Operator
 
   return (
     <div className="flex min-h-screen bg-[#F5F7FA]">
       {/* Desktop sidebar */}
       <aside className="hidden w-72 shrink-0 border-r border-[#E5E7EB] lg:fixed lg:inset-y-0 lg:z-50 lg:block">
-        <SidebarContent />
+        <SidebarContent operator={operator} onLogout={handleLogout} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col lg:pl-72">
@@ -163,7 +216,7 @@ export default function OperatorLayout({
               />
               <SheetContent side="left" className="w-72 p-0">
                 <SheetTitle className="sr-only">Navigation menu</SheetTitle>
-                <SidebarContent onNavigate={() => setSheetOpen(false)} />
+                <SidebarContent operator={operator} onLogout={handleLogout} onNavigate={() => setSheetOpen(false)} />
               </SheetContent>
             </Sheet>
             <div className="flex items-center gap-2">

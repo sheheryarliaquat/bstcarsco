@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   SlidersHorizontal,
   X,
   ArrowRight,
-  Loader2,
   SearchX,
   MapPin,
+  AlertCircle,
 } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { QuoteCard } from "@/components/booking/QuoteCard";
 import {
@@ -20,34 +21,12 @@ import {
 } from "@/components/booking/QuoteFilters";
 import { BookingSummary } from "@/components/booking/BookingSummary";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DEMO_DATA } from "@/constants";
-import type { Quote, SortingType, Location, TripType } from "@/types";
+import { saveBookingDraft } from "@/lib/booking-draft";
+import type { RealQuote } from "@/app/api/quotes/route";
+import type { SortingType, Location, TripType } from "@/types";
 import type { BookingSearchParams } from "@/components/booking/BookingSearch";
 
-const DEMO_SEARCH: BookingSearchParams = {
-  pickup: DEMO_DATA.locations[11],
-  destination: DEMO_DATA.locations[1],
-  tripType: "one_way",
-  date: new Date("2026-08-28"),
-  time: "15:30",
-  passengers: 5,
-  luggage: 6,
-  specialRequirements: {
-    childSeat: true,
-    wheelchairAccessible: false,
-    meetAndGreet: false,
-  },
-};
-
-const DEMO_PRICE_BREAKDOWN = {
-  baseFare: 5.0,
-  distance: 28.4,
-  fees: 4.2,
-  surcharge: 0,
-  total: 38.0,
-};
-
-function sortQuotes(quotes: Quote[], sortBy: SortingType): Quote[] {
+function sortQuotes(quotes: RealQuote[], sortBy: SortingType): RealQuote[] {
   const sorted = [...quotes];
   switch (sortBy) {
     case "lowest_price":
@@ -69,7 +48,7 @@ function sortQuotes(quotes: Quote[], sortBy: SortingType): Quote[] {
   }
 }
 
-function filterQuotes(quotes: Quote[], filters: QuoteFilterValues): Quote[] {
+function filterQuotes(quotes: RealQuote[], filters: QuoteFilterValues): RealQuote[] {
   return quotes.filter((q) => {
     if (q.price < filters.priceRange[0] || q.price > filters.priceRange[1])
       return false;
@@ -118,12 +97,37 @@ function SkeletonCard() {
   );
 }
 
+function NoSearchState() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA] px-4">
+      <div className="max-w-md rounded-xl border border-[#D9E0E8] bg-white p-8 text-center">
+        <MapPin className="mx-auto mb-4 h-12 w-12 text-[#D9E0E8]" />
+        <h1 className="text-lg font-bold text-[#172F52]">
+          Start a new search
+        </h1>
+        <p className="mt-2 text-sm text-[#6B7280]">
+          We need a pickup and destination to find you real quotes from our
+          operators.
+        </p>
+        <Button
+          render={<Link href="/" />}
+          nativeButton={false}
+          className="mt-5 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+        >
+          Back to search
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function QuotesContent() {
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const searchFromUrl: BookingSearchParams = useMemo(() => {
-    const pickupAddress = searchParams.get("pickupAddress")
-    const destAddress = searchParams.get("destAddress")
+    const pickupAddress = searchParams.get("pickupAddress");
+    const destAddress = searchParams.get("destAddress");
 
     const pickup: Location | null = pickupAddress
       ? {
@@ -135,7 +139,7 @@ function QuotesContent() {
           city: searchParams.get("pickupCity") || "",
           country: "United Kingdom",
         }
-      : null
+      : null;
 
     const destination: Location | null = destAddress
       ? {
@@ -147,10 +151,10 @@ function QuotesContent() {
           city: searchParams.get("destCity") || "",
           country: "United Kingdom",
         }
-      : null
+      : null;
 
-    const dateStr = searchParams.get("date")
-    const date = dateStr ? new Date(dateStr) : undefined
+    const dateStr = searchParams.get("date");
+    const date = dateStr ? new Date(dateStr) : undefined;
 
     return {
       pickup,
@@ -165,30 +169,132 @@ function QuotesContent() {
         wheelchairAccessible: false,
         meetAndGreet: false,
       },
-    }
-  }, [searchParams])
+    };
+  }, [searchParams]);
 
-  const activeSearch = searchFromUrl.pickup || searchFromUrl.destination
-    ? searchFromUrl
-    : DEMO_SEARCH
+  const hasSearch = !!searchFromUrl.pickup && !!searchFromUrl.destination;
 
   const [filters, setFilters] = useState<QuoteFilterValues>(DEFAULT_FILTERS);
   const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [quotes, setQuotes] = useState<RealQuote[]>([]);
+  const [distanceMiles, setDistanceMiles] = useState<number | null>(null);
+  const [loading, setLoading] = useState(hasSearch);
+  const [error, setError] = useState("");
+  const [reloadToken, setReloadToken] = useState(0);
+
+  useEffect(() => {
+    if (!hasSearch || !searchFromUrl.pickup || !searchFromUrl.destination) {
+      // Nothing to fetch — `loading`'s initial value already accounts for
+      // this case, and this render bails out to <NoSearchState/> anyway.
+      return;
+    }
+
+    let cancelled = false;
+
+    fetch("/api/quotes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pickup: searchFromUrl.pickup,
+        destination: searchFromUrl.destination,
+        date: format(searchFromUrl.date ?? new Date(), "yyyy-MM-dd"),
+        time: searchFromUrl.time,
+        passengers: searchFromUrl.passengers,
+        luggage: searchFromUrl.luggage,
+      }),
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "Could not load quotes.");
+        return data as { quotes: RealQuote[]; distanceMiles: number };
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setQuotes(data.quotes);
+        setDistanceMiles(data.distanceMiles);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Could not load quotes.");
+        setQuotes([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSearch, reloadToken, searchParams]);
 
   const filteredQuotes = useMemo(() => {
-    const filtered = filterQuotes(DEMO_DATA.quotes, filters);
+    const filtered = filterQuotes(quotes, filters);
     return sortQuotes(filtered, filters.sortBy);
-  }, [filters]);
+  }, [quotes, filters]);
 
-  const selectedQuoteData = DEMO_DATA.quotes.find(
-    (q) => q.id === selectedQuote
-  );
+  const selectedQuoteData = quotes.find((q) => q.id === selectedQuote);
+  const cheapestQuote = quotes[0];
+  const summaryQuote = selectedQuoteData ?? cheapestQuote;
 
   function handleReset() {
     setFilters(DEFAULT_FILTERS);
   }
+
+  function handleContinue() {
+    if (!selectedQuoteData || !searchFromUrl.pickup || !searchFromUrl.destination) return;
+
+    saveBookingDraft({
+      pickup: searchFromUrl.pickup,
+      destination: searchFromUrl.destination,
+      tripType: searchFromUrl.tripType,
+      date: format(searchFromUrl.date ?? new Date(), "yyyy-MM-dd"),
+      time: searchFromUrl.time,
+      passengers: searchFromUrl.passengers,
+      luggage: searchFromUrl.luggage,
+      specialRequirements: searchFromUrl.specialRequirements,
+      distanceMiles: distanceMiles ?? 0,
+      quote: {
+        quoteId: selectedQuoteData.id,
+        vehicleId: selectedQuoteData.vehicleId,
+        operatorId: selectedQuoteData.operatorId,
+        operatorName: selectedQuoteData.operatorName,
+        vehicleType: selectedQuoteData.vehicleType,
+        vehicleDescription: selectedQuoteData.vehicleDescription,
+        passengerCapacity: selectedQuoteData.passengerCapacity,
+        luggageCapacity: selectedQuoteData.luggageCapacity,
+        rating: selectedQuoteData.rating,
+        totalReviews: selectedQuoteData.totalReviews,
+        isElectric: selectedQuoteData.isElectric,
+        isHybrid: selectedQuoteData.isHybrid,
+        paymentTypes: selectedQuoteData.paymentTypes,
+        estimatedDuration: selectedQuoteData.estimatedJourneyTime,
+        price: selectedQuoteData.price,
+        breakdown: selectedQuoteData.breakdown,
+      },
+    });
+
+    router.push("/checkout");
+  }
+
+  if (!hasSearch) {
+    return <NoSearchState />;
+  }
+
+  const priceBreakdown = summaryQuote
+    ? {
+        baseFare: summaryQuote.breakdown.baseFare,
+        distance: summaryQuote.breakdown.distanceCharge,
+        fees: summaryQuote.breakdown.bookingFee + summaryQuote.breakdown.airportFee + summaryQuote.breakdown.timeCharge,
+        surcharge:
+          summaryQuote.breakdown.nightSurcharge +
+          summaryQuote.breakdown.weekendSurcharge +
+          summaryQuote.breakdown.peakSurcharge +
+          summaryQuote.breakdown.congestionCharge,
+        total: summaryQuote.breakdown.total,
+      }
+    : undefined;
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -199,8 +305,9 @@ function QuotesContent() {
               Available Quotes
             </h1>
             <p className="mt-1 text-sm text-[#6B7280]">
-              {filteredQuotes.length}{" "}
-              {filteredQuotes.length === 1 ? "option" : "options"} found
+              {loading
+                ? "Searching..."
+                : `${filteredQuotes.length} ${filteredQuotes.length === 1 ? "option" : "options"} found`}
             </p>
           </div>
           <Button
@@ -218,8 +325,8 @@ function QuotesContent() {
           <aside className="hidden w-[30%] shrink-0 lg:block">
             <div className="sticky top-6 space-y-4">
               <BookingSummary
-                searchParams={activeSearch}
-                priceBreakdown={DEMO_PRICE_BREAKDOWN}
+                searchParams={searchFromUrl}
+                priceBreakdown={priceBreakdown}
                 onEdit={() => {}}
               />
               <Button
@@ -270,11 +377,50 @@ function QuotesContent() {
               />
             </div>
 
+            {error && (
+              <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <span className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  {error}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setLoading(true);
+                    setError("");
+                    setReloadToken((t) => t + 1);
+                  }}
+                >
+                  Retry
+                </Button>
+              </div>
+            )}
+
             {loading ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
+              </div>
+            ) : quotes.length === 0 ? (
+              <div className="rounded-xl border border-[#D9E0E8] bg-white py-16 text-center">
+                <SearchX className="mx-auto mb-4 h-12 w-12 text-[#D9E0E8]" />
+                <h3 className="text-lg font-semibold text-[#172F52]">
+                  No transfer options available yet
+                </h3>
+                <p className="mx-auto mt-1 max-w-sm text-sm text-[#6B7280]">
+                  We don&apos;t have an approved, available vehicle for this
+                  route yet. Please check back soon or contact support.
+                </p>
+                <Button
+                  render={<Link href="/help" />}
+                  nativeButton={false}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  Contact Support
+                </Button>
               </div>
             ) : filteredQuotes.length === 0 ? (
               <div className="rounded-xl border border-[#D9E0E8] bg-white py-16 text-center">
@@ -308,16 +454,16 @@ function QuotesContent() {
         </div>
       </div>
 
-      {selectedQuote && (
+      {selectedQuote && selectedQuoteData && (
         <div className="fixed bottom-0 inset-x-0 z-40 border-t border-[#D9E0E8] bg-white p-4 shadow-lg">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-sm font-medium text-[#172033]">
-                {selectedQuoteData?.operatorName} -{" "}
-                {selectedQuoteData?.vehicleDescription}
+                {selectedQuoteData.operatorName} -{" "}
+                {selectedQuoteData.vehicleDescription}
               </p>
               <p className="text-lg font-bold text-[#172F52]">
-                £{selectedQuoteData?.price.toFixed(2)}
+                £{selectedQuoteData.price.toFixed(2)}
               </p>
             </div>
             <div className="flex shrink-0 gap-2">
@@ -329,8 +475,7 @@ function QuotesContent() {
                 Cancel
               </Button>
               <Button
-                render={<Link href="/checkout" />}
-                nativeButton={false}
+                onClick={handleContinue}
                 className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
               >
                 Continue to Book
