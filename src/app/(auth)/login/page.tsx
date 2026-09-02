@@ -69,8 +69,18 @@ export default function LoginPage() {
       const userData = await getUserData(result.user.uid);
       const role = userData?.role || "passenger";
       router.push(ROLE_ROUTES[role] || "/passenger/dashboard");
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      if (
+        message.includes("invalid-credential") ||
+        message.includes("user-not-found") ||
+        message.includes("wrong-password")
+      ) {
+        setError("Invalid email or password. Please try again.");
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
