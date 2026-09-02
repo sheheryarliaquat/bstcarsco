@@ -23,10 +23,10 @@ import { StatusBadge } from "@/components/shared/StatusBadge"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { createDriver, listenToDrivers } from "@/lib/services/driver-service"
+import { createDriver, listenToDrivers, updateDriver } from "@/lib/services/driver-service"
 import { getVehicle } from "@/lib/services/vehicle-service"
 import { getDocument } from "@/lib/firebase/firestore"
-import type { Driver, Operator } from "@/types"
+import type { Driver, DriverStatus, Operator } from "@/types"
 
 interface NewDriver {
   firstName: string
@@ -129,7 +129,7 @@ export default function AdminDriversPage() {
       lastName: newDriver.lastName,
       email: newDriver.email,
       phone: newDriver.phone,
-      status: "offline",
+      status: "online",
       lastLoginAt: now,
       operatorId: newDriver.operatorId,
       vehicleId: newDriver.vehicleId,
@@ -164,6 +164,10 @@ export default function AdminDriversPage() {
   const getVehicleInfo = (vehicleId: string) => {
     if (!vehicleId) return "-"
     return vehicleInfoMap[vehicleId] ?? "Loading..."
+  }
+
+  function handleSetDriverStatus(driver: Driver, status: DriverStatus) {
+    updateDriver(driver.uid, { status }).catch(() => {})
   }
 
   function handleViewDriver(driver: Driver) {
@@ -228,20 +232,32 @@ export default function AdminDriversPage() {
       render: (row) => {
         const d = row as unknown as Driver
         return (
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
-              d.status === "online" && "bg-green-50 text-green-700",
-              d.status === "busy" && "bg-amber-50 text-amber-700",
-              d.status === "offline" && "bg-gray-100 text-gray-500"
-            )}
-          >
-            <span className={cn(
-              "h-1.5 w-1.5 rounded-full",
-              d.status === "online" ? "bg-green-500" : d.status === "busy" ? "bg-amber-500" : "bg-gray-400"
-            )} />
-            {d.status}
-          </span>
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                d.status === "online" && "bg-green-50 text-green-700",
+                d.status === "busy" && "bg-amber-50 text-amber-700",
+                d.status === "offline" && "bg-gray-100 text-gray-500"
+              )}
+            >
+              <span className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                d.status === "online" ? "bg-green-500" : d.status === "busy" ? "bg-amber-500" : "bg-gray-400"
+              )} />
+              {d.status}
+            </span>
+            <select
+              aria-label={`Change status for ${d.firstName} ${d.lastName}`}
+              value={d.status}
+              onChange={(e) => handleSetDriverStatus(d, e.target.value as DriverStatus)}
+              className="h-7 rounded-md border border-[#D9E0E8] bg-white px-1.5 text-xs text-[#172F52] outline-none focus:border-[#D4145A]"
+            >
+              <option value="online">Online</option>
+              <option value="busy">Busy</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
         )
       },
     },
