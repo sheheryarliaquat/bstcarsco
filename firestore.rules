@@ -149,20 +149,17 @@ service cloud.firestore {
     // ============================================================
 
     match /drivers/{driverId} {
-      allow read: if isAuthenticated() || isOperator();
+      // NOTE ON SCHEMA: same mismatch as vehicles/bookings above — the old
+      // rule required userId/approvalStatus/licensed/insured fields this
+      // app's Driver type never writes (see src/types/index.ts), and gated
+      // create on the driver's own auth uid, but the primary way a driver
+      // profile is created today is an admin adding it from
+      // /admin/drivers before that person has (or needs) their own
+      // account. isAdmin() must be allowed to create/update/delete
+      // outright, same as vehicles.
+      allow read: if isAuthenticated();
 
-      allow create: if isOwner(driverId) &&
-        request.resource.data.keys().hasAll([
-          'userId', 'displayName', 'email', 'phone',
-          'approvalStatus', 'createdAt', 'updatedAt', 'active',
-          'averageRating', 'totalTrips', 'totalEarnings',
-          'vehicleId', 'operatorId', 'licensed', 'insured'
-        ]) &&
-        request.resource.data.userId == request.auth.uid;
-
-      allow update: if isOwner(driverId) || isAdmin() || (isOperator() && isOperatorApproved());
-
-      allow delete: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     // ============================================================

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Search,
   Eye,
@@ -12,19 +12,41 @@ import {
   Car,
   Star,
   Shield,
+  Plus,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { DataTable, type Column } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
-import type { Driver } from "@/types"
+import { createDriver, listenToDrivers } from "@/lib/services/driver-service"
+import { getVehicle } from "@/lib/services/vehicle-service"
+import { getDocument } from "@/lib/firebase/firestore"
+import type { Driver, Operator } from "@/types"
 
-const EMPTY_DRIVERS: Driver[] = []
+interface NewDriver {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  licenceNumber: string
+  operatorId: string
+  vehicleId: string
+}
+
+const EMPTY_DRIVER: NewDriver = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  licenceNumber: "",
+  operatorId: "",
+  vehicleId: "",
+}
 
 export default function AdminDriversPage() {
   const [search, setSearch] = useState("")
@@ -35,13 +57,49 @@ export default function AdminDriversPage() {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [suspendTarget, setSuspendTarget] = useState<Driver | null>(null)
+  const [drivers, setDrivers] = useState<Driver[]>([])
+  const [showCreate, setShowCreate] = useState(false)
+  const [newDriver, setNewDriver] = useState<NewDriver>(EMPTY_DRIVER)
+  const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
+  const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
 
-  const pendingDrivers = useMemo(() => {
-    return []
+  useEffect(() => {
+    const unsubscribe = listenToDrivers(
+      (data) => setDrivers(data),
+      () => setDrivers([])
+    )
+    return () => unsubscribe()
   }, [])
 
+  useEffect(() => {
+    const operatorIds = [...new Set(drivers.map((d) => d.operatorId).filter(Boolean))]
+    const vehicleIds = [...new Set(drivers.map((d) => d.vehicleId).filter(Boolean))]
+
+    Promise.all(operatorIds.map((id) => getDocument<Operator>("users", id).catch(() => null))).then(
+      (results) => {
+        const map: Record<string, string> = {}
+        results.forEach((o, i) => {
+          map[operatorIds[i]] = o?.companyName ?? "Unknown"
+        })
+        setOperatorNames(map)
+      }
+    )
+
+    Promise.all(vehicleIds.map((id) => getVehicle(id).catch(() => null))).then(
+      (results) => {
+        const map: Record<string, string> = {}
+        results.forEach((v, i) => {
+          map[vehicleIds[i]] = v ? `${v.make} ${v.model}` : "Unknown"
+        })
+        setVehicleInfoMap(map)
+      }
+    )
+  }, [drivers])
+
+  const pendingDrivers = useMemo(() => drivers.filter((d) => !d.isVerified), [drivers])
+
   const filtered = useMemo(() => {
-    const source = tab === "pending" ? pendingDrivers : EMPTY_DRIVERS
+    const source = tab === "pending" ? pendingDrivers : drivers
     let result = [...source]
 
     if (search) {
@@ -60,18 +118,52 @@ export default function AdminDriversPage() {
     }
 
     return result
-  }, [search, statusFilter, tab, pendingDrivers])
+  }, [search, statusFilter, tab, pendingDrivers, drivers])
+
+  function handleCreateDriver() {
+    if (!newDriver.firstName || !newDriver.lastName || !newDriver.email) return
+    const now = new Date().toISOString()
+    createDriver({
+      role: "driver",
+      firstName: newDriver.firstName,
+      lastName: newDriver.lastName,
+      email: newDriver.email,
+      phone: newDriver.phone,
+      status: "offline",
+      lastLoginAt: now,
+      operatorId: newDriver.operatorId,
+      vehicleId: newDriver.vehicleId,
+      rating: 0,
+      totalReviews: 0,
+      licenceNumber: newDriver.licenceNumber,
+      documents: [],
+      lastLocation: { latitude: 0, longitude: 0, updatedAt: now },
+      isVerified: false,
+      availability: {
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: [],
+        saturday: [],
+        sunday: [],
+      },
+    })
+    setNewDriver(EMPTY_DRIVER)
+    setShowCreate(false)
+  }
 
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
 
   const getOperatorName = (operatorId: string) => {
-    return DEMO_DATA.operators.find((o) => o.uid === operatorId)?.companyName ?? "Unknown"
+    if (!operatorId) return "Unassigned"
+    return operatorNames[operatorId] ?? "Loading..."
   }
 
   const getVehicleInfo = (vehicleId: string) => {
-    const v = DEMO_DATA.vehicles.find((v) => v.id === vehicleId)
-    return v ? `${v.make} ${v.model}` : "Unknown"
+    if (!vehicleId) return "-"
+    return vehicleInfoMap[vehicleId] ?? "Loading..."
   }
 
   function handleViewDriver(driver: Driver) {
@@ -214,9 +306,15 @@ export default function AdminDriversPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Drivers</h1>
-        <p className="text-sm text-[#6B7280]">Manage all platform drivers</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#172F52]">Drivers</h1>
+          <p className="text-sm text-[#6B7280]">Manage all platform drivers</p>
+        </div>
+        <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90" onClick={() => setShowCreate(true)}>
+          <Plus className="mr-1.5 h-4 w-4" />
+          Add Driver
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -228,7 +326,7 @@ export default function AdminDriversPage() {
             tab === "all" ? "bg-white text-[#172F52] shadow-sm" : "text-[#6B7280] hover:text-[#172F52]"
           )}
         >
-          All Drivers ({DEMO_DATA.drivers.length})
+          All Drivers ({drivers.length})
         </button>
         <button
           onClick={() => { setTab("pending"); setPage(1) }}
@@ -265,8 +363,8 @@ export default function AdminDriversPage() {
           </select>
           <select className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]">
             <option value="all">All Operators</option>
-            {DEMO_DATA.operators.map((o) => (
-              <option key={o.uid} value={o.uid}>{o.companyName}</option>
+            {Object.entries(operatorNames).map(([id, name]) => (
+              <option key={id} value={id}>{name}</option>
             ))}
           </select>
         </div>
@@ -292,6 +390,97 @@ export default function AdminDriversPage() {
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</Button>
         </div>
       </div>
+
+      {/* Add Driver Modal */}
+      <Modal
+        open={showCreate}
+        onOpenChange={setShowCreate}
+        title="Add New Driver"
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">First Name *</Label>
+              <Input
+                value={newDriver.firstName}
+                onChange={(e) => setNewDriver((p) => ({ ...p, firstName: e.target.value }))}
+                placeholder="e.g. Mohammed"
+                className="mt-1 h-10"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">Last Name *</Label>
+              <Input
+                value={newDriver.lastName}
+                onChange={(e) => setNewDriver((p) => ({ ...p, lastName: e.target.value }))}
+                placeholder="e.g. Hassan"
+                className="mt-1 h-10"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">Email *</Label>
+              <Input
+                type="email"
+                value={newDriver.email}
+                onChange={(e) => setNewDriver((p) => ({ ...p, email: e.target.value }))}
+                placeholder="e.g. driver@example.com"
+                className="mt-1 h-10"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">Phone</Label>
+              <Input
+                value={newDriver.phone}
+                onChange={(e) => setNewDriver((p) => ({ ...p, phone: e.target.value }))}
+                placeholder="e.g. +447700900000"
+                className="mt-1 h-10"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">Licence Number</Label>
+              <Input
+                value={newDriver.licenceNumber}
+                onChange={(e) => setNewDriver((p) => ({ ...p, licenceNumber: e.target.value }))}
+                placeholder="e.g. MOH1234567890"
+                className="mt-1 h-10"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">Operator ID</Label>
+              <Input
+                value={newDriver.operatorId}
+                onChange={(e) => setNewDriver((p) => ({ ...p, operatorId: e.target.value }))}
+                placeholder="Leave blank if unassigned"
+                className="mt-1 h-10"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-[#172033]">Vehicle ID</Label>
+              <Input
+                value={newDriver.vehicleId}
+                onChange={(e) => setNewDriver((p) => ({ ...p, vehicleId: e.target.value }))}
+                placeholder="Leave blank if unassigned"
+                className="mt-1 h-10"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 border-t border-[#D9E0E8] pt-4">
+            <Button variant="outline" onClick={() => setShowCreate(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              onClick={handleCreateDriver}
+              disabled={!newDriver.firstName || !newDriver.lastName || !newDriver.email}
+            >
+              <Plus className="mr-1.5 h-4 w-4" />
+              Add Driver
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Driver Detail Modal */}
       <Modal
