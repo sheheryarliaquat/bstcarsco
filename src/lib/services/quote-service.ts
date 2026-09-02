@@ -58,7 +58,13 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
 
     let operator = operatorCache.get(vehicle.operatorId);
     if (operator === undefined) {
-      operator = vehicle.operatorId ? await getDocument<Operator>('users', vehicle.operatorId) : null;
+      // The `users` collection only allows the owner or an admin to read a
+      // profile, so a signed-out/anonymous visitor gets permission-denied
+      // here for most operators — that must not take the whole quote list
+      // down with it, just fall back to an unnamed operator for this quote.
+      operator = vehicle.operatorId
+        ? await getDocument<Operator>('users', vehicle.operatorId).catch(() => null)
+        : null;
       operatorCache.set(vehicle.operatorId, operator);
     }
 
