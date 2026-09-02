@@ -102,7 +102,8 @@ export function QuoteFilters({
         <input
           type="range"
           min={0}
-          max={200}
+          max={1000}
+          step={10}
           value={priceMax}
           onChange={(e) => {
             const v = Number(e.target.value)
@@ -113,7 +114,7 @@ export function QuoteFilters({
         />
         <div className="flex justify-between text-xs text-[#6B7280]">
           <span>£0</span>
-          <span>£200</span>
+          <span>£1000</span>
         </div>
       </div>
 
@@ -270,7 +271,7 @@ export function QuoteFilters({
 }
 
 export const DEFAULT_FILTERS: QuoteFilterValues = {
-  priceRange: [0, 200],
+  priceRange: [0, 1000],
   minRating: 0,
   vehicleTypes: [],
   electricOnly: false,
