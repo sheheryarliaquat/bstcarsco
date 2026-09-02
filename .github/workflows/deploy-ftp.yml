@@ -1,8 +1,12 @@
+# Disabled from auto-running: next.config.ts no longer builds a static
+# export (output: "export" was removed so GoDaddy's Node.js hosting can
+# run `next start`), so this workflow's `npm run build` no longer
+# produces the `out/` folder it deploys. Left as workflow_dispatch only
+# in case cPanel/FTP static hosting is needed again later — re-add the
+# `push` trigger and restore `output: "export"` in next.config.ts if so.
 name: Deploy static site to cPanel SFTP
 
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 jobs:
