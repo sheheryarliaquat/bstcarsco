@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   MapPin,
   Users,
@@ -18,16 +18,14 @@ import { Button } from "@/components/ui/button"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { RatingStars } from "@/components/shared/RatingStars"
-import { DEMO_DATA } from "@/constants"
-import type { Booking, Driver, VehicleType } from "@/types"
+import { listenToAllBookings, updateBooking } from "@/lib/services/booking-service"
+import { listenToDrivers, updateDriver } from "@/lib/services/driver-service"
+import { getVehicle } from "@/lib/services/vehicle-service"
+import { getDocument } from "@/lib/firebase/firestore"
+import type { Booking, Driver, Operator, VehicleType } from "@/types"
 import { BookingStatus } from "@/types"
 
-const EMPTY_BOOKINGS: Booking[] = []
-const EMPTY_DRIVERS: Driver[] = []
-
-const UNASSIGNED_BOOKINGS: Booking[] = []
-
-const AVAILABLE_DRIVERS: Driver[] = []
+type BookingRow = Booking & { id: string }
 
 const VEHICLE_LABELS: Record<VehicleType, string> = {
   saloon: "Saloon",
@@ -40,12 +38,71 @@ const VEHICLE_LABELS: Record<VehicleType, string> = {
 }
 
 export default function AdminDispatchPage() {
-  const [queue, setQueue] = useState<Booking[]>(UNASSIGNED_BOOKINGS)
-  const [drivers, setDrivers] = useState<Driver[]>(AVAILABLE_DRIVERS)
-  const [assignModal, setAssignModal] = useState<Booking | null>(null)
-  const [confirmAssign, setConfirmAssign] = useState<{ booking: Booking; driver: Driver } | null>(null)
+  const [allBookings, setAllBookings] = useState<BookingRow[]>([])
+  const [allDrivers, setAllDrivers] = useState<Driver[]>([])
+  const [assignModal, setAssignModal] = useState<BookingRow | null>(null)
+  const [confirmAssign, setConfirmAssign] = useState<{ booking: BookingRow; driver: Driver } | null>(null)
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null)
   const [sortByDistance, setSortByDistance] = useState(true)
+  const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
+  const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const unsubscribe = listenToAllBookings(
+      (data) => setAllBookings(data as BookingRow[]),
+      () => setAllBookings([])
+    )
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = listenToDrivers(
+      (data) => setAllDrivers(data),
+      () => setAllDrivers([])
+    )
+    return () => unsubscribe()
+  }, [])
+
+  // Awaiting a driver: submitted but nobody's been assigned yet, and it
+  // isn't already cancelled.
+  const queue = useMemo(
+    () =>
+      allBookings.filter(
+        (b) =>
+          !b.driverId &&
+          b.bookingStatus !== BookingStatus.CancelledByPassenger &&
+          b.bookingStatus !== BookingStatus.CancelledByDriver &&
+          b.bookingStatus !== BookingStatus.CancelledByOperator &&
+          b.bookingStatus !== BookingStatus.CancelledByAdmin &&
+          b.bookingStatus !== BookingStatus.TripCompleted
+      ),
+    [allBookings]
+  )
+  const drivers = useMemo(() => allDrivers.filter((d) => d.status === "online"), [allDrivers])
+
+  useEffect(() => {
+    const operatorIds = [...new Set(queue.map((b) => b.operatorId).filter(Boolean))]
+    Promise.all(operatorIds.map((id) => getDocument<Operator>("users", id).catch(() => null))).then(
+      (results) => {
+        const map: Record<string, string> = {}
+        results.forEach((o, i) => {
+          map[operatorIds[i]] = o?.companyName ?? "Unknown"
+        })
+        setOperatorNames(map)
+      }
+    )
+  }, [queue])
+
+  useEffect(() => {
+    const vehicleIds = [...new Set(drivers.map((d) => d.vehicleId).filter(Boolean))]
+    Promise.all(vehicleIds.map((id) => getVehicle(id).catch(() => null))).then((results) => {
+      const map: Record<string, string> = {}
+      results.forEach((v, i) => {
+        map[vehicleIds[i]] = v ? `${v.make} ${v.model}` : "Unknown"
+      })
+      setVehicleInfoMap(map)
+    })
+  }, [drivers])
 
   const sortedDrivers = sortByDistance
     ? [...drivers].sort((a, b) => {
@@ -63,17 +120,23 @@ export default function AdminDispatchPage() {
     setConfirmAssign({ booking: assignModal, driver })
   }
 
-  function confirmAssignment() {
+  async function confirmAssignment() {
     if (!confirmAssign) return
-    setQueue((prev) => prev.filter((b) => b.bookingNumber !== confirmAssign.booking.bookingNumber))
-    setDrivers((prev) => prev.filter((d) => d.uid !== confirmAssign.driver.uid))
+    await Promise.all([
+      updateBooking(confirmAssign.booking.id, {
+        driverId: confirmAssign.driver.uid,
+        bookingStatus: BookingStatus.DriverAssigned,
+      }),
+      updateDriver(confirmAssign.driver.uid, { status: "busy" }),
+    ])
     setAssignModal(null)
     setConfirmAssign(null)
     setSelectedDriverId(null)
   }
 
   function getOperatorName(operatorId: string) {
-    return DEMO_DATA.operators.find((o) => o.uid === operatorId)?.companyName ?? "Unknown"
+    if (!operatorId) return "Unassigned"
+    return operatorNames[operatorId] ?? "Loading..."
   }
 
   function getDistanceEstimate(driver: Driver, booking: Booking) {
@@ -96,8 +159,8 @@ export default function AdminDispatchPage() {
           size="sm"
           className="border-[#D9E0E8]"
           onClick={() => {
-            setQueue(UNASSIGNED_BOOKINGS)
-            setDrivers(AVAILABLE_DRIVERS)
+            setAssignModal(null)
+            setSelectedDriverId(null)
           }}
         >
           <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
@@ -339,7 +402,7 @@ export default function AdminDispatchPage() {
                             {getDistanceEstimate(driver, assignModal)} from pickup
                           </span>
                           <span className="text-[10px] text-[#6B7280]">
-                            {DEMO_DATA.vehicles.find((v) => v.id === driver.vehicleId)?.make} {DEMO_DATA.vehicles.find((v) => v.id === driver.vehicleId)?.model}
+                            {driver.vehicleId ? vehicleInfoMap[driver.vehicleId] ?? "Loading..." : "No vehicle"}
                           </span>
                         </div>
                       )}
