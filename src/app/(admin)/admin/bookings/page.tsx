@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import React from "react"
 import {
   Search,
@@ -27,12 +27,14 @@ import { DataTable, type Column } from "@/components/shared/DataTable"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
 import { BOOKING_STATUSES, PAYMENT_STATUSES, UK_CITIES } from "@/constants"
-import type { Booking } from "@/types"
+import type { Booking, Operator, User as AppUser } from "@/types"
 import { BookingStatus } from "@/types"
+import { listenToAllBookings, updateBookingStatus } from "@/lib/services/booking-service"
+import { getVehicle } from "@/lib/services/vehicle-service"
+import { getDocument } from "@/lib/firebase/firestore"
 
-const ALL_BOOKINGS: Booking[] = []
+type BookingRow = Booking & { id: string }
 
 const PAGE_SIZES = [10, 25, 50, 100]
 
@@ -43,13 +45,62 @@ export default function AdminBookingsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [paymentFilter, setPaymentFilter] = useState<string>("all")
   const [showFilters, setShowFilters] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
-  const [cancelBooking, setCancelBooking] = useState<Booking | null>(null)
+  const [cancelBooking, setCancelBooking] = useState<BookingRow | null>(null)
   const [expandedRow, setExpandedRow] = useState<string | null>(null)
-  const [cashActionBooking, setCashActionBooking] = useState<Booking | null>(null)
+  const [cashActionBooking, setCashActionBooking] = useState<BookingRow | null>(null)
   const [cashActionType, setCashActionType] = useState<"approve" | "reject">("approve")
-  const [bookings, setBookings] = useState<Booking[]>([])
+  const [bookings, setBookings] = useState<BookingRow[]>([])
+  const [passengerNames, setPassengerNames] = useState<Record<string, string>>({})
+  const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
+  const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const unsubscribe = listenToAllBookings(
+      (data) => setBookings(data as BookingRow[]),
+      () => setBookings([])
+    )
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    const passengerIds = [...new Set(bookings.map((b) => b.passengerId).filter(Boolean))]
+    const operatorIds = [...new Set(bookings.map((b) => b.operatorId).filter(Boolean))]
+    const vehicleIds = [...new Set(bookings.map((b) => b.vehicleId).filter(Boolean))]
+
+    Promise.all(
+      passengerIds.map((id) =>
+        id.startsWith("guest-") || id.length < 20
+          ? Promise.resolve(null)
+          : getDocument<AppUser>("users", id).catch(() => null)
+      )
+    ).then((results) => {
+      const map: Record<string, string> = {}
+      results.forEach((u, i) => {
+        map[passengerIds[i]] = u ? `${u.firstName} ${u.lastName}` : "Guest"
+      })
+      setPassengerNames(map)
+    })
+
+    Promise.all(operatorIds.map((id) => getDocument<Operator>("users", id).catch(() => null))).then(
+      (results) => {
+        const map: Record<string, string> = {}
+        results.forEach((o, i) => {
+          map[operatorIds[i]] = o?.companyName ?? "Unknown"
+        })
+        setOperatorNames(map)
+      }
+    )
+
+    Promise.all(vehicleIds.map((id) => getVehicle(id).catch(() => null))).then((results) => {
+      const map: Record<string, string> = {}
+      results.forEach((v, i) => {
+        map[vehicleIds[i]] = v ? `${v.make} ${v.model}` : "Unknown"
+      })
+      setVehicleInfoMap(map)
+    })
+  }, [bookings])
 
   const filtered = useMemo(() => {
     let result = [...bookings]
@@ -78,51 +129,38 @@ export default function AdminBookingsPage() {
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
 
-  const getPassengerName = (passengerId: string) => {
-    const p = DEMO_DATA.passengers.find((p) => p.uid === passengerId)
-    return p ? `${p.firstName} ${p.lastName}` : "Unknown"
-  }
+  const getPassengerName = (passengerId: string) => passengerNames[passengerId] ?? "Loading..."
 
   const getOperatorName = (operatorId: string) => {
-    const o = DEMO_DATA.operators.find((o) => o.uid === operatorId)
-    return o?.companyName ?? "Unknown"
+    if (!operatorId) return "Unassigned"
+    return operatorNames[operatorId] ?? "Loading..."
   }
 
   const getDriverName = (driverId: string) => {
     if (!driverId) return "Unassigned"
-    const d = DEMO_DATA.drivers.find((d) => d.uid === driverId)
-    return d ? `${d.firstName} ${d.lastName}` : "Unknown"
+    return "Unknown"
   }
 
   const getVehicleInfo = (vehicleId: string) => {
     if (!vehicleId) return "-"
-    const v = DEMO_DATA.vehicles.find((v) => v.id === vehicleId)
-    return v ? `${v.make} ${v.model}` : "Unknown"
+    return vehicleInfoMap[vehicleId] ?? "Loading..."
   }
 
-  function handleViewBooking(booking: Booking) {
+  function handleViewBooking(booking: BookingRow) {
     setSelectedBooking(booking)
     setDetailOpen(true)
   }
 
-  function handleCashAction(booking: Booking, action: "approve" | "reject") {
+  function handleCashAction(booking: BookingRow, action: "approve" | "reject") {
     setCashActionBooking(booking)
     setCashActionType(action)
   }
 
-  function confirmCashAction() {
+  async function confirmCashAction() {
     if (!cashActionBooking) return
-    setBookings((prev) =>
-      prev.map((b) =>
-        b.bookingNumber === cashActionBooking.bookingNumber
-          ? {
-              ...b,
-              bookingStatus: cashActionType === "approve" ? BookingStatus.Confirmed : BookingStatus.CancelledByAdmin,
-              paymentStatus: cashActionType === "approve" ? ("pending" as const) : ("refunded" as const),
-            }
-          : b
-      )
-    )
+    const status = cashActionType === "approve" ? BookingStatus.Confirmed : BookingStatus.CancelledByAdmin
+    const paymentStatus = cashActionType === "approve" ? ("pending" as const) : ("refunded" as const)
+    await updateBookingStatus(cashActionBooking.id, status, { paymentStatus })
     setCashActionBooking(null)
   }
 
@@ -318,8 +356,8 @@ export default function AdminBookingsPage() {
             />
             <select className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]">
               <option value="all">All Operators</option>
-              {DEMO_DATA.operators.map((o) => (
-                <option key={o.uid} value={o.uid}>{o.companyName}</option>
+              {Object.entries(operatorNames).map(([id, name]) => (
+                <option key={id} value={id}>{name}</option>
               ))}
             </select>
           </div>
