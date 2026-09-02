@@ -24,6 +24,8 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { DEMO_DATA } from "@/constants"
 import type { Driver } from "@/types"
 
+const EMPTY_DRIVERS: Driver[] = []
+
 export default function AdminDriversPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -35,11 +37,11 @@ export default function AdminDriversPage() {
   const [suspendTarget, setSuspendTarget] = useState<Driver | null>(null)
 
   const pendingDrivers = useMemo(() => {
-    return DEMO_DATA.drivers.filter((d) => !d.isVerified)
+    return []
   }, [])
 
   const filtered = useMemo(() => {
-    const source = tab === "pending" ? pendingDrivers : DEMO_DATA.drivers
+    const source = tab === "pending" ? pendingDrivers : EMPTY_DRIVERS
     let result = [...source]
 
     if (search) {

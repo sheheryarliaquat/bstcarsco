@@ -32,7 +32,7 @@ import { BOOKING_STATUSES, PAYMENT_STATUSES, UK_CITIES } from "@/constants"
 import type { Booking } from "@/types"
 import { BookingStatus } from "@/types"
 
-const ALL_BOOKINGS = DEMO_DATA.bookings
+const ALL_BOOKINGS: Booking[] = []
 
 const PAGE_SIZES = [10, 25, 50, 100]
 
@@ -49,7 +49,7 @@ export default function AdminBookingsPage() {
   const [expandedRow, setExpandedRow] = useState<string | null>(null)
   const [cashActionBooking, setCashActionBooking] = useState<Booking | null>(null)
   const [cashActionType, setCashActionType] = useState<"approve" | "reject">("approve")
-  const [bookings, setBookings] = useState<Booking[]>(ALL_BOOKINGS)
+  const [bookings, setBookings] = useState<Booking[]>([])
 
   const filtered = useMemo(() => {
     let result = [...bookings]

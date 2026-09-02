@@ -16,8 +16,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardCard } from "@/components/shared/DashboardCard"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
-
 interface PayoutRecord {
   id: string
   recipientId: string
@@ -30,24 +28,9 @@ interface PayoutRecord {
   date: string
 }
 
-const OPERATOR_PAYOUTS: PayoutRecord[] = [
-  { id: "opay-001", recipientId: "op-001", recipientName: "Kingsley Travel", period: "Aug 1-15, 2026", gross: 4250.00, commission: 637.50, netAmount: 3612.50, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "opay-002", recipientId: "op-002", recipientName: "Northern Taxi Services", period: "Aug 1-15, 2026", gross: 3180.00, commission: 572.40, netAmount: 2607.60, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "opay-003", recipientId: "op-003", recipientName: "Capital Taxis Edinburgh", period: "Aug 1-15, 2026", gross: 2450.00, commission: 294.00, netAmount: 2156.00, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "opay-004", recipientId: "op-001", recipientName: "Kingsley Travel", period: "Aug 16-31, 2026", gross: 5120.00, commission: 768.00, netAmount: 4352.00, status: "pending", date: "2026-08-31T12:00:00Z" },
-  { id: "opay-005", recipientId: "op-002", recipientName: "Northern Taxi Services", period: "Aug 16-31, 2026", gross: 3890.00, commission: 700.20, netAmount: 3189.80, status: "processing", date: "2026-08-31T12:00:00Z" },
-  { id: "opay-006", recipientId: "op-003", recipientName: "Capital Taxis Edinburgh", period: "Aug 16-31, 2026", gross: 2980.00, commission: 357.60, netAmount: 2622.40, status: "pending", date: "2026-08-31T12:00:00Z" },
-]
+const OPERATOR_PAYOUTS: PayoutRecord[] = []
 
-const DRIVER_PAYOUTS: PayoutRecord[] = [
-  { id: "dpay-001", recipientId: "drv-001", recipientName: "Mohammed Hassan", period: "Aug 1-15, 2026", gross: 1850.00, commission: 277.50, netAmount: 1572.50, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "dpay-002", recipientId: "drv-002", recipientName: "Sarah O'Brien", period: "Aug 1-15, 2026", gross: 1620.00, commission: 243.00, netAmount: 1377.00, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "dpay-003", recipientId: "drv-003", recipientName: "Amit Sharma", period: "Aug 1-15, 2026", gross: 1340.00, commission: 241.20, netAmount: 1098.80, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "dpay-004", recipientId: "drv-005", recipientName: "Linda Nguyen", period: "Aug 1-15, 2026", gross: 1560.00, commission: 187.20, netAmount: 1372.80, status: "completed", date: "2026-08-16T12:00:00Z" },
-  { id: "dpay-005", recipientId: "drv-001", recipientName: "Mohammed Hassan", period: "Aug 16-31, 2026", gross: 2100.00, commission: 315.00, netAmount: 1785.00, status: "pending", date: "2026-08-31T12:00:00Z" },
-  { id: "dpay-006", recipientId: "drv-002", recipientName: "Sarah O'Brien", period: "Aug 16-31, 2026", gross: 1780.00, commission: 267.00, netAmount: 1513.00, status: "pending", date: "2026-08-31T12:00:00Z" },
-  { id: "dpay-007", recipientId: "drv-003", recipientName: "Amit Sharma", period: "Aug 16-31, 2026", gross: 1450.00, commission: 261.00, netAmount: 1189.00, status: "processing", date: "2026-08-31T12:00:00Z" },
-]
+const DRIVER_PAYOUTS: PayoutRecord[] = []
 
 export default function AdminPayoutsPage() {
   const [tab, setTab] = useState<"operator" | "driver">("operator")

@@ -22,11 +22,12 @@ import { DEMO_DATA } from "@/constants"
 import type { Booking, Driver, VehicleType } from "@/types"
 import { BookingStatus } from "@/types"
 
-const UNASSIGNED_BOOKINGS = DEMO_DATA.bookings.filter(
-  (b) => !b.driverId && b.bookingStatus !== BookingStatus.TripCompleted && b.bookingStatus !== BookingStatus.CancelledByPassenger && b.bookingStatus !== BookingStatus.CancelledByDriver && b.bookingStatus !== BookingStatus.CancelledByAdmin
-)
+const EMPTY_BOOKINGS: Booking[] = []
+const EMPTY_DRIVERS: Driver[] = []
 
-const AVAILABLE_DRIVERS = DEMO_DATA.drivers.filter((d) => d.status === "online")
+const UNASSIGNED_BOOKINGS: Booking[] = []
+
+const AVAILABLE_DRIVERS: Driver[] = []
 
 const VEHICLE_LABELS: Record<VehicleType, string> = {
   saloon: "Saloon",

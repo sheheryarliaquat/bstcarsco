@@ -23,7 +23,9 @@ import { DashboardCard } from "@/components/shared/DashboardCard"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { DEMO_DATA } from "@/constants"
-import type { Passenger } from "@/types"
+import type { Booking, Passenger } from "@/types"
+
+const EMPTY_PASSENGERS: Passenger[] = []
 
 export default function AdminPassengersPage() {
   const [search, setSearch] = useState("")
@@ -34,17 +36,13 @@ export default function AdminPassengersPage() {
   const [suspendTarget, setSuspendTarget] = useState<Passenger | null>(null)
 
   const passengerStats = useMemo(() => {
-    const total = DEMO_DATA.passengers.length
-    const active = DEMO_DATA.passengers.filter((p) => p.status === "active").length
-    const totalBookings = DEMO_DATA.bookings.length
-    const totalRevenue = DEMO_DATA.bookings.reduce((sum, b) => sum + b.total, 0)
-    return { total, active, totalBookings, totalRevenue }
+    return { total: 0, active: 0, totalBookings: 0, totalRevenue: 0 }
   }, [])
 
   const filtered = useMemo(() => {
-    if (!search) return DEMO_DATA.passengers
+    if (!search) return EMPTY_PASSENGERS
     const q = search.toLowerCase()
-    return DEMO_DATA.passengers.filter(
+    return EMPTY_PASSENGERS.filter(
       (p) =>
         p.firstName.toLowerCase().includes(q) ||
         p.lastName.toLowerCase().includes(q) ||
@@ -56,8 +54,8 @@ export default function AdminPassengersPage() {
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
 
-  const getPassengerBookings = (passengerId: string) => {
-    return DEMO_DATA.bookings.filter((b) => b.passengerId === passengerId)
+  const getPassengerBookings = (passengerId: string): Booking[] => {
+    return []
   }
 
   const getPassengerSpent = (passengerId: string) => {

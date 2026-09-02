@@ -25,13 +25,13 @@ export default function OperatorProfilePage() {
   const operator = DEMO_DATA.operators[0]
   const [saved, setSaved] = useState(false)
   const [profile, setProfile] = useState({
-    companyName: operator.companyName,
-    description: operator.description,
-    email: operator.email,
-    phone: operator.phone,
+    companyName: operator?.companyName ?? "",
+    description: operator?.description ?? "",
+    email: operator?.email ?? "",
+    phone: operator?.phone ?? "",
     address: "45 Mayfair Lane, London, W1K 4QS",
     operatingAreas: ["Central London", "Greater London", "Heathrow Airport", "Gatwick Airport"],
-    fleetSize: operator.fleetSize.toString(),
+    fleetSize: (operator?.fleetSize ?? 0).toString(),
     serviceHoursStart: "06:00",
     serviceHoursEnd: "23:00",
     weekendHoursStart: "08:00",
@@ -69,16 +69,16 @@ export default function OperatorProfilePage() {
           <div className="mb-4 flex flex-col items-center text-center">
             <div className="relative mb-4">
               <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-[#172F52] text-2xl font-bold text-white">
-                {operator.companyName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                {(operator?.companyName ?? "").split(" ").map((w) => w[0]).join("").slice(0, 2)}
               </div>
               <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#D4145A] text-white shadow-md hover:bg-[#D4145A]/90">
                 <Camera className="h-4 w-4" />
               </button>
             </div>
             <h2 className="text-lg font-bold text-[#172F52]">
-              {operator.companyName}
+              {operator?.companyName || "Your Company"}
             </h2>
-            <RatingStars rating={operator.rating} size="md" count={operator.totalReviews} />
+            <RatingStars rating={operator?.rating ?? 0} size="md" count={operator?.totalReviews ?? 0} />
           </div>
 
           <div className="space-y-3 border-t border-[#F5F7FA] pt-4">
@@ -93,21 +93,21 @@ export default function OperatorProfilePage() {
               <Car className="h-4 w-4 shrink-0" />
               <span>Fleet Size</span>
               <span className="ml-auto font-medium text-[#172F52]">
-                {operator.fleetSize} vehicles
+                {operator?.fleetSize ?? 0} vehicles
               </span>
             </div>
             <div className="flex items-center gap-3 text-sm text-[#6B7280]">
               <Star className="h-4 w-4 shrink-0" />
               <span>Rating</span>
               <span className="ml-auto font-medium text-[#172F52]">
-                {operator.rating}/5.0
+                {operator?.rating ?? 0}/5.0
               </span>
             </div>
             <div className="flex items-center gap-3 text-sm text-[#6B7280]">
               <Users className="h-4 w-4 shrink-0" />
               <span>Total Reviews</span>
               <span className="ml-auto font-medium text-[#172F52]">
-                {operator.totalReviews.toLocaleString()}
+                {(operator?.totalReviews ?? 0).toLocaleString()}
               </span>
             </div>
           </div>

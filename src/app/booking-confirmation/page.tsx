@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   CheckCircle2,
@@ -26,16 +26,79 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BookingProgress } from "@/components/booking/BookingProgress";
-import { DEMO_DATA } from "@/constants";
+import { getBookingByNumberAnySource } from "@/lib/services/booking-service";
+import { getVehicle } from "@/lib/services/vehicle-service";
+import { getDocument } from "@/lib/firebase/firestore";
+import type { Booking, Operator } from "@/types";
 import { format } from "date-fns";
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const paymentMethod = searchParams.get("payment") || "card";
+  const bookingNumber = searchParams.get("bookingNumber");
   const isCash = paymentMethod === "cash";
 
-  const booking = DEMO_DATA.bookings[3];
-  const quote = DEMO_DATA.quotes[0];
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [vehicleDescription, setVehicleDescription] = useState<string | null>(null);
+  const [operatorName, setOperatorName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!bookingNumber) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    getBookingByNumberAnySource(bookingNumber)
+      .then(async (found) => {
+        if (cancelled || !found) return;
+        setBooking(found);
+        const [vehicle, operator] = await Promise.all([
+          found.vehicleId ? getVehicle(found.vehicleId).catch(() => null) : null,
+          found.operatorId ? getDocument<Operator>("users", found.operatorId).catch(() => null) : null,
+        ]);
+        if (cancelled) return;
+        if (vehicle) setVehicleDescription(`${vehicle.make} ${vehicle.model}`);
+        if (operator) setOperatorName(operator.companyName);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [bookingNumber]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#D4145A] border-t-transparent" />
+          <p className="text-sm text-[#6B7280]">Loading booking details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-[#172F52]">Booking not found</h1>
+          <p className="mt-2 text-sm text-[#6B7280]">
+            We couldn&apos;t find that booking. If you just paid, check your email for confirmation.
+          </p>
+          <Button
+            render={<Link href="/" />}
+            nativeButton={false}
+            className="mt-4 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          >
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -136,7 +199,7 @@ function ConfirmationContent() {
               <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
                 <Car className="h-3.5 w-3.5 text-[#6B7280]" />
                 <span className="font-medium">
-                  {quote.vehicleDescription}
+                  {vehicleDescription ?? booking.vehicleType}
                 </span>
               </div>
             </div>
@@ -144,7 +207,7 @@ function ConfirmationContent() {
               <p className="text-xs text-[#6B7280]">Operator</p>
               <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
                 <Building2 className="h-3.5 w-3.5 text-[#6B7280]" />
-                <span className="font-medium">{quote.operatorName}</span>
+                <span className="font-medium">{operatorName ?? "Unknown Operator"}</span>
               </div>
             </div>
             <div>

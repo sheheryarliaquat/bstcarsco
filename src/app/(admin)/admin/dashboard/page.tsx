@@ -24,43 +24,31 @@ import { RatingStars } from "@/components/shared/RatingStars"
 import { DEMO_DATA } from "@/constants"
 import { BookingStatus } from "@/types"
 
-const RECENT_BOOKINGS = [
-  { id: "UKTB-2026-000002", passenger: "Emma Thompson", pickup: "1 Manchester Square, London", destination: "10 Downing Street, London", time: "14:00", price: "£11.52", status: BookingStatus.DriverEnRoute, operator: "Kingsley Travel" },
-  { id: "UKTB-2026-000005", passenger: "David Morgan", pickup: "Waverley Station, Edinburgh", destination: "Glasgow Central Station", time: "09:00", price: "£410.40", status: BookingStatus.TripStarted, operator: "Capital Taxis" },
-  { id: "UKTB-2026-000001", passenger: "James Wilson", pickup: "221B Baker Street, London", destination: "Heathrow Airport, T5", time: "06:30", price: "£51.00", status: BookingStatus.TripCompleted, operator: "Kingsley Travel" },
-  { id: "UKTB-2026-000003", passenger: "Raj Patel", pickup: "Birmingham New Street", destination: "Manchester Airport", time: "10:00", price: "£102.60", status: BookingStatus.Confirmed, operator: "Northern Taxi" },
-  { id: "UKTB-2026-000004", passenger: "Sophie Clarkson", pickup: "The O2 Arena, London", destination: "Heathrow Airport, T5", time: "15:30", price: "£45.60", status: BookingStatus.PendingPayment, operator: "Kingsley Travel" },
-  { id: "UKTB-2026-000006", passenger: "James Wilson", pickup: "221B Baker Street, London", destination: "10 Downing Street, London", time: "18:30", price: "£13.80", status: BookingStatus.PaymentFailed, operator: "Kingsley Travel" },
-]
+const RECENT_BOOKINGS: Array<{ id: string; passenger: string; pickup: string; destination: string; time: string; price: string; status: string }> = []
 
 const BOOKINGS_BY_DAY = [
-  { day: "Mon", count: 38 },
-  { day: "Tue", count: 45 },
-  { day: "Wed", count: 52 },
-  { day: "Thu", count: 41 },
-  { day: "Fri", count: 67 },
-  { day: "Sat", count: 48 },
-  { day: "Sun", count: 32 },
+  { day: "Mon", count: 0 },
+  { day: "Tue", count: 0 },
+  { day: "Wed", count: 0 },
+  { day: "Thu", count: 0 },
+  { day: "Fri", count: 0 },
+  { day: "Sat", count: 0 },
+  { day: "Sun", count: 0 },
 ]
 
 const REVENUE_BY_DAY = [
-  { day: "Mon", amount: 2180 },
-  { day: "Tue", amount: 3420 },
-  { day: "Wed", amount: 2890 },
-  { day: "Thu", amount: 3150 },
-  { day: "Fri", amount: 4680 },
-  { day: "Sat", amount: 3240 },
-  { day: "Sun", amount: 1890 },
+  { day: "Mon", amount: 0 },
+  { day: "Tue", amount: 0 },
+  { day: "Wed", amount: 0 },
+  { day: "Thu", amount: 0 },
+  { day: "Fri", amount: 0 },
+  { day: "Sat", amount: 0 },
+  { day: "Sun", amount: 0 },
 ]
 
-const ONLINE_DRIVERS = DEMO_DATA.drivers.filter((d) => d.status !== "offline")
+const ONLINE_DRIVERS: Array<{ uid: string; firstName: string; lastName: string; status: string; rating: number; totalReviews: number }> = []
 
-const SYSTEM_ALERTS = [
-  { id: 1, type: "warning", message: "3 drivers have documents expiring within 7 days", time: "2 hours ago" },
-  { id: 2, type: "info", message: "New operator application received: City Cars Bristol", time: "4 hours ago" },
-  { id: 3, type: "error", message: "Payment gateway timeout detected — investigating", time: "5 hours ago" },
-  { id: 4, type: "warning", message: "5 bookings pending driver assignment for over 30 minutes", time: "6 hours ago" },
-]
+const SYSTEM_ALERTS: Array<{ id: number; type: "warning" | "info" | "error"; message: string; time: string }> = []
 
 export default function AdminDashboardPage() {
   const maxBookings = Math.max(...BOOKINGS_BY_DAY.map((d) => d.count))
@@ -80,18 +68,18 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        <DashboardCard title="Today's Bookings" value={47} icon={<CalendarDays className="h-5 w-5" />} trend="up" change={12} />
-        <DashboardCard title="Today's Revenue" value="£3,240" icon={<Banknote className="h-5 w-5" />} trend="up" change={8} />
-        <DashboardCard title="Active Trips" value={12} icon={<Navigation className="h-5 w-5" />} trend="up" change={5} />
-        <DashboardCard title="Available Drivers" value={23} icon={<UserCheck className="h-5 w-5" />} trend="down" change={3} />
-        <DashboardCard title="Online Drivers" value={18} icon={<Car className="h-5 w-5" />} trend="up" change={10} />
+        <DashboardCard title="Today's Bookings" value={0} icon={<CalendarDays className="h-5 w-5" />} />
+        <DashboardCard title="Today's Revenue" value="£0" icon={<Banknote className="h-5 w-5" />} />
+        <DashboardCard title="Active Trips" value={0} icon={<Navigation className="h-5 w-5" />} />
+        <DashboardCard title="Available Drivers" value={0} icon={<UserCheck className="h-5 w-5" />} />
+        <DashboardCard title="Online Drivers" value={0} icon={<Car className="h-5 w-5" />} />
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        <DashboardCard title="Total Passengers" value="2,450" icon={<Users className="h-5 w-5" />} trend="up" change={15} />
-        <DashboardCard title="Total Operators" value={15} icon={<Building className="h-5 w-5" />} trend="up" change={2} />
-        <DashboardCard title="Pending Approvals" value={5} icon={<Clock className="h-5 w-5" />} />
-        <DashboardCard title="Pending Documents" value={8} icon={<FileWarning className="h-5 w-5" />} />
-        <DashboardCard title="Cancelled Trips" value={3} icon={<XCircle className="h-5 w-5" />} trend="down" change={40} />
+        <DashboardCard title="Total Passengers" value="0" icon={<Users className="h-5 w-5" />} />
+        <DashboardCard title="Total Operators" value={0} icon={<Building className="h-5 w-5" />} />
+        <DashboardCard title="Pending Approvals" value={0} icon={<Clock className="h-5 w-5" />} />
+        <DashboardCard title="Pending Documents" value={0} icon={<FileWarning className="h-5 w-5" />} />
+        <DashboardCard title="Cancelled Trips" value={0} icon={<XCircle className="h-5 w-5" />} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -151,32 +139,38 @@ export default function AdminDashboardPage() {
               </Link>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">ID</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Passenger</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Route</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Time</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Price</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {RECENT_BOOKINGS.map((booking) => (
-                    <tr key={booking.id} className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50">
-                      <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{booking.id}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{booking.passenger}</td>
-                      <td className="max-w-[200px] truncate px-4 py-3 text-[#6B7280]">
-                        {booking.pickup.split(",")[0]} → {booking.destination.split(",")[0]}
-                      </td>
-                      <td className="px-4 py-3 text-[#6B7280]">{booking.time}</td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">{booking.price}</td>
-                      <td className="px-4 py-3"><StatusBadge status={booking.status} type="booking" /></td>
+              {RECENT_BOOKINGS.length === 0 ? (
+                <div className="px-6 py-8 text-center">
+                  <p className="text-sm text-[#6B7280]">No recent bookings to display</p>
+                </div>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Passenger</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Route</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Time</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Price</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {RECENT_BOOKINGS.map((booking) => (
+                      <tr key={booking.id} className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50">
+                        <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{booking.id}</td>
+                        <td className="px-4 py-3 text-[#172F52]">{booking.passenger}</td>
+                        <td className="max-w-[200px] truncate px-4 py-3 text-[#6B7280]">
+                          {booking.pickup.split(",")[0]} → {booking.destination.split(",")[0]}
+                        </td>
+                        <td className="px-4 py-3 text-[#6B7280]">{booking.time}</td>
+                        <td className="px-4 py-3 font-semibold text-[#172F52]">{booking.price}</td>
+                        <td className="px-4 py-3"><StatusBadge status={booking.status} type="booking" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
@@ -189,31 +183,37 @@ export default function AdminDashboardPage() {
               <span className="text-xs text-[#6B7280]">{ONLINE_DRIVERS.length} active</span>
             </div>
             <div className="divide-y divide-[#F5F7FA]">
-              {ONLINE_DRIVERS.map((driver) => (
-                <div key={driver.uid} className="flex items-center gap-3 px-6 py-3">
-                  <div className="relative">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52] text-xs font-semibold text-white">
-                      {driver.firstName[0]}{driver.lastName[0]}
-                    </div>
-                    <span
-                      className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
-                        driver.status === "online" ? "bg-green-500" : driver.status === "busy" ? "bg-amber-500" : "bg-gray-400"
-                      }`}
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-[#172F52]">
-                      {driver.firstName} {driver.lastName}
-                    </p>
-                    <RatingStars rating={driver.rating} size="sm" />
-                  </div>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    driver.status === "online" ? "bg-green-50 text-green-700" : driver.status === "busy" ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-500"
-                  }`}>
-                    {driver.status}
-                  </span>
+              {ONLINE_DRIVERS.length === 0 ? (
+                <div className="px-6 py-8 text-center">
+                  <p className="text-sm text-[#6B7280]">No online drivers at the moment</p>
                 </div>
-              ))}
+              ) : (
+                ONLINE_DRIVERS.map((driver) => (
+                  <div key={driver.uid} className="flex items-center gap-3 px-6 py-3">
+                    <div className="relative">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52] text-xs font-semibold text-white">
+                        {driver.firstName[0]}{driver.lastName[0]}
+                      </div>
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
+                          driver.status === "online" ? "bg-green-500" : driver.status === "busy" ? "bg-amber-500" : "bg-gray-400"
+                        }`}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-[#172F52]">
+                        {driver.firstName} {driver.lastName}
+                      </p>
+                      <RatingStars rating={driver.rating} size="sm" />
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      driver.status === "online" ? "bg-green-50 text-green-700" : driver.status === "busy" ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-500"
+                    }`}>
+                      {driver.status}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -229,21 +229,27 @@ export default function AdminDashboardPage() {
               </span>
             </div>
             <div className="divide-y divide-[#F5F7FA]">
-              {SYSTEM_ALERTS.map((alert) => (
-                <div key={alert.id} className="flex items-start gap-3 px-6 py-3">
-                  <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                    alert.type === "error" ? "bg-red-100" : alert.type === "warning" ? "bg-amber-100" : "bg-blue-100"
-                  }`}>
-                    <AlertTriangle className={`h-3.5 w-3.5 ${
-                      alert.type === "error" ? "text-red-600" : alert.type === "warning" ? "text-amber-600" : "text-blue-600"
-                    }`} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-[#172F52]">{alert.message}</p>
-                    <p className="mt-0.5 text-xs text-[#6B7280]">{alert.time}</p>
-                  </div>
+              {SYSTEM_ALERTS.length === 0 ? (
+                <div className="px-6 py-8 text-center">
+                  <p className="text-sm text-[#6B7280]">No system alerts</p>
                 </div>
-              ))}
+              ) : (
+                SYSTEM_ALERTS.map((alert) => (
+                  <div key={alert.id} className="flex items-start gap-3 px-6 py-3">
+                    <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                      alert.type === "error" ? "bg-red-100" : alert.type === "warning" ? "bg-amber-100" : "bg-blue-100"
+                    }`}>
+                      <AlertTriangle className={`h-3.5 w-3.5 ${
+                        alert.type === "error" ? "text-red-600" : alert.type === "warning" ? "text-amber-600" : "text-blue-600"
+                      }`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-[#172F52]">{alert.message}</p>
+                      <p className="mt-0.5 text-xs text-[#6B7280]">{alert.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -258,33 +264,9 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
         <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
-          {DEMO_DATA.operators.map((op) => (
-            <div key={op.uid} className="rounded-xl border border-[#F5F7FA] bg-[#F5F7FA]/50 p-4 transition-colors hover:bg-[#F5F7FA]">
-              <div className="mb-3 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#172F52] text-sm font-bold text-white">
-                  {op.companyName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#172F52]">{op.companyName}</p>
-                  <RatingStars rating={op.rating} size="sm" count={op.totalReviews} />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div>
-                  <p className="text-lg font-bold text-[#172F52]">{op.fleetSize}</p>
-                  <p className="text-[10px] text-[#6B7280]">Vehicles</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-[#172F52]">{op.totalReviews}</p>
-                  <p className="text-[10px] text-[#6B7280]">Reviews</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-[#172F52]">{op.commission.percent}%</p>
-                  <p className="text-[10px] text-[#6B7280]">Commission</p>
-                </div>
-              </div>
-            </div>
-          ))}
+          <div className="col-span-full text-center py-8">
+            <p className="text-sm text-[#6B7280]">No operators to display</p>
+          </div>
         </div>
       </div>
     </div>

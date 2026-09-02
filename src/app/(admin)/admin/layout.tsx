@@ -248,9 +248,6 @@ export default function AdminLayout({
         <div className="ml-auto">
           <Link href="/admin/notifications" className="relative">
             <Bell className="h-5 w-5 text-[#6B7280]" />
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4145A] text-[9px] font-bold text-white">
-              5
-            </span>
           </Link>
         </div>
       </div>

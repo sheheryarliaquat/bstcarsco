@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/sheet"
 import { NotificationBell } from "@/components/shared/NotificationBell"
 import { cn } from "@/lib/utils"
-import { DEMO_DATA } from "@/constants"
+import { useAuth } from "@/hooks/useAuth"
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/passenger/dashboard", icon: LayoutDashboard },
@@ -45,10 +45,17 @@ const NAV_ITEMS = [
   { id: "support", label: "Support", path: "/passenger/support", icon: Headphones },
 ] as const
 
-const passenger = DEMO_DATA.passengers[0]
-
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const { userData } = useAuth()
+  const displayName = userData
+    ? `${userData.firstName} ${userData.lastName}`.trim() || "Passenger"
+    : "Passenger"
+  const initials = userData
+    ? `${userData.firstName?.[0] ?? ""}${userData.lastName?.[0] ?? ""}`.toUpperCase() || "P"
+    : "P"
+  const email = userData?.email ?? "No email available"
+  const avatarSrc = userData?.photoURL ?? ""
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -103,18 +110,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar size="sm">
-          <AvatarImage src={passenger.photoURL} alt={passenger.firstName} />
+          {avatarSrc ? <AvatarImage src={avatarSrc} alt={displayName} /> : null}
           <AvatarFallback className="bg-[#172F52] text-xs text-white">
-            {passenger.firstName[0]}
-            {passenger.lastName[0]}
+            {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[#172F52]">
-            {passenger.firstName} {passenger.lastName}
+            {displayName}
           </p>
           <p className="truncate text-[11px] text-[#6B7280]">
-            {passenger.email}
+            {email}
           </p>
         </div>
       </div>

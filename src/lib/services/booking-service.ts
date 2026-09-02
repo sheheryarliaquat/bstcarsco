@@ -35,21 +35,44 @@ function saveBookingLocally(booking: Booking & Record<string, unknown>): string 
   return id;
 }
 
+function getLocalBookingByNumber(bookingNumber: string): Booking | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const existing = JSON.parse(localStorage.getItem(LOCAL_BOOKINGS_KEY) || '{}');
+    const match = Object.values(existing).find(
+      (b) => (b as Booking).bookingNumber === bookingNumber
+    );
+    return (match as Booking) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function createBooking(
   data: Omit<Booking, 'bookingNumber' | 'createdAt' | 'updatedAt'>
-): Promise<string> {
+): Promise<{ id: string; bookingNumber: string }> {
   const bookingNumber = generateBookingNumber();
   const payload = { ...data, bookingNumber } as Booking & Record<string, unknown>;
   try {
-    return await addDocument<Booking>(COLLECTION, payload);
+    const id = await addDocument<Booking>(COLLECTION, payload);
+    return { id, bookingNumber };
   } catch (err) {
     // Firestore can reject this write (offline, misconfigured rules, no
     // network to the project) — don't let a checkout crash on that. Keep
     // the booking locally so the passenger still gets a confirmation; log
     // for diagnosis instead of surfacing the raw SDK error.
     console.error('createBooking: falling back to local storage —', err);
-    return saveBookingLocally(payload);
+    const id = saveBookingLocally(payload);
+    return { id, bookingNumber };
   }
+}
+
+export async function getBookingByNumberAnySource(
+  bookingNumber: string
+): Promise<Booking | null> {
+  const remote = await getBookingByNumber(bookingNumber).catch(() => null);
+  if (remote) return remote;
+  return getLocalBookingByNumber(bookingNumber);
 }
 
 export async function getBooking(id: string): Promise<Booking | null> {

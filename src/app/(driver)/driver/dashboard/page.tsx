@@ -27,58 +27,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { BookingStatus } from "@/types"
 
-const DEMO_RECENT_TRIPS = [
-  {
-    id: "UKTB-2026-000001",
-    from: "221B Baker Street, London NW1 6XE",
-    to: "Heathrow Airport, Terminal 5",
-    date: "25 Aug 2026",
-    time: "06:30",
-    amount: "£51.00",
-    status: BookingStatus.TripCompleted,
-    passenger: "James Wilson",
-  },
-  {
-    id: "UKTB-2026-000002",
-    from: "1 Manchester Square, London W1U 3PH",
-    to: "10 Downing Street, London SW1A 2AA",
-    date: "25 Aug 2026",
-    time: "14:00",
-    amount: "£11.52",
-    status: BookingStatus.DriverEnRoute,
-    passenger: "Emma Thompson",
-  },
-  {
-    id: "UKTB-2026-000005",
-    from: "Waverley Station, Edinburgh EH1 1BZ",
-    to: "Glasgow Central Station, Glasgow G1 1AE",
-    date: "25 Aug 2026",
-    time: "09:00",
-    amount: "£410.40",
-    status: BookingStatus.TripStarted,
-    passenger: "David Morgan",
-  },
-  {
-    id: "UKTB-2026-000003",
-    from: "Birmingham New Street, Birmingham B2 4QA",
-    to: "Manchester Airport, Manchester M90 1QX",
-    date: "27 Aug 2026",
-    time: "10:00",
-    amount: "£102.60",
-    status: BookingStatus.Confirmed,
-    passenger: "Raj Patel",
-  },
-  {
-    id: "UKTB-2026-000006",
-    from: "221B Baker Street, London NW1 6XE",
-    to: "10 Downing Street, London SW1A 2AA",
-    date: "25 Aug 2026",
-    time: "18:30",
-    amount: "£13.80",
-    status: BookingStatus.PaymentFailed,
-    passenger: "James Wilson",
-  },
-]
+const DEMO_RECENT_TRIPS: Array<any> = []
 
 export default function DriverDashboardPage() {
   const [isOnline, setIsOnline] = useState(true)
@@ -121,42 +70,32 @@ export default function DriverDashboardPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <DashboardCard
           title="Today's Trips"
-          value={3}
+          value={0}
           icon={<Car className="h-5 w-5" />}
-          trend="up"
-          change={20}
         />
         <DashboardCard
           title="Today's Earnings"
-          value="£87.50"
+          value="£0"
           icon={<Wallet className="h-5 w-5" />}
-          trend="up"
-          change={12}
         />
         <DashboardCard
           title="This Week"
-          value="£412.30"
+          value="£0"
           icon={<Calendar className="h-5 w-5" />}
-          trend="up"
-          change={8}
         />
         <DashboardCard
           title="This Month"
-          value="£1,650"
+          value="£0"
           icon={<TrendingUp className="h-5 w-5" />}
-          trend="up"
-          change={15}
         />
         <DashboardCard
           title="Completed Trips"
-          value={156}
+          value={0}
           icon={<CheckCircle2 className="h-5 w-5" />}
-          trend="up"
-          change={5}
         />
         <DashboardCard
           title="Rating"
-          value="4.8"
+          value="0.0"
           icon={<Star className="h-5 w-5" />}
         />
       </div>
@@ -251,38 +190,44 @@ export default function DriverDashboardPage() {
               </Link>
             </div>
             <div className="divide-y divide-[#F5F7FA]">
-              {DEMO_RECENT_TRIPS.map((trip) => (
-                <div
-                  key={trip.id}
-                  className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-[#F5F7FA]/50"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-[#172F52]">
-                        {trip.from.split(",")[0]}
-                      </p>
-                      <ArrowRight className="h-3 w-3 shrink-0 text-[#6B7280]" />
-                      <p className="truncate text-sm text-[#6B7280]">
-                        {trip.to.split(",")[0]}
-                      </p>
-                    </div>
-                    <div className="mt-1 flex items-center gap-3">
-                      <span className="text-xs text-[#6B7280]">
-                        {trip.date} at {trip.time}
-                      </span>
-                      <span className="text-xs text-[#6B7280]">
-                        {trip.passenger}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="ml-4 flex items-center gap-3">
-                    <span className="text-sm font-bold text-[#172F52]">
-                      {trip.amount}
-                    </span>
-                    <StatusBadge status={trip.status} type="booking" />
-                  </div>
+              {DEMO_RECENT_TRIPS.length === 0 ? (
+                <div className="px-6 py-8 text-center">
+                  <p className="text-sm text-[#6B7280]">No recent trips to display</p>
                 </div>
-              ))}
+              ) : (
+                DEMO_RECENT_TRIPS.map((trip) => (
+                  <div
+                    key={trip.id}
+                    className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-[#F5F7FA]/50"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate text-sm font-medium text-[#172F52]">
+                          {trip.from.split(",")[0]}
+                        </p>
+                        <ArrowRight className="h-3 w-3 shrink-0 text-[#6B7280]" />
+                        <p className="truncate text-sm text-[#6B7280]">
+                          {trip.to.split(",")[0]}
+                        </p>
+                      </div>
+                      <div className="mt-1 flex items-center gap-3">
+                        <span className="text-xs text-[#6B7280]">
+                          {trip.date} at {trip.time}
+                        </span>
+                        <span className="text-xs text-[#6B7280]">
+                          {trip.passenger}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="ml-4 flex items-center gap-3">
+                      <span className="text-sm font-bold text-[#172F52]">
+                        {trip.amount}
+                      </span>
+                      <StatusBadge status={trip.status} type="booking" />
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

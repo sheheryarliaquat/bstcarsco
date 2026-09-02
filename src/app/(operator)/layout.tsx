@@ -29,8 +29,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { DEMO_DATA } from "@/constants"
-import { RatingStars } from "@/components/shared/RatingStars"
+import { useAuth } from "@/hooks/useAuth"
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/operator/dashboard", icon: LayoutDashboard },
@@ -45,10 +44,16 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings", path: "/operator/settings", icon: Settings },
 ] as const
 
-const operator = DEMO_DATA.operators[0]
-
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const { userData } = useAuth()
+  const displayName = userData
+    ? `${userData.firstName} ${userData.lastName}`.trim() || "Operator"
+    : "Operator"
+  const initials = userData
+    ? `${userData.firstName?.[0] ?? ""}${userData.lastName?.[0] ?? ""}`.toUpperCase() || "O"
+    : "O"
+  const email = userData?.email ?? "No email available"
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -67,13 +72,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="mx-4 mt-4 rounded-xl bg-[#172F52]/5 p-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52] text-white text-xs font-bold">
-            {operator.companyName.split(" ").map(w => w[0]).join("").slice(0, 2)}
+            {initials}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-[#172F52]">
-              {operator.companyName}
+              {displayName}
             </p>
-            <RatingStars rating={operator.rating} size="sm" count={operator.totalReviews} />
+            <p className="text-[10px] text-[#6B7280]">Operator account</p>
           </div>
         </div>
       </div>
@@ -118,15 +123,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
           <AvatarFallback className="bg-[#172F52] text-xs font-semibold text-white">
-            {operator.firstName[0]}{operator.lastName[0]}
+            {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[#172F52]">
-            {operator.firstName} {operator.lastName}
+            {displayName}
           </p>
           <p className="truncate text-[11px] text-[#6B7280]">
-            {operator.email}
+            {email}
           </p>
         </div>
       </div>
@@ -175,9 +180,6 @@ export default function OperatorLayout({
           </div>
           <Link href="/operator/notifications" className="relative">
             <Bell className="h-5 w-5 text-[#6B7280]" />
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4145A] text-[9px] font-bold text-white">
-              5
-            </span>
           </Link>
         </div>
 

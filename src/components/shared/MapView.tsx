@@ -31,7 +31,7 @@ export function MapView({
   const initMap = useCallback(async () => {
     if (!mapRef.current || typeof window === "undefined") return
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyCptLq80ZFFeBZNl1l1uJjR4IHeO4j41Xw"
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ""
     if (!apiKey) return
 
     try {

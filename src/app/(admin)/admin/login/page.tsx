@@ -154,7 +154,7 @@ export default function AdminLoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@bstcars.co"
+                    placeholder="Enter your admin email"
                     className="h-11 pl-10"
                     {...register("email")}
                   />

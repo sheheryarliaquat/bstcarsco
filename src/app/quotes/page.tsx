@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   SlidersHorizontal,
   X,
   ArrowRight,
-  Loader2,
   SearchX,
-  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuoteCard } from "@/components/booking/QuoteCard";
@@ -20,32 +18,10 @@ import {
 } from "@/components/booking/QuoteFilters";
 import { BookingSummary } from "@/components/booking/BookingSummary";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DEMO_DATA } from "@/constants";
+import { getAvailableQuotes } from "@/lib/services/quote-service";
+import { saveCheckoutSelection } from "@/lib/checkout-session";
 import type { Quote, SortingType, Location, TripType } from "@/types";
 import type { BookingSearchParams } from "@/components/booking/BookingSearch";
-
-const DEMO_SEARCH: BookingSearchParams = {
-  pickup: DEMO_DATA.locations[11],
-  destination: DEMO_DATA.locations[1],
-  tripType: "one_way",
-  date: new Date("2026-08-28"),
-  time: "15:30",
-  passengers: 5,
-  luggage: 6,
-  specialRequirements: {
-    childSeat: true,
-    wheelchairAccessible: false,
-    meetAndGreet: false,
-  },
-};
-
-const DEMO_PRICE_BREAKDOWN = {
-  baseFare: 5.0,
-  distance: 28.4,
-  fees: 4.2,
-  surcharge: 0,
-  total: 38.0,
-};
 
 function sortQuotes(quotes: Quote[], sortBy: SortingType): Quote[] {
   const sorted = [...quotes];
@@ -120,6 +96,7 @@ function SkeletonCard() {
 
 function QuotesContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   const searchFromUrl: BookingSearchParams = useMemo(() => {
     const pickupAddress = searchParams.get("pickupAddress")
@@ -168,26 +145,58 @@ function QuotesContent() {
     }
   }, [searchParams])
 
-  const activeSearch = searchFromUrl.pickup || searchFromUrl.destination
-    ? searchFromUrl
-    : DEMO_SEARCH
+  const activeSearch = searchFromUrl
 
   const [filters, setFilters] = useState<QuoteFilterValues>(DEFAULT_FILTERS);
   const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const filteredQuotes = useMemo(() => {
-    const filtered = filterQuotes(DEMO_DATA.quotes, filters);
-    return sortQuotes(filtered, filters.sortBy);
-  }, [filters]);
+  useEffect(() => {
+    if (!activeSearch.pickup || !activeSearch.destination) {
+      setQuotes([]);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    getAvailableQuotes({
+      pickup: activeSearch.pickup,
+      destination: activeSearch.destination,
+      passengers: activeSearch.passengers,
+      luggage: activeSearch.luggage,
+      wheelchairAccessible: activeSearch.specialRequirements.wheelchairAccessible,
+    })
+      .then((result) => {
+        if (!cancelled) setQuotes(result);
+      })
+      .catch(() => {
+        if (!cancelled) setQuotes([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSearch]);
 
-  const selectedQuoteData = DEMO_DATA.quotes.find(
-    (q) => q.id === selectedQuote
-  );
+  const filteredQuotes = useMemo(() => {
+    const filtered = filterQuotes(quotes, filters);
+    return sortQuotes(filtered, filters.sortBy);
+  }, [quotes, filters]);
+
+  const selectedQuoteData = quotes.find((q) => q.id === selectedQuote);
 
   function handleReset() {
     setFilters(DEFAULT_FILTERS);
+  }
+
+  function handleContinueToBook() {
+    if (!selectedQuoteData) return;
+    saveCheckoutSelection({ quote: selectedQuoteData, search: activeSearch });
+    router.push("/checkout");
   }
 
   return (
@@ -219,7 +228,6 @@ function QuotesContent() {
             <div className="sticky top-6 space-y-4">
               <BookingSummary
                 searchParams={activeSearch}
-                priceBreakdown={DEMO_PRICE_BREAKDOWN}
                 onEdit={() => {}}
               />
               <Button
@@ -270,7 +278,24 @@ function QuotesContent() {
               />
             </div>
 
-            {loading ? (
+            {!activeSearch.pickup || !activeSearch.destination ? (
+              <div className="rounded-xl border border-[#D9E0E8] bg-white py-16 text-center">
+                <SearchX className="mx-auto mb-4 h-12 w-12 text-[#D9E0E8]" />
+                <h3 className="text-lg font-semibold text-[#172F52]">
+                  Start a search to see quotes
+                </h3>
+                <p className="mt-1 text-sm text-[#6B7280]">
+                  Enter a pickup and destination on the home page to compare live quotes.
+                </p>
+                <Button
+                  render={<Link href="/" />}
+                  nativeButton={false}
+                  className="mt-4 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                >
+                  Search for a ride
+                </Button>
+              </div>
+            ) : loading ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />
@@ -283,7 +308,9 @@ function QuotesContent() {
                   No quotes found
                 </h3>
                 <p className="mt-1 text-sm text-[#6B7280]">
-                  Try adjusting your filters to see more results.
+                  {quotes.length === 0
+                    ? "No operators currently have an available vehicle for this route."
+                    : "Try adjusting your filters to see more results."}
                 </p>
                 <Button
                   variant="outline"
@@ -329,8 +356,7 @@ function QuotesContent() {
                 Cancel
               </Button>
               <Button
-                render={<Link href="/checkout" />}
-                nativeButton={false}
+                onClick={handleContinueToBook}
                 className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
               >
                 Continue to Book

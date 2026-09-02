@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Search,
   Eye,
@@ -25,8 +25,15 @@ import { DataTable, type Column } from "@/components/shared/DataTable"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { VEHICLE_TYPES } from "@/constants"
-import { DEMO_DATA } from "@/constants"
-import { updateVehicle } from "@/lib/services/vehicle-service"
+import {
+  createVehicle,
+  deleteVehicle,
+  listenToVehicles,
+  updateVehicle,
+  getVehicleRates,
+  saveVehicleRates,
+  type VehicleRate,
+} from "@/lib/services/vehicle-service"
 import type { Vehicle, VehicleType, VehicleAvailabilityStatus } from "@/types"
 
 const AVAILABILITY_META: Record<
@@ -40,16 +47,6 @@ const AVAILABILITY_META: Record<
 
 function getAvailability(v: Vehicle): VehicleAvailabilityStatus {
   return v.availabilityStatus ?? "available"
-}
-
-interface VehicleRate {
-  vehicleType: VehicleType
-  label: string
-  baseFare: number
-  perMile: number
-  perMinute: number
-  minimumFare: number
-  bookingFee: number
 }
 
 const DEFAULT_RATES: VehicleRate[] = [
@@ -104,18 +101,33 @@ export default function AdminVehiclesPage() {
   const [removeTarget, setRemoveTarget] = useState<Vehicle | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [newVehicle, setNewVehicle] = useState<NewVehicle>(EMPTY_VEHICLE)
-  const [vehicles, setVehicles] = useState<Vehicle[]>(DEMO_DATA.vehicles)
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [rates, setRates] = useState<VehicleRate[]>(DEFAULT_RATES)
   const [rateSaved, setRateSaved] = useState(false)
+  const [rateSaving, setRateSaving] = useState(false)
 
-  const getOperatorName = (operatorId: string) => {
-    return DEMO_DATA.operators.find((o) => o.uid === operatorId)?.companyName ?? "Unknown"
+  useEffect(() => {
+    const unsubscribe = listenToVehicles(
+      (data) => setVehicles(data),
+      () => setVehicles([])
+    )
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    getVehicleRates()
+      .then((saved) => {
+        if (saved && saved.length > 0) setRates(saved)
+      })
+      .catch(() => {})
+  }, [])
+
+  const getOperatorName = (_operatorId: string) => {
+    return "Unknown"
   }
 
   const getDriverName = (driverId: string) => {
-    if (!driverId) return "Unassigned"
-    const d = DEMO_DATA.drivers.find((d) => d.uid === driverId)
-    return d ? `${d.firstName} ${d.lastName}` : "Unknown"
+    return driverId ? "Unknown" : "Unassigned"
   }
 
   const filtered = useMemo(() => {
@@ -148,11 +160,10 @@ export default function AdminVehiclesPage() {
     return VEHICLE_TYPES.find((vt) => vt.value === type)?.label ?? type
   }
 
-  function handleCreateVehicle() {
+  async function handleCreateVehicle() {
     if (!newVehicle.make || !newVehicle.model || !newVehicle.registration) return
-    const vehicle: Vehicle = {
-      id: `vh-${Date.now()}`,
-      operatorId: newVehicle.operatorId || "op-001",
+    const vehicle: Omit<Vehicle, "id"> = {
+      operatorId: newVehicle.operatorId,
       driverId: "",
       make: newVehicle.make,
       model: newVehicle.model,
@@ -168,21 +179,19 @@ export default function AdminVehiclesPage() {
       isApproved: false,
       availabilityStatus: "available",
     }
-    setVehicles((prev) => [vehicle, ...prev])
+    await createVehicle(vehicle)
     setNewVehicle(EMPTY_VEHICLE)
     setShowCreate(false)
   }
 
-  function handleDeleteVehicle() {
+  async function handleDeleteVehicle() {
     if (!removeTarget) return
-    setVehicles((prev) => prev.filter((v) => v.id !== removeTarget.id))
+    await deleteVehicle(removeTarget.id)
     setRemoveTarget(null)
   }
 
-  function handleApproveVehicle(vehicle: Vehicle) {
-    setVehicles((prev) =>
-      prev.map((v) => (v.id === vehicle.id ? { ...v, isApproved: true } : v))
-    )
+  async function handleApproveVehicle(vehicle: Vehicle) {
+    await updateVehicle(vehicle.id, { isApproved: true })
   }
 
   function handleSetAvailability(vehicle: Vehicle, status: VehicleAvailabilityStatus) {
@@ -195,8 +204,7 @@ export default function AdminVehiclesPage() {
     setSelectedVehicle((prev) =>
       prev && prev.id === vehicle.id ? { ...prev, availabilityStatus: status, availabilityUpdatedAt } : prev
     )
-    // Best-effort sync to Firestore; the demo fleet keeps working from local
-    // state even when there's no live backend to write to.
+    // Optimistic local update; the Firestore listener reconciles once the write lands.
     updateVehicle(vehicle.id, { availabilityStatus: status, availabilityUpdatedAt }).catch(() => {})
   }
 
@@ -206,9 +214,15 @@ export default function AdminVehiclesPage() {
     )
   }
 
-  function saveRates() {
-    setRateSaved(true)
-    setTimeout(() => setRateSaved(false), 2000)
+  async function saveRates() {
+    setRateSaving(true)
+    try {
+      await saveVehicleRates(rates)
+      setRateSaved(true)
+      setTimeout(() => setRateSaved(false), 2000)
+    } finally {
+      setRateSaving(false)
+    }
   }
 
   const columns: Column<Record<string, unknown>>[] = [
@@ -366,9 +380,9 @@ export default function AdminVehiclesPage() {
             <DollarSign className="h-5 w-5 text-[#D4145A]" />
             <h2 className="text-lg font-bold text-[#172F52]">Vehicle Type Rates</h2>
           </div>
-          <Button size="sm" className="bg-[#168A55] text-white hover:bg-[#168A55]/90" onClick={saveRates}>
+          <Button size="sm" className="bg-[#168A55] text-white hover:bg-[#168A55]/90" onClick={saveRates} disabled={rateSaving}>
             <Save className="mr-1.5 h-3.5 w-3.5" />
-            {rateSaved ? "Saved!" : "Save Rates"}
+            {rateSaved ? "Saved!" : rateSaving ? "Saving..." : "Save Rates"}
           </Button>
         </div>
         <p className="mb-4 text-sm text-[#6B7280]">

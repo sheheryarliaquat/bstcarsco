@@ -26,7 +26,9 @@ import { DashboardCard } from "@/components/shared/DashboardCard"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { DEMO_DATA } from "@/constants"
-import type { Operator } from "@/types"
+import type { Booking, Operator } from "@/types"
+
+const EMPTY_OPERATORS: Operator[] = []
 
 export default function AdminOperatorsPage() {
   const [search, setSearch] = useState("")
@@ -38,24 +40,24 @@ export default function AdminOperatorsPage() {
   const [suspendTarget, setSuspendTarget] = useState<Operator | null>(null)
 
   const operatorStats = useMemo(() => {
-    const total = DEMO_DATA.operators.length
-    const totalDrivers = DEMO_DATA.drivers.length
-    const totalVehicles = DEMO_DATA.vehicles.length
-    const totalBookings = DEMO_DATA.bookings.length
-    const totalRevenue = DEMO_DATA.bookings.reduce((sum, b) => sum + b.total, 0)
+    const total = 0
+    const totalDrivers = 0
+    const totalVehicles = 0
+    const totalBookings = 0
+    const totalRevenue = 0
     return { total, totalDrivers, totalVehicles, totalBookings, totalRevenue }
   }, [])
 
   const getOperatorDrivers = (operatorId: string) => {
-    return DEMO_DATA.drivers.filter((d) => d.operatorId === operatorId)
+    return []
   }
 
   const getOperatorVehicles = (operatorId: string) => {
-    return DEMO_DATA.vehicles.filter((v) => v.operatorId === operatorId)
+    return []
   }
 
-  const getOperatorBookings = (operatorId: string) => {
-    return DEMO_DATA.bookings.filter((b) => b.operatorId === operatorId)
+  const getOperatorBookings = (operatorId: string): Booking[] => {
+    return []
   }
 
   const getOperatorRevenue = (operatorId: string) => {
@@ -63,9 +65,9 @@ export default function AdminOperatorsPage() {
   }
 
   const filtered = useMemo(() => {
-    if (!search) return DEMO_DATA.operators
+    if (!search) return EMPTY_OPERATORS
     const q = search.toLowerCase()
-    return DEMO_DATA.operators.filter(
+    return EMPTY_OPERATORS.filter(
       (o) =>
         o.companyName.toLowerCase().includes(q) ||
         o.firstName.toLowerCase().includes(q) ||

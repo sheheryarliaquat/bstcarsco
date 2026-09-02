@@ -29,14 +29,6 @@ const ROLE_ROUTES: Record<string, string> = {
   operator: "/operator/dashboard",
 };
 
-const DEMO_USERS: Record<string, string> = {
-  "passenger@demo.com": "passenger",
-  "driver@demo.com": "driver",
-  "admin@bstcars.co": "admin",
-  "admin@demo.com": "admin",
-  "operator@demo.com": "operator",
-};
-
 const loginSchema = z.object({
   email: z
     .string()
@@ -78,14 +70,7 @@ export default function LoginPage() {
       const role = userData?.role || "passenger";
       router.push(ROLE_ROUTES[role] || "/passenger/dashboard");
     } catch {
-      const demoRole = DEMO_USERS[data.email.toLowerCase()];
-      if (demoRole) {
-        router.push(ROLE_ROUTES[demoRole] || "/passenger/dashboard");
-      } else {
-        setError(
-          "Login failed. Try demo accounts: passenger@demo.com, driver@demo.com, admin@bstcars.co (password: any)"
-        );
-      }
+      setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -238,16 +223,6 @@ export default function LoginPage() {
           )}
         </Button>
       </form>
-
-      <div className="mt-4 rounded-lg bg-[#F5F7FA] p-3 text-xs text-[#6B7280]">
-        <p className="mb-1 font-semibold text-[#172033]">Demo Accounts:</p>
-        <div className="grid grid-cols-1 gap-1">
-          <p><span className="font-medium text-[#172033]">Passenger:</span> passenger@demo.com</p>
-          <p><span className="font-medium text-[#172033]">Driver:</span> driver@demo.com</p>
-          <p><span className="font-medium text-[#172033]">Admin:</span> admin@bstcars.co</p>
-          <p className="mt-1 text-[#9CA3AF]">Password: any value works</p>
-        </div>
-      </div>
 
       <div className="mt-4 text-center text-sm text-[#6B7280]">
         Don&apos;t have an account?{" "}

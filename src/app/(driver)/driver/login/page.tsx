@@ -69,11 +69,7 @@ export default function DriverLoginPage() {
         router.push("/passenger/dashboard")
       }
     } catch {
-      if (data.email.toLowerCase().includes("driver") || data.email.toLowerCase() === "driver@demo.com") {
-        router.push("/driver/dashboard")
-      } else {
-        setError("Invalid email or password. Try driver@demo.com with any password.")
-      }
+      setError("Invalid email or password. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -97,19 +93,9 @@ export default function DriverLoginPage() {
             Sign in to manage your trips, track your earnings, and stay on the
             road.
           </p>
-          <div className="mt-12 grid grid-cols-3 gap-6 text-center">
-            <div>
-              <p className="text-2xl font-bold text-[#D4145A]">156+</p>
-              <p className="mt-1 text-sm text-white/60">Trips This Month</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#D4145A]">4.9</p>
-              <p className="mt-1 text-sm text-white/60">Your Rating</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[#D4145A]">£1.6k</p>
-              <p className="mt-1 text-sm text-white/60">Monthly Earnings</p>
-            </div>
+          <div className="mt-12 space-y-3 text-center text-white/70">
+            <p className="text-lg font-medium">Driver account portal</p>
+            <p className="text-sm">Sign in to manage your trips and availability.</p>
           </div>
         </div>
       </div>
@@ -230,13 +216,7 @@ export default function DriverLoginPage() {
               </Button>
             </form>
 
-            <div className="mt-4 rounded-lg bg-[#F5F7FA] p-3 text-xs text-[#6B7280]">
-              <p className="mb-1 font-semibold text-[#172033]">Demo: driver@demo.com</p>
-              <p>Password: any value works</p>
-            </div>
-          </div>
-
-          <div className="mt-6 text-center">
+            <div className="mt-6 text-center">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6B7280] hover:text-[#172F52]"
@@ -258,6 +238,7 @@ export default function DriverLoginPage() {
           </Link>
         </p>
       </div>
+    </div>
     </div>
   )
 }

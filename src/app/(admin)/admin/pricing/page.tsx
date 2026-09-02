@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DEMO_DATA, VEHICLE_TYPES, PRICING_DEFAULTS } from "@/constants"
+import { VEHICLE_TYPES, PRICING_DEFAULTS } from "@/constants"
 import type { PricingRule } from "@/types"
 
 interface Surcharges {

@@ -7,10 +7,23 @@ import {
   deleteDocument,
   queryDocuments,
   onSnapshotListener,
+  batchSet,
 } from '@/lib/firebase/firestore';
-import type { Vehicle } from '@/types';
+import type { Vehicle, VehicleType } from '@/types';
 
 const COLLECTION = 'vehicles';
+const SETTINGS_COLLECTION = 'settings';
+const RATES_DOC_ID = 'vehicleRates';
+
+export interface VehicleRate {
+  vehicleType: VehicleType;
+  label: string;
+  baseFare: number;
+  perMile: number;
+  perMinute: number;
+  minimumFare: number;
+  bookingFee: number;
+}
 
 export async function createVehicle(
   data: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>
@@ -68,4 +81,13 @@ export function listenToVehiclesByOperator(
     callback,
     errorCallback
   );
+}
+
+export async function getVehicleRates(): Promise<VehicleRate[] | null> {
+  const doc = await getDocument<{ rates: VehicleRate[] }>(SETTINGS_COLLECTION, RATES_DOC_ID);
+  return doc?.rates ?? null;
+}
+
+export async function saveVehicleRates(rates: VehicleRate[]): Promise<void> {
+  await batchSet([{ collectionName: SETTINGS_COLLECTION, id: RATES_DOC_ID, data: { rates } }]);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -38,10 +38,15 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "@/components/booking/BookingProgress";
 import { PaymentForm } from "@/components/shared/PaymentForm";
-import { DEMO_DATA } from "@/constants";
-import { BookingStatus, type Booking, type PaymentStatus } from "@/types";
+import { BookingStatus, type Booking } from "@/types";
 import { createBooking } from "@/lib/services/booking-service";
+import { calculateDistance } from "@/lib/services/pricing";
 import { auth as getFirebaseAuth } from "@/lib/firebase/config";
+import {
+  getCheckoutSelection,
+  clearCheckoutSelection,
+  type CheckoutSelection,
+} from "@/lib/checkout-session";
 import { format } from "date-fns";
 
 const passengerSchema = z.object({
@@ -66,6 +71,8 @@ type PassengerFormData = z.infer<typeof passengerSchema>;
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const [selection, setSelection] = useState<CheckoutSelection | null>(null);
+  const [selectionChecked, setSelectionChecked] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
@@ -74,10 +81,24 @@ export default function CheckoutPage() {
   const [specialOpen, setSpecialOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
 
-  const quote = DEMO_DATA.quotes[0];
-  const booking = DEMO_DATA.bookings[3];
+  useEffect(() => {
+    const stored = getCheckoutSelection();
+    if (!stored || !stored.search.pickup || !stored.search.destination) {
+      router.replace("/quotes");
+      return;
+    }
+    setSelection(stored);
+    setSelectionChecked(true);
+  }, [router]);
 
-  const basePrice = quote.price;
+  const quote = selection?.quote;
+  const search = selection?.search;
+  const pickup = search?.pickup;
+  const destination = search?.destination;
+  const distanceMiles =
+    pickup && destination ? calculateDistance(pickup, destination) : 0;
+
+  const basePrice = quote?.price ?? 0;
   const discount = promoDiscount;
   const tax = (basePrice - discount) * 0.2;
   const total = basePrice - discount + tax;
@@ -115,6 +136,7 @@ export default function CheckoutPage() {
   }
 
   async function handlePayment() {
+    if (!quote || !pickup || !destination || !search) return;
     setPaymentLoading(true);
     setPaymentError("");
 
@@ -133,18 +155,18 @@ export default function CheckoutPage() {
         passengerId,
         operatorId: quote.operatorId,
         driverId: "",
-        vehicleId: "",
-        tripType: "one_way",
-        pickup: booking.pickup,
-        destination: booking.destination,
-        viaStops: booking.viaStops || [],
-        date: booking.date,
-        pickupTime: booking.pickupTime,
-        passengers: booking.passengers,
-        luggage: booking.luggage,
+        vehicleId: quote.id,
+        tripType: search.tripType,
+        pickup,
+        destination,
+        viaStops: [],
+        date: (search.date ?? new Date()).toISOString(),
+        pickupTime: search.time,
+        passengers: search.passengers,
+        luggage: search.luggage,
         vehicleType: quote.vehicleType,
-        distanceMiles: booking.distanceMiles,
-        estimatedDuration: booking.estimatedDuration,
+        distanceMiles,
+        estimatedDuration: quote.estimatedJourneyTime,
         price: basePrice,
         discount,
         tax,
@@ -157,9 +179,10 @@ export default function CheckoutPage() {
           : BookingStatus.Confirmed,
       };
 
-      await createBooking(bookingData);
+      const { bookingNumber } = await createBooking(bookingData);
+      clearCheckoutSelection();
 
-      router.push(`/booking-confirmation?payment=${paymentMethod}`);
+      router.push(`/booking-confirmation?payment=${paymentMethod}&bookingNumber=${bookingNumber}`);
     } catch (err) {
       setPaymentError(err instanceof Error ? err.message : "Failed to create booking. Please try again.");
     } finally {
@@ -169,6 +192,17 @@ export default function CheckoutPage() {
 
   function onSubmit(_data: PassengerFormData) {
     handlePayment();
+  }
+
+  if (!selectionChecked || !quote || !pickup || !destination || !search) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+        <div className="text-center">
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-[#D4145A]" />
+          <p className="text-sm text-[#6B7280]">Loading your booking...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -550,7 +584,7 @@ export default function CheckoutPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-[#6B7280]">Pickup</p>
                       <p className="truncate text-sm font-medium text-[#172033]">
-                        {booking.pickup.formattedAddress}
+                        {pickup.formattedAddress}
                       </p>
                     </div>
                   </div>
@@ -560,7 +594,7 @@ export default function CheckoutPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-[#6B7280]">Destination</p>
                       <p className="truncate text-sm font-medium text-[#172033]">
-                        {booking.destination.formattedAddress}
+                        {destination.formattedAddress}
                       </p>
                     </div>
                   </div>
@@ -571,11 +605,11 @@ export default function CheckoutPage() {
                 <div className="mb-3 space-y-2 text-sm">
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Calendar className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {format(new Date(booking.date), "dd MMMM yyyy")}
+                    {format(search.date ?? new Date(), "dd MMMM yyyy")}
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Clock className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {booking.pickupTime}
+                    {search.time}
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Car className="h-3.5 w-3.5 text-[#6B7280]" />
@@ -587,13 +621,13 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Users className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {booking.passengers}{" "}
-                    {booking.passengers === 1 ? "Passenger" : "Passengers"}
+                    {search.passengers}{" "}
+                    {search.passengers === 1 ? "Passenger" : "Passengers"}
                   </div>
                   <div className="flex items-center gap-2 text-[#172033]">
                     <Briefcase className="h-3.5 w-3.5 text-[#6B7280]" />
-                    {booking.luggage}{" "}
-                    {booking.luggage === 1 ? "Luggage" : "Luggage items"}
+                    {search.luggage}{" "}
+                    {search.luggage === 1 ? "Luggage" : "Luggage items"}
                   </div>
                 </div>
 

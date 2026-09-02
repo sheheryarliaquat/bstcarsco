@@ -66,40 +66,40 @@ export default function AdminSettingsPage() {
   })
 
   const [email, setEmail] = useState({
-    smtpHost: "smtp.bstcars.co",
-    smtpPort: "587",
-    smtpUser: "noreply@bstcars.co",
-    smtpPass: "••••••••••••",
-    senderName: "Blue Star Airport Transfers LTD",
-    templatesEnabled: true,
+    smtpHost: "",
+    smtpPort: "",
+    smtpUser: "",
+    smtpPass: "",
+    senderName: "",
+    templatesEnabled: false,
   })
 
   const [sms, setSms] = useState({
-    provider: "Twilio",
-    apiKey: "••••••••••••••••••••••••",
-    apiSecret: "••••••••••••••••",
-    fromNumber: "+447700900000",
-    enabled: true,
+    provider: "",
+    apiKey: "",
+    apiSecret: "",
+    fromNumber: "",
+    enabled: false,
   })
 
   const [maps, setMaps] = useState({
-    googleMapsKey: "AIza••••••••••••••••••••••••",
-    defaultLat: "51.5074",
-    defaultLng: "-0.1278",
-    defaultZoom: "12",
+    googleMapsKey: "",
+    defaultLat: "",
+    defaultLng: "",
+    defaultZoom: "",
   })
 
   const [stripeConfig, setStripeConfig] = useState({
-    publishableKey: "pk_live_••••••••••••••••••••••••",
-    secretKey: "sk_live_••••••••••••••••••••••••",
-    webhookSecret: "whsec_••••••••••••••••••••••••",
-    enabled: true,
+    publishableKey: "",
+    secretKey: "",
+    webhookSecret: "",
+    enabled: false,
   })
 
   const [firebase, setFirebase] = useState({
-    projectId: "uk-taxi-book-prod",
-    authDomain: "uk-taxi-book-prod.firebaseapp.com",
-    storageBucket: "uk-taxi-book-prod.appspot.com",
+    projectId: "",
+    authDomain: "",
+    storageBucket: "",
   })
 
   const [maintenance, setMaintenance] = useState({

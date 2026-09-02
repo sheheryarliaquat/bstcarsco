@@ -33,18 +33,7 @@ interface PaymentRecord {
   date: string
 }
 
-const DEMO_PAYMENTS: PaymentRecord[] = [
-  { id: "pay-001", bookingId: "UKTB-2026-000001", passenger: "James Wilson", amount: 51.00, method: "card", status: "completed", date: "2026-08-20T14:30:00Z" },
-  { id: "pay-002", bookingId: "UKTB-2026-000002", passenger: "Emma Thompson", amount: 11.52, method: "card", status: "completed", date: "2026-08-24T16:00:00Z" },
-  { id: "pay-003", bookingId: "UKTB-2026-000003", passenger: "Raj Patel", amount: 102.60, method: "card", status: "completed", date: "2026-08-22T09:15:00Z" },
-  { id: "pay-004", bookingId: "UKTB-2026-000004", passenger: "Sophie Clarkson", amount: 45.60, method: "card", status: "pending", date: "2026-08-25T10:00:00Z" },
-  { id: "pay-005", bookingId: "UKTB-2026-000005", passenger: "David Morgan", amount: 410.40, method: "card", status: "completed", date: "2026-08-23T11:30:00Z" },
-  { id: "pay-006", bookingId: "UKTB-2026-000006", passenger: "James Wilson", amount: 13.80, method: "card", status: "failed", date: "2026-08-25T12:00:00Z" },
-  { id: "pay-007", bookingId: "UKTB-2026-000001", passenger: "James Wilson", amount: 51.00, method: "apple_pay", status: "completed", date: "2026-08-19T10:15:00Z" },
-  { id: "pay-008", bookingId: "UKTB-2026-000003", passenger: "Raj Patel", amount: 52.50, method: "card", status: "refunded", date: "2026-08-21T14:45:00Z" },
-  { id: "pay-009", bookingId: "UKTB-2026-000005", passenger: "David Morgan", amount: 410.40, method: "card", status: "processing", date: "2026-08-24T08:20:00Z" },
-  { id: "pay-010", bookingId: "UKTB-2026-000002", passenger: "Emma Thompson", amount: 15.00, method: "cash", status: "completed", date: "2026-08-23T16:30:00Z" },
-]
+const DEMO_PAYMENTS: PaymentRecord[] = []
 
 export default function AdminPaymentsPage() {
   const [search, setSearch] = useState("")

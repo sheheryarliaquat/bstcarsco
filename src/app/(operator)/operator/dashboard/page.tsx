@@ -23,71 +23,9 @@ import { RatingStars } from "@/components/shared/RatingStars"
 import { DEMO_DATA } from "@/constants"
 import { BookingStatus, type Driver } from "@/types"
 
-const recentBookings = [
-  {
-    id: "UKTB-2026-000002",
-    passenger: "Emma Thompson",
-    from: "1 Manchester Square, London W1U",
-    to: "10 Downing Street, London SW1A",
-    time: "14:00",
-    driver: "Sarah O'Brien",
-    vehicle: "Mercedes E-Class",
-    amount: "£11.52",
-    status: BookingStatus.DriverEnRoute,
-  },
-  {
-    id: "UKTB-2026-000005",
-    passenger: "David Morgan",
-    from: "Waverley Station, Edinburgh",
-    to: "Glasgow Central Station",
-    time: "09:00",
-    driver: "Linda Nguyen",
-    vehicle: "Citroen Berlingo WAV",
-    amount: "£410.40",
-    status: BookingStatus.TripStarted,
-  },
-  {
-    id: "UKTB-2026-000004",
-    passenger: "Sophie Clarkson",
-    from: "The O2 Arena, London SE10",
-    to: "Heathrow Airport, Terminal 5",
-    time: "15:30",
-    driver: "Unassigned",
-    vehicle: "Minibus",
-    amount: "£45.60",
-    status: BookingStatus.PendingPayment,
-  },
-  {
-    id: "UKTB-2026-000003",
-    passenger: "Raj Patel",
-    from: "Birmingham New Street",
-    to: "Manchester Airport",
-    time: "10:00",
-    driver: "Amit Sharma",
-    vehicle: "Ford Mondeo Estate",
-    amount: "£102.60",
-    status: BookingStatus.Confirmed,
-  },
-  {
-    id: "UKTB-2026-000006",
-    passenger: "James Wilson",
-    from: "221B Baker Street, London NW1",
-    to: "10 Downing Street, London SW1A",
-    time: "18:30",
-    driver: "Unassigned",
-    vehicle: "Saloon",
-    amount: "£13.80",
-    status: BookingStatus.PaymentFailed,
-  },
-]
+const recentBookings: Array<any> = []
 
-const driverStatusData: { driver: Driver; tripsToday: number }[] = [
-  { driver: DEMO_DATA.drivers[0], tripsToday: 5 },
-  { driver: DEMO_DATA.drivers[1], tripsToday: 3 },
-  { driver: DEMO_DATA.drivers[2], tripsToday: 2 },
-  { driver: DEMO_DATA.drivers[3], tripsToday: 0 },
-  { driver: DEMO_DATA.drivers[4], tripsToday: 4 },
-]
+const driverStatusData: { driver: Driver; tripsToday: number }[] = []
 
 export default function OperatorDashboardPage() {
   const [bookings, setBookings] = useState(recentBookings)
@@ -127,41 +65,33 @@ export default function OperatorDashboardPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <DashboardCard
           title="Today's Bookings"
-          value={8}
+          value={0}
           icon={<ClipboardList className="h-5 w-5" />}
-          trend="up"
-          change={12}
         />
         <DashboardCard
           title="Active Trips"
-          value={3}
+          value={0}
           icon={<Activity className="h-5 w-5" />}
         />
         <DashboardCard
           title="Total Drivers"
-          value={12}
+          value={0}
           icon={<Users className="h-5 w-5" />}
         />
         <DashboardCard
           title="Online Drivers"
-          value={7}
+          value={0}
           icon={<Car className="h-5 w-5" />}
-          trend="up"
-          change={8}
         />
         <DashboardCard
           title="Revenue Today"
-          value="£1,245"
+          value="£0"
           icon={<Wallet className="h-5 w-5" />}
-          trend="up"
-          change={15}
         />
         <DashboardCard
           title="Monthly Revenue"
-          value="£28,500"
+          value="£0"
           icon={<TrendingUp className="h-5 w-5" />}
-          trend="up"
-          change={7}
         />
       </div>
 
@@ -179,64 +109,70 @@ export default function OperatorDashboardPage() {
               </Link>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Booking ID</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Passenger</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Route</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Amount</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Status</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.map((booking) => (
-                    <tr
-                      key={booking.id}
-                      className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
-                    >
-                      <td className="px-4 py-3 font-medium text-[#172F52]">{booking.id}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{booking.passenger}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5 max-w-[200px]">
-                          <MapPin className="h-3 w-3 shrink-0 text-[#D4145A]" />
-                          <span className="truncate text-[#6B7280]">
-                            {booking.from.split(",")[0]} → {booking.to.split(",")[0]}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">{booking.amount}</td>
-                      <td className="px-4 py-3">
-                        <StatusBadge status={booking.status} type="booking" />
-                      </td>
-                      <td className="px-4 py-3">
-                        {booking.status === BookingStatus.PendingPayment && (
-                          <div className="flex items-center gap-1.5">
-                            <Button
-                              size="sm"
-                              onClick={() => handleAccept(booking.id)}
-                              className="h-7 bg-[#28A745] text-white hover:bg-[#28A745]/90"
-                            >
-                              <CheckCircle2 className="h-3 w-3" />
-                              Accept
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleReject(booking.id)}
-                              className="h-7"
-                            >
-                              <XCircle className="h-3 w-3" />
-                              Reject
-                            </Button>
-                          </div>
-                        )}
-                      </td>
+              {bookings.length === 0 ? (
+                <div className="px-6 py-8 text-center">
+                  <p className="text-sm text-[#6B7280]">No recent bookings to display</p>
+                </div>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Booking ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Passenger</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Route</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Amount</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Status</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {bookings.map((booking) => (
+                      <tr
+                        key={booking.id}
+                        className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
+                      >
+                        <td className="px-4 py-3 font-medium text-[#172F52]">{booking.id}</td>
+                        <td className="px-4 py-3 text-[#172F52]">{booking.passenger}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1.5 max-w-[200px]">
+                            <MapPin className="h-3 w-3 shrink-0 text-[#D4145A]" />
+                            <span className="truncate text-[#6B7280]">
+                              {booking.from.split(",")[0]} → {booking.to.split(",")[0]}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-[#172F52]">{booking.amount}</td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={booking.status} type="booking" />
+                        </td>
+                        <td className="px-4 py-3">
+                          {booking.status === BookingStatus.PendingPayment && (
+                            <div className="flex items-center gap-1.5">
+                              <Button
+                                size="sm"
+                                onClick={() => handleAccept(booking.id)}
+                                className="h-7 bg-[#28A745] text-white hover:bg-[#28A745]/90"
+                              >
+                                <CheckCircle2 className="h-3 w-3" />
+                                Accept
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleReject(booking.id)}
+                                className="h-7"
+                              >
+                                <XCircle className="h-3 w-3" />
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
@@ -314,11 +250,11 @@ export default function OperatorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-[#6B7280]">Completion Rate</p>
-              <p className="text-2xl font-bold text-[#172F52]">94.2%</p>
+              <p className="text-2xl font-bold text-[#172F52]">0%</p>
             </div>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-[#F5F7FA]">
-            <div className="h-full rounded-full bg-[#28A745]" style={{ width: "94.2%" }} />
+            <div className="h-full rounded-full bg-[#28A745]" style={{ width: "0%" }} />
           </div>
         </div>
 
@@ -329,11 +265,11 @@ export default function OperatorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-[#6B7280]">Cancellation Rate</p>
-              <p className="text-2xl font-bold text-[#172F52]">3.8%</p>
+              <p className="text-2xl font-bold text-[#172F52]">0%</p>
             </div>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-[#F5F7FA]">
-            <div className="h-full rounded-full bg-[#DC3545]" style={{ width: "3.8%" }} />
+            <div className="h-full rounded-full bg-[#DC3545]" style={{ width: "0%" }} />
           </div>
         </div>
 
@@ -344,10 +280,10 @@ export default function OperatorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-[#6B7280]">Average Rating</p>
-              <p className="text-2xl font-bold text-[#172F52]">4.8</p>
+              <p className="text-2xl font-bold text-[#172F52]">0.0</p>
             </div>
           </div>
-          <RatingStars rating={4.8} size="lg" count={3245} />
+          <RatingStars rating={0} size="lg" count={0} />
         </div>
       </div>
     </div>
