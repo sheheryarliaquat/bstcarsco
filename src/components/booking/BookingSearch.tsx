@@ -342,11 +342,17 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
 
       <Button
         onClick={handleSearch}
-        className="h-12 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90"
+        disabled={!pickup || !destination}
+        className="h-12 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <MapPin className="mr-2 h-5 w-5" />
         Get Quotes
       </Button>
+      {(!pickup || !destination) && (pickupText || destinationText) && (
+        <p className="text-center text-xs text-[#6B7280]">
+          Select a pickup and destination from the suggestions to continue.
+        </p>
+      )}
     </div>
   )
 }
