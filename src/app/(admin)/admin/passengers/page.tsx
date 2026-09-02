@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Search,
   Users,
@@ -22,10 +22,9 @@ import { StatusBadge } from "@/components/shared/StatusBadge"
 import { DashboardCard } from "@/components/shared/DashboardCard"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
+import { listenToUsersByRole } from "@/lib/services/user-service"
+import { getPassengerBookings as fetchPassengerBookings } from "@/lib/services/booking-service"
 import type { Booking, Passenger } from "@/types"
-
-const EMPTY_PASSENGERS: Passenger[] = []
 
 export default function AdminPassengersPage() {
   const [search, setSearch] = useState("")
@@ -34,28 +33,57 @@ export default function AdminPassengersPage() {
   const [selectedPassenger, setSelectedPassenger] = useState<Passenger | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [suspendTarget, setSuspendTarget] = useState<Passenger | null>(null)
+  const [passengers, setPassengers] = useState<Passenger[]>([])
+  const [bookingsByPassenger, setBookingsByPassenger] = useState<Record<string, Booking[]>>({})
 
-  const passengerStats = useMemo(() => {
-    return { total: 0, active: 0, totalBookings: 0, totalRevenue: 0 }
+  useEffect(() => {
+    const unsubscribe = listenToUsersByRole(
+      "passenger",
+      (data) => setPassengers(data as Passenger[]),
+      () => setPassengers([])
+    )
+    return () => unsubscribe()
   }, [])
 
+  useEffect(() => {
+    Promise.all(
+      passengers.map((p) => fetchPassengerBookings(p.uid).catch(() => [] as Booking[]))
+    ).then((results) => {
+      const map: Record<string, Booking[]> = {}
+      passengers.forEach((p, i) => {
+        map[p.uid] = results[i]
+      })
+      setBookingsByPassenger(map)
+    })
+  }, [passengers])
+
+  const passengerStats = useMemo(() => {
+    const allBookings = Object.values(bookingsByPassenger).flat()
+    return {
+      total: passengers.length,
+      active: passengers.filter((p) => p.status === "active").length,
+      totalBookings: allBookings.length,
+      totalRevenue: allBookings.reduce((sum, b) => sum + b.total, 0),
+    }
+  }, [passengers, bookingsByPassenger])
+
   const filtered = useMemo(() => {
-    if (!search) return EMPTY_PASSENGERS
+    if (!search) return passengers
     const q = search.toLowerCase()
-    return EMPTY_PASSENGERS.filter(
+    return passengers.filter(
       (p) =>
         p.firstName.toLowerCase().includes(q) ||
         p.lastName.toLowerCase().includes(q) ||
         p.email.toLowerCase().includes(q) ||
         p.phone.includes(q)
     )
-  }, [search])
+  }, [search, passengers])
 
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
 
   const getPassengerBookings = (passengerId: string): Booking[] => {
-    return []
+    return bookingsByPassenger[passengerId] ?? []
   }
 
   const getPassengerSpent = (passengerId: string) => {
@@ -183,10 +211,10 @@ export default function AdminPassengersPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <DashboardCard title="Total Passengers" value={passengerStats.total} icon={<Users className="h-5 w-5" />} trend="up" change={12} />
+        <DashboardCard title="Total Passengers" value={passengerStats.total} icon={<Users className="h-5 w-5" />} />
         <DashboardCard title="Active Passengers" value={passengerStats.active} icon={<Users className="h-5 w-5" />} />
         <DashboardCard title="Total Bookings" value={passengerStats.totalBookings} icon={<ClipboardList className="h-5 w-5" />} />
-        <DashboardCard title="Total Revenue" value={`£${passengerStats.totalRevenue.toFixed(0)}`} icon={<Banknote className="h-5 w-5" />} trend="up" change={18} />
+        <DashboardCard title="Total Revenue" value={`£${passengerStats.totalRevenue.toFixed(0)}`} icon={<Banknote className="h-5 w-5" />} />
       </div>
 
       <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
