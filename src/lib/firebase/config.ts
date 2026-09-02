@@ -3,14 +3,32 @@ import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
+// Firebase's client-side web config is not a secret — it's meant to be
+// public (Firebase's own docs note this); real access control comes from
+// Firestore/Storage security rules, not from hiding this object. These
+// fallbacks exist because some hosting platforms' "environment variables"
+// panel doesn't actually inject NEXT_PUBLIC_* vars into `next build` (they
+// only reach the runtime process, not the client bundle those vars need to
+// be baked into) — env vars still take priority whenever they *are*
+// wired through correctly.
+const FALLBACK_FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyCoAHZj99dLuTbPnJmrZfEhOVPHtUFBHK8',
+  authDomain: 'bstcarsco.firebaseapp.com',
+  projectId: 'bstcarsco',
+  storageBucket: 'bstcarsco.firebasestorage.app',
+  messagingSenderId: '756277897347',
+  appId: '1:756277897347:web:bf992bb7e3f2a4572153b6',
+  measurementId: 'G-0Z3V4NTT3Q',
+};
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? '',
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? '',
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? '',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? '',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? '',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? '',
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ?? '',
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? FALLBACK_FIREBASE_CONFIG.apiKey,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? FALLBACK_FIREBASE_CONFIG.authDomain,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? FALLBACK_FIREBASE_CONFIG.projectId,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? FALLBACK_FIREBASE_CONFIG.storageBucket,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? FALLBACK_FIREBASE_CONFIG.messagingSenderId,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? FALLBACK_FIREBASE_CONFIG.appId,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ?? FALLBACK_FIREBASE_CONFIG.measurementId,
 };
 
 function getFirebaseApp(): FirebaseApp {
