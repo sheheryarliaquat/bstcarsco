@@ -35,14 +35,11 @@ function saveBookingLocally(booking: Booking & Record<string, unknown>): string 
   return id;
 }
 
-function getLocalBookingByNumber(bookingNumber: string): Booking | null {
+function getLocalBookingById(id: string): Booking | null {
   if (typeof window === 'undefined') return null;
   try {
     const existing = JSON.parse(localStorage.getItem(LOCAL_BOOKINGS_KEY) || '{}');
-    const match = Object.values(existing).find(
-      (b) => (b as Booking).bookingNumber === bookingNumber
-    );
-    return (match as Booking) ?? null;
+    return (existing[id] as Booking) ?? null;
   } catch {
     return null;
   }
@@ -67,12 +64,10 @@ export async function createBooking(
   }
 }
 
-export async function getBookingByNumberAnySource(
-  bookingNumber: string
-): Promise<Booking | null> {
-  const remote = await getBookingByNumber(bookingNumber).catch(() => null);
+export async function getBookingByIdAnySource(id: string): Promise<Booking | null> {
+  const remote = await getBooking(id).catch(() => null);
   if (remote) return remote;
-  return getLocalBookingByNumber(bookingNumber);
+  return getLocalBookingById(id);
 }
 
 export async function getBooking(id: string): Promise<Booking | null> {

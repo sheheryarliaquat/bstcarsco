@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInAnonymously,
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
@@ -329,6 +330,28 @@ export function onAuthStateChanged(
   }
 
   return () => {};
+}
+
+/**
+ * Firestore rules for `vehicles`/`settings`/`bookings` require
+ * request.auth != null — a signed-out visitor otherwise gets a silent
+ * permission-denied on the public quotes/checkout flow. This gives them an
+ * anonymous Firebase session (stable uid, no credentials) so those reads
+ * and their own booking's create/read succeed without forcing a real
+ * account. Requires Anonymous sign-in enabled in the Firebase console
+ * (Authentication → Sign-in method).
+ */
+export async function ensureAuthSession(): Promise<User | null> {
+  if (!isFirebaseAvailable()) return getCurrentUser();
+  try {
+    const current = getAuth().currentUser;
+    if (current) return current;
+    const credential = await signInAnonymously(getAuth());
+    return credential.user;
+  } catch (err) {
+    console.error('ensureAuthSession: anonymous sign-in failed —', err);
+    return getAuth().currentUser;
+  }
 }
 
 export function getCurrentUser(): User | null {

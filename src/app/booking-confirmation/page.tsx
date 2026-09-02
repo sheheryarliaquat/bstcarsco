@@ -26,7 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BookingProgress } from "@/components/booking/BookingProgress";
-import { getBookingByNumberAnySource } from "@/lib/services/booking-service";
+import { getBookingByIdAnySource } from "@/lib/services/booking-service";
+import { ensureAuthSession } from "@/lib/firebase/auth";
 import { getVehicle } from "@/lib/services/vehicle-service";
 import { getDocument } from "@/lib/firebase/firestore";
 import type { Booking, Operator } from "@/types";
@@ -35,7 +36,7 @@ import { format } from "date-fns";
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const paymentMethod = searchParams.get("payment") || "card";
-  const bookingNumber = searchParams.get("bookingNumber");
+  const bookingId = searchParams.get("bookingId");
   const isCash = paymentMethod === "cash";
 
   const [booking, setBooking] = useState<Booking | null>(null);
@@ -44,12 +45,15 @@ function ConfirmationContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!bookingNumber) {
+    if (!bookingId) {
       setLoading(false);
       return;
     }
     let cancelled = false;
-    getBookingByNumberAnySource(bookingNumber)
+    // Same rationale as checkout: reading the booking back requires an
+    // authenticated (possibly anonymous) session matching its passengerId.
+    ensureAuthSession()
+      .then(() => getBookingByIdAnySource(bookingId))
       .then(async (found) => {
         if (cancelled || !found) return;
         setBooking(found);
@@ -67,7 +71,7 @@ function ConfirmationContent() {
     return () => {
       cancelled = true;
     };
-  }, [bookingNumber]);
+  }, [bookingId]);
 
   if (loading) {
     return (

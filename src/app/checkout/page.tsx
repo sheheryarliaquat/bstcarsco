@@ -41,7 +41,7 @@ import { PaymentForm } from "@/components/shared/PaymentForm";
 import { BookingStatus, type Booking } from "@/types";
 import { createBooking } from "@/lib/services/booking-service";
 import { calculateDistance } from "@/lib/services/pricing";
-import { auth as getFirebaseAuth } from "@/lib/firebase/config";
+import { ensureAuthSession } from "@/lib/firebase/auth";
 import {
   getCheckoutSelection,
   clearCheckoutSelection,
@@ -143,9 +143,12 @@ export default function CheckoutPage() {
     try {
       let passengerId = "guest-" + Date.now();
       try {
-        // Firebase Auth is optional here — a signed-out guest paying by
-        // cash should never be blocked by an auth/Firestore hiccup.
-        const currentUser = getFirebaseAuth().currentUser;
+        // The bookings security rule requires request.auth.uid to match
+        // passengerId for a real write, so a signed-out guest needs an
+        // (anonymous) session before their booking can be saved — the
+        // "guest-*" id below is only a fallback if that session can't be
+        // established (e.g. anonymous sign-in disabled in the console).
+        const currentUser = await ensureAuthSession();
         if (currentUser) passengerId = currentUser.uid;
       } catch {
         // Proceed as guest.
@@ -179,10 +182,10 @@ export default function CheckoutPage() {
           : BookingStatus.Confirmed,
       };
 
-      const { bookingNumber } = await createBooking(bookingData);
+      const { id } = await createBooking(bookingData);
       clearCheckoutSelection();
 
-      router.push(`/booking-confirmation?payment=${paymentMethod}&bookingNumber=${bookingNumber}`);
+      router.push(`/booking-confirmation?payment=${paymentMethod}&bookingId=${id}`);
     } catch (err) {
       setPaymentError(err instanceof Error ? err.message : "Failed to create booking. Please try again.");
     } finally {

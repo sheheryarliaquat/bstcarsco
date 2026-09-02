@@ -20,6 +20,7 @@ import { BookingSummary } from "@/components/booking/BookingSummary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAvailableQuotes } from "@/lib/services/quote-service";
 import { saveCheckoutSelection } from "@/lib/checkout-session";
+import { ensureAuthSession } from "@/lib/firebase/auth";
 import type { Quote, SortingType, Location, TripType } from "@/types";
 import type { BookingSearchParams } from "@/components/booking/BookingSearch";
 
@@ -161,13 +162,18 @@ function QuotesContent() {
     }
     let cancelled = false;
     setLoading(true);
-    getAvailableQuotes({
-      pickup: activeSearch.pickup,
-      destination: activeSearch.destination,
-      passengers: activeSearch.passengers,
-      luggage: activeSearch.luggage,
-      wheelchairAccessible: activeSearch.specialRequirements.wheelchairAccessible,
-    })
+    // Firestore rules require a signed-in session to read vehicles/rates —
+    // this gives a signed-out visitor an anonymous one so quotes can load.
+    ensureAuthSession()
+      .then(() =>
+        getAvailableQuotes({
+          pickup: activeSearch.pickup!,
+          destination: activeSearch.destination!,
+          passengers: activeSearch.passengers,
+          luggage: activeSearch.luggage,
+          wheelchairAccessible: activeSearch.specialRequirements.wheelchairAccessible,
+        })
+      )
       .then((result) => {
         if (!cancelled) setQuotes(result);
       })
