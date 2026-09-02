@@ -340,13 +340,29 @@ export function onAuthStateChanged(
  * and their own booking's create/read succeed without forcing a real
  * account. Requires Anonymous sign-in enabled in the Firebase console
  * (Authentication → Sign-in method).
+ *
+ * IMPORTANT: Firebase Auth restores a persisted session (e.g. an admin's
+ * login) asynchronously after page load — `auth.currentUser` can read
+ * `null` for a moment even when a real session is about to be restored.
+ * Checking it synchronously here previously caused a real signed-in
+ * session to occasionally be raced and overwritten by a fresh anonymous
+ * one (Firebase Auth persistence is shared across tabs in the same
+ * browser, so this could silently sign an admin out everywhere). Waiting
+ * for the first onAuthStateChanged callback guarantees restoration has
+ * finished before deciding whether an anonymous session is needed.
  */
 export async function ensureAuthSession(): Promise<User | null> {
   if (!isFirebaseAvailable()) return getCurrentUser();
   try {
-    const current = getAuth().currentUser;
-    if (current) return current;
-    const credential = await signInAnonymously(getAuth());
+    const auth = getAuth();
+    const restored = await new Promise<User | null>((resolve) => {
+      const unsubscribe = firebaseOnAuthStateChanged(auth, (user) => {
+        unsubscribe();
+        resolve(user);
+      });
+    });
+    if (restored) return restored;
+    const credential = await signInAnonymously(auth);
     return credential.user;
   } catch (err) {
     console.error('ensureAuthSession: anonymous sign-in failed —', err);
