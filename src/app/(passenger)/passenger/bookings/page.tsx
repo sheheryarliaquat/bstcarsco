@@ -27,208 +27,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { DEMO_DATA } from "@/constants"
-import { BookingStatus, type Booking } from "@/types"
+import { BookingStatus, type Booking, type Operator } from "@/types"
 import { listenToPassengerBookings } from "@/lib/services/booking-service"
+import { getDocument } from "@/lib/firebase/firestore"
+import { useAuth } from "@/hooks/useAuth"
 
 type TabFilter = "all" | "upcoming" | "active" | "completed" | "cancelled"
-
-const extraBookings: Booking[] = [
-  {
-    bookingNumber: "UKTB-2026-000007",
-    passengerId: "pass-001",
-    operatorId: "op-001",
-    driverId: "drv-001",
-    vehicleId: "veh-001",
-    tripType: "one_way",
-    pickup: DEMO_DATA.locations[0],
-    destination: DEMO_DATA.locations[5],
-    viaStops: [],
-    date: "2026-08-20",
-    pickupTime: "09:00",
-    passengers: 1,
-    luggage: 1,
-    vehicleType: "saloon",
-    distanceMiles: 5.2,
-    estimatedDuration: 22,
-    price: 14.5,
-    discount: 0,
-    tax: 2.9,
-    total: 17.4,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.TripCompleted,
-    createdAt: "2026-08-18T10:00:00Z",
-    updatedAt: "2026-08-20T09:45:00Z",
-  },
-  {
-    bookingNumber: "UKTB-2026-000008",
-    passengerId: "pass-001",
-    operatorId: "op-001",
-    driverId: "drv-002",
-    vehicleId: "veh-002",
-    tripType: "one_way",
-    pickup: DEMO_DATA.locations[3],
-    destination: DEMO_DATA.locations[1],
-    viaStops: [],
-    date: "2026-08-15",
-    pickupTime: "14:00",
-    passengers: 1,
-    luggage: 2,
-    vehicleType: "executive",
-    distanceMiles: 16.8,
-    estimatedDuration: 42,
-    price: 38.0,
-    discount: 3.8,
-    tax: 6.84,
-    total: 41.04,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.TripCompleted,
-    createdAt: "2026-08-13T12:00:00Z",
-    updatedAt: "2026-08-15T15:10:00Z",
-  },
-  {
-    bookingNumber: "UKTB-2026-000009",
-    passengerId: "pass-001",
-    operatorId: "op-001",
-    driverId: "",
-    vehicleId: "",
-    tripType: "one_way",
-    pickup: DEMO_DATA.locations[11],
-    destination: DEMO_DATA.locations[7],
-    viaStops: [],
-    date: "2026-08-10",
-    pickupTime: "08:00",
-    passengers: 2,
-    luggage: 1,
-    vehicleType: "saloon",
-    distanceMiles: 117.0,
-    estimatedDuration: 130,
-    price: 142.0,
-    discount: 14.2,
-    tax: 25.56,
-    total: 153.36,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.TripCompleted,
-    createdAt: "2026-08-08T09:00:00Z",
-    updatedAt: "2026-08-10T10:30:00Z",
-  },
-  {
-    bookingNumber: "UKTB-2026-000010",
-    passengerId: "pass-001",
-    operatorId: "op-001",
-    driverId: "",
-    vehicleId: "",
-    tripType: "return",
-    pickup: DEMO_DATA.locations[11],
-    destination: DEMO_DATA.locations[0],
-    viaStops: [],
-    date: "2026-08-27",
-    pickupTime: "10:00",
-    returnDate: "2026-08-28",
-    returnTime: "16:00",
-    passengers: 1,
-    luggage: 0,
-    vehicleType: "saloon",
-    distanceMiles: 3.1,
-    estimatedDuration: 18,
-    price: 11.5,
-    discount: 0,
-    tax: 2.3,
-    total: 13.8,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.Confirmed,
-    createdAt: "2026-08-25T08:00:00Z",
-    updatedAt: "2026-08-25T08:00:00Z",
-  },
-  {
-    bookingNumber: "UKTB-2026-000011",
-    passengerId: "pass-001",
-    operatorId: "op-002",
-    driverId: "drv-003",
-    vehicleId: "veh-003",
-    tripType: "one_way",
-    pickup: DEMO_DATA.locations[5],
-    destination: DEMO_DATA.locations[4],
-    viaStops: [],
-    date: "2026-07-28",
-    pickupTime: "11:00",
-    passengers: 1,
-    luggage: 2,
-    vehicleType: "estate",
-    distanceMiles: 120.5,
-    estimatedDuration: 140,
-    price: 148.0,
-    discount: 14.8,
-    tax: 26.64,
-    total: 159.84,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.TripCompleted,
-    createdAt: "2026-07-25T14:00:00Z",
-    updatedAt: "2026-07-28T13:20:00Z",
-  },
-  {
-    bookingNumber: "UKTB-2026-000012",
-    passengerId: "pass-001",
-    operatorId: "op-001",
-    driverId: "",
-    vehicleId: "",
-    tripType: "one_way",
-    pickup: DEMO_DATA.locations[11],
-    destination: DEMO_DATA.locations[3],
-    viaStops: [],
-    date: "2026-07-20",
-    pickupTime: "15:00",
-    passengers: 1,
-    luggage: 0,
-    vehicleType: "saloon",
-    distanceMiles: 1.2,
-    estimatedDuration: 8,
-    price: 6.5,
-    discount: 0,
-    tax: 1.3,
-    total: 7.8,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.CancelledByPassenger,
-    createdAt: "2026-07-20T14:30:00Z",
-    updatedAt: "2026-07-20T14:45:00Z",
-    cancellationReason: "changed_mind",
-  },
-  {
-    bookingNumber: "UKTB-2026-000013",
-    passengerId: "pass-001",
-    operatorId: "op-001",
-    driverId: "drv-001",
-    vehicleId: "veh-006",
-    tripType: "one_way",
-    pickup: DEMO_DATA.locations[3],
-    destination: DEMO_DATA.locations[10],
-    viaStops: [],
-    date: "2026-07-15",
-    pickupTime: "07:30",
-    passengers: 1,
-    luggage: 1,
-    vehicleType: "electric",
-    distanceMiles: 0.8,
-    estimatedDuration: 5,
-    price: 5.5,
-    discount: 0,
-    tax: 1.1,
-    total: 6.6,
-    currency: "GBP",
-    paymentStatus: "completed",
-    bookingStatus: BookingStatus.TripCompleted,
-    createdAt: "2026-07-14T18:00:00Z",
-    updatedAt: "2026-07-15T07:40:00Z",
-  },
-]
-
-const demoBookings = [...extraBookings]
 
 const upcomingStatuses = new Set([
   BookingStatus.Confirmed,
@@ -271,36 +75,42 @@ function filterByTab(bookings: Booking[], tab: TabFilter): Booking[] {
 }
 
 export default function BookingsPage() {
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<TabFilter>("all")
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
-  const [allBookings, setAllBookings] = useState<Booking[]>(demoBookings)
+  const [allBookings, setAllBookings] = useState<Booking[]>([])
+  const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
   const pageSize = 8
 
   useEffect(() => {
-    const stored = localStorage.getItem("bstcars_user")
-    const userId = stored ? JSON.parse(stored).uid : null
-    if (!userId) return
-
+    if (!user) {
+      setAllBookings([])
+      return
+    }
     const unsub = listenToPassengerBookings(
-      userId,
-      (firestoreBookings) => {
-        const merged = [...firestoreBookings, ...extraBookings]
-        const deduped = merged.filter(
-          (b, i, arr) =>
-            arr.findIndex((x) => x.bookingNumber === b.bookingNumber) === i
-        )
-        setAllBookings(deduped)
-      },
-      () => {
-        setAllBookings(demoBookings)
-      }
+      user.uid,
+      (data) => setAllBookings(data),
+      () => setAllBookings([])
     )
     return unsub
-  }, [])
+  }, [user])
+
+  useEffect(() => {
+    const operatorIds = [...new Set(allBookings.map((b) => b.operatorId).filter(Boolean))]
+    Promise.all(operatorIds.map((id) => getDocument<Operator>("users", id).catch(() => null))).then(
+      (results) => {
+        const map: Record<string, string> = {}
+        results.forEach((o, i) => {
+          map[operatorIds[i]] = o?.companyName ?? "Unknown"
+        })
+        setOperatorNames(map)
+      }
+    )
+  }, [allBookings])
 
   const filtered = useMemo(() => {
-    let result = filterByTab(demoBookings, activeTab)
+    let result = filterByTab(allBookings, activeTab)
     if (search) {
       const q = search.toLowerCase()
       result = result.filter(
@@ -311,7 +121,7 @@ export default function BookingsPage() {
       )
     }
     return result
-  }, [activeTab, search])
+  }, [allBookings, activeTab, search])
 
   const paginated = useMemo(() => {
     const start = (page - 1) * pageSize
@@ -364,10 +174,9 @@ export default function BookingsPage() {
       header: "Operator",
       render: (row) => {
         const b = row as unknown as Booking
-        const op = DEMO_DATA.operators.find((o) => o.uid === b.operatorId)
         return (
           <span className="text-sm text-[#172F52]">
-            {op?.companyName ?? "N/A"}
+            {b.operatorId ? operatorNames[b.operatorId] ?? "Loading..." : "N/A"}
           </span>
         )
       },

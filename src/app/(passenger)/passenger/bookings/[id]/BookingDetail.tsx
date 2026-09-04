@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useState } from "react"
+import { use, useEffect, useState } from "react"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -15,12 +15,18 @@ import {
   CheckCircle2,
   Navigation,
   CircleDot,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
-import { BookingStatus } from "@/types"
+import { BookingStatus, type Booking, type Driver, type Operator, type Vehicle } from "@/types"
+import { getBookingByNumber, updateBookingStatus } from "@/lib/services/booking-service"
+import { getVehicle } from "@/lib/services/vehicle-service"
+import { getDriver } from "@/lib/services/driver-service"
+import { getDocument } from "@/lib/firebase/firestore"
+
+type BookingRow = Booking & { id: string }
 
 export default function BookingDetail({
   params,
@@ -29,8 +35,55 @@ export default function BookingDetail({
 }) {
   const { id } = use(params)
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [booking, setBooking] = useState<BookingRow | null>(null)
+  const [driver, setDriver] = useState<Driver | null>(null)
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null)
+  const [operator, setOperator] = useState<Operator | null>(null)
 
-  const booking = DEMO_DATA.bookings.find((b) => b.bookingNumber === id)
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    getBookingByNumber(id)
+      .then(async (found) => {
+        if (cancelled) return
+        setBooking(found as BookingRow | null)
+        if (!found) return
+        const [d, v, o] = await Promise.all([
+          found.driverId ? getDriver(found.driverId).catch(() => null) : null,
+          found.vehicleId ? getVehicle(found.vehicleId).catch(() => null) : null,
+          found.operatorId ? getDocument<Operator>("users", found.operatorId).catch(() => null) : null,
+        ])
+        if (cancelled) return
+        setDriver(d)
+        setVehicle(v)
+        setOperator(o)
+      })
+      .catch(() => {
+        if (!cancelled) setBooking(null)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [id])
+
+  async function handleCancel() {
+    if (!booking) return
+    await updateBookingStatus(booking.id, BookingStatus.CancelledByPassenger)
+    setBooking({ ...booking, bookingStatus: BookingStatus.CancelledByPassenger })
+    setCancelOpen(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+      </div>
+    )
+  }
 
   if (!booking) {
     return (
@@ -47,16 +100,6 @@ export default function BookingDetail({
       </div>
     )
   }
-
-  const driver =
-    booking.driverId &&
-    DEMO_DATA.drivers.find((d) => d.uid === booking.driverId)
-  const vehicle =
-    booking.vehicleId &&
-    DEMO_DATA.vehicles.find((v) => v.id === booking.vehicleId)
-  const operator = DEMO_DATA.operators.find(
-    (o) => o.uid === booking.operatorId
-  )
 
   const timelineSteps = [
     {
@@ -145,9 +188,6 @@ export default function BookingDetail({
                       <CheckCircle2 className="h-5 w-5 shrink-0 text-[#28A745]" />
                     ) : step.status === "cancelled" ? (
                       <XCircle className="h-5 w-5 shrink-0 text-[#DC3545]" />
-                    ) : i === timelineSteps.length - 1 ||
-                      timelineSteps[i + 1]?.status === "completed" ? (
-                      <CircleDot className="h-5 w-5 shrink-0 text-[#D9E0E8]" />
                     ) : (
                       <CircleDot className="h-5 w-5 shrink-0 text-[#D9E0E8]" />
                     )}
@@ -426,7 +466,7 @@ export default function BookingDetail({
         title="Cancel Booking"
         description="Are you sure you want to cancel this booking? A cancellation fee may apply."
         confirmText="Yes, Cancel"
-        onConfirm={() => {}}
+        onConfirm={handleCancel}
         variant="destructive"
       />
     </div>

@@ -17,36 +17,35 @@ import {
 import { DashboardCard } from "@/components/shared/DashboardCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Button } from "@/components/ui/button"
-import { DEMO_DATA } from "@/constants"
 import { BookingStatus, type Booking } from "@/types"
 import { listenToPassengerBookings } from "@/lib/services/booking-service"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function PassengerDashboardPage() {
+  const { user } = useAuth()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const stored = localStorage.getItem("bstcars_user")
-    const userId = stored ? JSON.parse(stored).uid : null
-    if (!userId) {
+    if (!user) {
       setBookings([])
       setLoading(false)
       return
     }
 
     const unsub = listenToPassengerBookings(
-      userId,
+      user.uid,
       (data) => {
         setBookings(data)
         setLoading(false)
       },
       () => {
-        setBookings(DEMO_DATA.bookings.filter((b) => b.passengerId === "pass-001"))
+        setBookings([])
         setLoading(false)
       }
     )
     return unsub
-  }, [])
+  }, [user])
 
   const passengerBookings = bookings
   const upcomingCount = passengerBookings.filter(
