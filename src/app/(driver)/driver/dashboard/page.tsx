@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
   Car,
@@ -9,29 +9,103 @@ import {
   TrendingUp,
   Star,
   CheckCircle2,
-  MapPin,
   Clock,
   ArrowRight,
   Power,
   Phone,
   Users,
-  Luggage,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { DashboardCard } from "@/components/shared/DashboardCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
-import { RatingStars } from "@/components/shared/RatingStars"
-import { BookingStatus } from "@/types"
+import { BookingStatus, type Booking, type Driver } from "@/types"
+import { useAuth } from "@/hooks/useAuth"
+import { listenToDriverBookings } from "@/lib/services/booking-service"
+import { getDriver, updateDriver } from "@/lib/services/driver-service"
 
-const DEMO_RECENT_TRIPS: Array<any> = []
+const ACTIVE_STATUSES = new Set([
+  BookingStatus.DriverEnRoute,
+  BookingStatus.DriverArrived,
+  BookingStatus.PassengerOnboard,
+  BookingStatus.TripStarted,
+])
+
+function isSameDay(a: string, b: Date) {
+  const d = new Date(a)
+  return (
+    d.getFullYear() === b.getFullYear() &&
+    d.getMonth() === b.getMonth() &&
+    d.getDate() === b.getDate()
+  )
+}
 
 export default function DriverDashboardPage() {
-  const [isOnline, setIsOnline] = useState(true)
-  const currentTrip = DEMO_RECENT_TRIPS[1]
+  const { user } = useAuth()
+  const [profile, setProfile] = useState<Driver | null>(null)
+  const [bookings, setBookings] = useState<Booking[]>([])
+
+  useEffect(() => {
+    if (!user) return
+    const unsub = listenToDriverBookings(user.uid, setBookings, () => setBookings([]))
+    return unsub
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    getDriver(user.uid).then(setProfile).catch(() => setProfile(null))
+  }, [user])
+
+  const isOnline = profile?.status === "online"
+
+  function setIsOnline(next: boolean) {
+    if (!user) return
+    setProfile((p) => (p ? { ...p, status: next ? "online" : "offline" } : p))
+    updateDriver(user.uid, { status: next ? "online" : "offline" }).catch(() => {})
+  }
+
+  const now = useMemo(() => new Date(), [])
+  const weekStart = useMemo(() => {
+    const d = new Date(now)
+    d.setDate(d.getDate() - d.getDay())
+    d.setHours(0, 0, 0, 0)
+    return d
+  }, [now])
+
+  const todaysTrips = bookings.filter((b) => isSameDay(b.date, now))
+  const todaysEarnings = todaysTrips
+    .filter((b) => b.bookingStatus === BookingStatus.TripCompleted)
+    .reduce((sum, b) => sum + b.total, 0)
+  const thisWeekBookings = bookings.filter(
+    (b) => new Date(b.date) >= weekStart && b.bookingStatus === BookingStatus.TripCompleted
+  )
+  const thisWeekEarnings = thisWeekBookings.reduce((sum, b) => sum + b.total, 0)
+  const thisMonthEarnings = bookings
+    .filter(
+      (b) =>
+        b.bookingStatus === BookingStatus.TripCompleted &&
+        new Date(b.date).getMonth() === now.getMonth() &&
+        new Date(b.date).getFullYear() === now.getFullYear()
+    )
+    .reduce((sum, b) => sum + b.total, 0)
+  const completedCount = bookings.filter((b) => b.bookingStatus === BookingStatus.TripCompleted).length
+
+  const currentTrip = bookings.find((b) => ACTIVE_STATUSES.has(b.bookingStatus))
+
+  const recentTrips = [...bookings]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5)
+
+  const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  const weeklyChart = weekdayLabels.map((label, i) => {
+    const total = thisWeekBookings
+      .filter((b) => new Date(b.date).getDay() === i)
+      .reduce((sum, b) => sum + b.total, 0)
+    return { day: label, amount: total }
+  })
+  const maxDay = Math.max(...weeklyChart.map((d) => d.amount), 1)
 
   return (
     <div className="space-y-6">
@@ -70,32 +144,32 @@ export default function DriverDashboardPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <DashboardCard
           title="Today's Trips"
-          value={0}
+          value={todaysTrips.length}
           icon={<Car className="h-5 w-5" />}
         />
         <DashboardCard
           title="Today's Earnings"
-          value="£0"
+          value={`£${todaysEarnings.toFixed(2)}`}
           icon={<Wallet className="h-5 w-5" />}
         />
         <DashboardCard
           title="This Week"
-          value="£0"
+          value={`£${thisWeekEarnings.toFixed(2)}`}
           icon={<Calendar className="h-5 w-5" />}
         />
         <DashboardCard
           title="This Month"
-          value="£0"
+          value={`£${thisMonthEarnings.toFixed(2)}`}
           icon={<TrendingUp className="h-5 w-5" />}
         />
         <DashboardCard
           title="Completed Trips"
-          value={0}
+          value={completedCount}
           icon={<CheckCircle2 className="h-5 w-5" />}
         />
         <DashboardCard
           title="Rating"
-          value="0.0"
+          value={(profile?.rating ?? 0).toFixed(1)}
           icon={<Star className="h-5 w-5" />}
         />
       </div>
@@ -109,7 +183,7 @@ export default function DriverDashboardPage() {
               <h3 className="text-lg font-bold text-[#172F52]">Current Trip</h3>
             </div>
             <Badge className="bg-[#D4145A]/10 text-[#D4145A]">
-              {currentTrip.id}
+              {currentTrip.bookingNumber}
             </Badge>
           </div>
 
@@ -122,7 +196,7 @@ export default function DriverDashboardPage() {
                     Pickup
                   </p>
                   <p className="text-sm font-semibold text-[#172F52]">
-                    {currentTrip.from}
+                    {currentTrip.pickup.formattedAddress}
                   </p>
                 </div>
               </div>
@@ -133,7 +207,7 @@ export default function DriverDashboardPage() {
                     Destination
                   </p>
                   <p className="text-sm font-semibold text-[#172F52]">
-                    {currentTrip.to}
+                    {currentTrip.destination.formattedAddress}
                   </p>
                 </div>
               </div>
@@ -143,19 +217,19 @@ export default function DriverDashboardPage() {
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-[#6B7280]" />
                 <span className="text-sm text-[#172F52]">
-                  Passenger: <span className="font-medium">{currentTrip.passenger}</span>
+                  Passengers: <span className="font-medium">{currentTrip.passengers}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-[#6B7280]" />
                 <span className="text-sm text-[#172F52]">
-                  Pickup: <span className="font-medium">{currentTrip.time}</span>
+                  Pickup: <span className="font-medium">{currentTrip.pickupTime}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Wallet className="h-4 w-4 text-[#6B7280]" />
                 <span className="text-sm text-[#172F52]">
-                  Earnings: <span className="font-bold text-green-600">{currentTrip.amount}</span>
+                  Fare: <span className="font-bold text-green-600">£{currentTrip.total.toFixed(2)}</span>
                 </span>
               </div>
             </div>
@@ -190,40 +264,37 @@ export default function DriverDashboardPage() {
               </Link>
             </div>
             <div className="divide-y divide-[#F5F7FA]">
-              {DEMO_RECENT_TRIPS.length === 0 ? (
+              {recentTrips.length === 0 ? (
                 <div className="px-6 py-8 text-center">
                   <p className="text-sm text-[#6B7280]">No recent trips to display</p>
                 </div>
               ) : (
-                DEMO_RECENT_TRIPS.map((trip) => (
+                recentTrips.map((trip) => (
                   <div
-                    key={trip.id}
+                    key={trip.bookingNumber}
                     className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-[#F5F7FA]/50"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <p className="truncate text-sm font-medium text-[#172F52]">
-                          {trip.from.split(",")[0]}
+                          {trip.pickup.formattedAddress.split(",")[0]}
                         </p>
                         <ArrowRight className="h-3 w-3 shrink-0 text-[#6B7280]" />
                         <p className="truncate text-sm text-[#6B7280]">
-                          {trip.to.split(",")[0]}
+                          {trip.destination.formattedAddress.split(",")[0]}
                         </p>
                       </div>
                       <div className="mt-1 flex items-center gap-3">
                         <span className="text-xs text-[#6B7280]">
-                          {trip.date} at {trip.time}
-                        </span>
-                        <span className="text-xs text-[#6B7280]">
-                          {trip.passenger}
+                          {trip.date} at {trip.pickupTime}
                         </span>
                       </div>
                     </div>
                     <div className="ml-4 flex items-center gap-3">
                       <span className="text-sm font-bold text-[#172F52]">
-                        {trip.amount}
+                        £{trip.total.toFixed(2)}
                       </span>
-                      <StatusBadge status={trip.status} type="booking" />
+                      <StatusBadge status={trip.bookingStatus} type="booking" />
                     </div>
                   </div>
                 ))
@@ -232,21 +303,13 @@ export default function DriverDashboardPage() {
           </div>
         </div>
 
-        {/* Earnings Chart Placeholder */}
+        {/* Weekly Earnings */}
         <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
           <h3 className="mb-4 text-base font-bold text-[#172F52]">
             Weekly Earnings
           </h3>
           <div className="space-y-3">
-            {[
-              { day: "Mon", amount: 68, max: 120 },
-              { day: "Tue", amount: 95, max: 120 },
-              { day: "Wed", amount: 42, max: 120 },
-              { day: "Thu", amount: 110, max: 120 },
-              { day: "Fri", amount: 87, max: 120 },
-              { day: "Sat", amount: 0, max: 120 },
-              { day: "Sun", amount: 0, max: 120 },
-            ].map((item) => (
+            {weeklyChart.map((item) => (
               <div key={item.day} className="flex items-center gap-3">
                 <span className="w-8 text-xs font-medium text-[#6B7280]">
                   {item.day}
@@ -256,13 +319,13 @@ export default function DriverDashboardPage() {
                     <div
                       className="h-full rounded-full bg-[#D4145A] transition-all duration-500"
                       style={{
-                        width: `${(item.amount / item.max) * 100}%`,
+                        width: `${(item.amount / maxDay) * 100}%`,
                       }}
                     />
                   </div>
                 </div>
                 <span className="w-14 text-right text-xs font-semibold text-[#172F52]">
-                  {item.amount > 0 ? `£${item.amount}` : "-"}
+                  {item.amount > 0 ? `£${item.amount.toFixed(0)}` : "-"}
                 </span>
               </div>
             ))}
@@ -270,7 +333,7 @@ export default function DriverDashboardPage() {
           <div className="mt-4 border-t border-[#E5E7EB] pt-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-[#6B7280]">This Week</span>
-              <span className="text-lg font-bold text-[#172F52]">£412.30</span>
+              <span className="text-lg font-bold text-[#172F52]">£{thisWeekEarnings.toFixed(2)}</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   MapPin,
   Navigation,
@@ -11,254 +11,192 @@ import {
   Clock,
   Ruler,
   ExternalLink,
-  MessageSquare,
   CheckCircle2,
   XCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
+import { EmptyState } from "@/components/shared/EmptyState"
 import { MapView } from "@/components/shared/MapView"
-import { BookingStatus } from "@/types"
+import { BookingStatus, type Booking, type User as AppUser } from "@/types"
+import { useAuth } from "@/hooks/useAuth"
+import { listenToDriverBookings, updateBookingStatus } from "@/lib/services/booking-service"
+import { getDocument } from "@/lib/firebase/firestore"
 
-type TripStatus =
-  | "assigned"
-  | "accepted"
-  | "en_route"
-  | "arrived"
-  | "on_board"
-  | "trip_started"
-  | "completed"
-  | "no_show"
-  | "cancelled"
+type BookingRow = Booking & { id: string }
 
-const STATUS_CONFIG: Record<
-  TripStatus,
-  { label: string; color: string; bg: string }
-> = {
-  assigned: { label: "New Trip Assigned", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
-  accepted: { label: "Trip Accepted", color: "text-green-700", bg: "bg-green-50 border-green-200" },
-  en_route: { label: "En Route to Pickup", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
-  arrived: { label: "Arrived at Pickup", color: "text-amber-700", bg: "bg-amber-50 border-amber-200" },
-  on_board: { label: "Passenger On Board", color: "text-purple-700", bg: "bg-purple-50 border-purple-200" },
-  trip_started: { label: "Trip In Progress", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
-  completed: { label: "Trip Completed", color: "text-green-700", bg: "bg-green-50 border-green-200" },
-  no_show: { label: "Passenger No Show", color: "text-red-700", bg: "bg-red-50 border-red-200" },
-  cancelled: { label: "Trip Cancelled", color: "text-red-700", bg: "bg-red-50 border-red-200" },
+const ACTIVE_STATUSES = [
+  BookingStatus.DriverAssigned,
+  BookingStatus.DriverAccepted,
+  BookingStatus.DriverEnRoute,
+  BookingStatus.DriverArrived,
+  BookingStatus.PassengerOnboard,
+  BookingStatus.TripStarted,
+]
+
+const STATUS_CONFIG: Partial<Record<BookingStatus, { label: string; color: string; bg: string }>> = {
+  [BookingStatus.DriverAssigned]: { label: "New Trip Assigned", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
+  [BookingStatus.DriverAccepted]: { label: "Trip Accepted", color: "text-green-700", bg: "bg-green-50 border-green-200" },
+  [BookingStatus.DriverEnRoute]: { label: "En Route to Pickup", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
+  [BookingStatus.DriverArrived]: { label: "Arrived at Pickup", color: "text-amber-700", bg: "bg-amber-50 border-amber-200" },
+  [BookingStatus.PassengerOnboard]: { label: "Passenger On Board", color: "text-purple-700", bg: "bg-purple-50 border-purple-200" },
+  [BookingStatus.TripStarted]: { label: "Trip In Progress", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
+  [BookingStatus.TripCompleted]: { label: "Trip Completed", color: "text-green-700", bg: "bg-green-50 border-green-200" },
+  [BookingStatus.NoShow]: { label: "Passenger No Show", color: "text-red-700", bg: "bg-red-50 border-red-200" },
+  [BookingStatus.CancelledByDriver]: { label: "Trip Cancelled", color: "text-red-700", bg: "bg-red-50 border-red-200" },
 }
 
-const DEMO_TRIP = {
-  id: "UKTB-2026-000002",
-  pickup: {
-    address: "1 Manchester Square, London W1U 3PH",
-    lat: 51.5141,
-    lng: -0.1535,
-  },
-  destination: {
-    address: "10 Downing Street, Westminster, London SW1A 2AA",
-    lat: 51.5034,
-    lng: -0.1276,
-  },
-  passenger: {
-    name: "Emma Thompson",
-    phone: "+447700900200",
-  },
-  passengers: 2,
-  luggage: 1,
-  specialRequirements: "None",
-  estimatedTime: "15 min",
-  estimatedDistance: "2.3 miles",
-  fare: "£11.52",
+function getNextActions(status: BookingStatus) {
+  switch (status) {
+    case BookingStatus.DriverAssigned:
+      return [
+        { label: "Accept Trip", status: BookingStatus.DriverAccepted, color: "bg-green-600 text-white hover:bg-green-700", icon: <CheckCircle2 className="h-4 w-4" /> },
+        { label: "Decline", status: BookingStatus.CancelledByDriver, color: "border-2 border-red-200 text-red-600 hover:bg-red-50", icon: <XCircle className="h-4 w-4" /> },
+      ]
+    case BookingStatus.DriverAccepted:
+      return [{ label: "On The Way", status: BookingStatus.DriverEnRoute, color: "bg-blue-600 text-white hover:bg-blue-700", icon: <Navigation className="h-4 w-4" /> }]
+    case BookingStatus.DriverEnRoute:
+      return [{ label: "I Have Arrived", status: BookingStatus.DriverArrived, color: "bg-amber-500 text-white hover:bg-amber-600", icon: <MapPin className="h-4 w-4" /> }]
+    case BookingStatus.DriverArrived:
+      return [
+        { label: "Passenger On Board", status: BookingStatus.PassengerOnboard, color: "bg-purple-600 text-white hover:bg-purple-700", icon: <Users className="h-4 w-4" /> },
+        { label: "Passenger No Show", status: BookingStatus.NoShow, color: "border-2 border-red-200 text-red-600 hover:bg-red-50", icon: <AlertTriangle className="h-4 w-4" /> },
+      ]
+    case BookingStatus.PassengerOnboard:
+      return [{ label: "Start Trip", status: BookingStatus.TripStarted, color: "bg-blue-600 text-white hover:bg-blue-700", icon: <Navigation className="h-4 w-4" /> }]
+    case BookingStatus.TripStarted:
+      return [{ label: "Complete Trip", status: BookingStatus.TripCompleted, color: "bg-green-600 text-white hover:bg-green-700", icon: <CheckCircle2 className="h-4 w-4" /> }]
+    default:
+      return []
+  }
 }
 
 export default function ActiveTripPage() {
-  const [status, setStatus] = useState<TripStatus>("en_route")
+  const { user } = useAuth()
+  const [bookings, setBookings] = useState<BookingRow[]>([])
+  const [passenger, setPassenger] = useState<AppUser | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [pendingAction, setPendingAction] = useState<{
-    status: TripStatus
-    label: string
-  } | null>(null)
+  const [pendingAction, setPendingAction] = useState<{ status: BookingStatus; label: string } | null>(null)
 
-  const statusConfig = STATUS_CONFIG[status]
+  useEffect(() => {
+    if (!user) {
+      setBookings([])
+      return
+    }
+    const unsub = listenToDriverBookings(user.uid, (data) => setBookings(data as BookingRow[]), () => setBookings([]))
+    return unsub
+  }, [user])
 
-  function handleStatusChange(newStatus: TripStatus, label: string) {
+  const trip = useMemo(
+    () => bookings.find((b) => ACTIVE_STATUSES.includes(b.bookingStatus)),
+    [bookings]
+  )
+
+  useEffect(() => {
+    if (!trip?.passengerId) {
+      setPassenger(null)
+      return
+    }
+    getDocument<AppUser>("users", trip.passengerId).then(setPassenger).catch(() => setPassenger(null))
+  }, [trip?.passengerId])
+
+  function handleStatusChange(newStatus: BookingStatus, label: string) {
     setPendingAction({ status: newStatus, label })
     setConfirmOpen(true)
   }
 
-  function confirmStatusChange() {
-    if (pendingAction) {
-      setStatus(pendingAction.status)
+  async function confirmStatusChange() {
+    if (pendingAction && trip) {
+      await updateBookingStatus(trip.id, pendingAction.status)
       setPendingAction(null)
     }
     setConfirmOpen(false)
   }
 
-  function getNextActions(): {
-    label: string
-    status: TripStatus
-    color: string
-    icon: React.ReactNode
-  }[] {
-    switch (status) {
-      case "assigned":
-        return [
-          {
-            label: "Accept Trip",
-            status: "accepted",
-            color: "bg-green-600 text-white hover:bg-green-700",
-            icon: <CheckCircle2 className="h-4 w-4" />,
-          },
-          {
-            label: "Decline",
-            status: "cancelled",
-            color: "border-2 border-red-200 text-red-600 hover:bg-red-50",
-            icon: <XCircle className="h-4 w-4" />,
-          },
-        ]
-      case "accepted":
-        return [
-          {
-            label: "On The Way",
-            status: "en_route",
-            color: "bg-blue-600 text-white hover:bg-blue-700",
-            icon: <Navigation className="h-4 w-4" />,
-          },
-        ]
-      case "en_route":
-        return [
-          {
-            label: "I Have Arrived",
-            status: "arrived",
-            color: "bg-amber-500 text-white hover:bg-amber-600",
-            icon: <MapPin className="h-4 w-4" />,
-          },
-        ]
-      case "arrived":
-        return [
-          {
-            label: "Passenger On Board",
-            status: "on_board",
-            color: "bg-purple-600 text-white hover:bg-purple-700",
-            icon: <Users className="h-4 w-4" />,
-          },
-          {
-            label: "Passenger No Show",
-            status: "no_show",
-            color: "border-2 border-red-200 text-red-600 hover:bg-red-50",
-            icon: <AlertTriangle className="h-4 w-4" />,
-          },
-        ]
-      case "on_board":
-        return [
-          {
-            label: "Start Trip",
-            status: "trip_started",
-            color: "bg-blue-600 text-white hover:bg-blue-700",
-            icon: <Navigation className="h-4 w-4" />,
-          },
-        ]
-      case "trip_started":
-        return [
-          {
-            label: "Complete Trip",
-            status: "completed",
-            color: "bg-green-600 text-white hover:bg-green-700",
-            icon: <CheckCircle2 className="h-4 w-4" />,
-          },
-        ]
-      default:
-        return []
-    }
+  if (!trip) {
+    return (
+      <EmptyState
+        icon={<Navigation className="h-16 w-16" />}
+        title="No active trip"
+        description="You don't have an active trip right now. Go online and wait for a dispatch assignment."
+      />
+    )
   }
 
-  const nextActions = getNextActions()
-  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${DEMO_TRIP.pickup.lat},${DEMO_TRIP.pickup.lng}&destination=${DEMO_TRIP.destination.lat},${DEMO_TRIP.destination.lng}&travelmode=driving`
+  const statusConfig = STATUS_CONFIG[trip.bookingStatus] ?? {
+    label: trip.bookingStatus,
+    color: "text-[#172F52]",
+    bg: "bg-[#F5F7FA] border-[#D9E0E8]",
+  }
+  const nextActions = getNextActions(trip.bookingStatus)
+  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${trip.pickup.latitude},${trip.pickup.longitude}&destination=${trip.destination.latitude},${trip.destination.longitude}&travelmode=driving`
+  const passengerName = passenger ? `${passenger.firstName} ${passenger.lastName}` : "Guest Passenger"
+  const passengerPhone = passenger?.phone ?? "N/A"
 
   return (
     <div className="space-y-4">
       {/* Status Banner */}
-      <div
-        className={cn(
-          "flex items-center justify-between rounded-xl border-2 p-4",
-          statusConfig.bg
-        )}
-      >
+      <div className={cn("flex items-center justify-between rounded-xl border-2 p-4", statusConfig.bg)}>
         <div className="flex items-center gap-3">
           <div
             className={cn(
               "flex h-10 w-10 items-center justify-center rounded-full",
-              status === "completed" || status === "no_show" || status === "cancelled"
+              [BookingStatus.TripCompleted, BookingStatus.NoShow, BookingStatus.CancelledByDriver].includes(trip.bookingStatus)
                 ? "bg-gray-200"
                 : "animate-pulse bg-green-500"
             )}
           >
-            {status === "completed" ? (
+            {trip.bookingStatus === BookingStatus.TripCompleted ? (
               <CheckCircle2 className="h-5 w-5 text-green-600" />
-            ) : status === "no_show" || status === "cancelled" ? (
+            ) : [BookingStatus.NoShow, BookingStatus.CancelledByDriver].includes(trip.bookingStatus) ? (
               <XCircle className="h-5 w-5 text-red-500" />
             ) : (
               <div className="h-3 w-3 rounded-full bg-white" />
             )}
           </div>
           <div>
-            <p className={cn("text-sm font-bold", statusConfig.color)}>
-              {statusConfig.label}
-            </p>
-            <p className="text-xs text-[#6B7280]">{DEMO_TRIP.id}</p>
+            <p className={cn("text-sm font-bold", statusConfig.color)}>{statusConfig.label}</p>
+            <p className="text-xs text-[#6B7280]">{trip.bookingNumber}</p>
           </div>
         </div>
-        <Badge
-          variant="outline"
-          className="border-[#D9E0E8] text-xs font-medium text-[#6B7280]"
-        >
+        <Badge variant="outline" className="border-[#D9E0E8] text-xs font-medium text-[#6B7280]">
           <Clock className="mr-1 h-3 w-3" />
-          Est. {DEMO_TRIP.estimatedTime}
+          Est. {trip.estimatedDuration} min
         </Badge>
       </div>
 
       {/* Map */}
       <div className="overflow-hidden rounded-2xl ring-1 ring-[#E5E7EB]">
         <MapView
-          pickup={{ lat: DEMO_TRIP.pickup.lat, lng: DEMO_TRIP.pickup.lng }}
-          destination={{ lat: DEMO_TRIP.destination.lat, lng: DEMO_TRIP.destination.lng }}
+          pickup={{ lat: trip.pickup.latitude, lng: trip.pickup.longitude }}
+          destination={{ lat: trip.destination.latitude, lng: trip.destination.longitude }}
           height="350px"
         />
       </div>
 
       {/* Trip Info Cards */}
       <div className="grid gap-4 md:grid-cols-2">
-        {/* Pickup */}
         <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
           <div className="mb-2 flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D4145A]">
               <MapPin className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-              Pickup
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Pickup</span>
           </div>
-          <p className="text-base font-bold text-[#172F52]">
-            {DEMO_TRIP.pickup.address}
-          </p>
+          <p className="text-base font-bold text-[#172F52]">{trip.pickup.formattedAddress}</p>
         </div>
 
-        {/* Destination */}
         <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
           <div className="mb-2 flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500">
               <MapPin className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
-              Destination
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Destination</span>
           </div>
-          <p className="text-base font-bold text-[#172F52]">
-            {DEMO_TRIP.destination.address}
-          </p>
+          <p className="text-base font-bold text-[#172F52]">{trip.destination.formattedAddress}</p>
         </div>
       </div>
 
@@ -267,46 +205,36 @@ export default function ActiveTripPage() {
         <h3 className="mb-4 text-base font-bold text-[#172F52]">Trip Details</h3>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Passenger */}
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
               <Users className="h-4 w-4 text-[#172F52]" />
             </div>
             <div>
               <p className="text-xs text-[#6B7280]">Passenger</p>
-              <p className="text-sm font-semibold text-[#172F52]">
-                {DEMO_TRIP.passenger.name}
-              </p>
+              <p className="text-sm font-semibold text-[#172F52]">{passengerName}</p>
             </div>
           </div>
 
-          {/* Phone */}
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
               <Phone className="h-4 w-4 text-[#172F52]" />
             </div>
             <div>
               <p className="text-xs text-[#6B7280]">Phone</p>
-              <p className="text-sm font-semibold text-[#172F52]">
-                {DEMO_TRIP.passenger.phone}
-              </p>
+              <p className="text-sm font-semibold text-[#172F52]">{passengerPhone}</p>
             </div>
           </div>
 
-          {/* Passengers */}
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
               <Users className="h-4 w-4 text-[#172F52]" />
             </div>
             <div>
               <p className="text-xs text-[#6B7280]">Passengers</p>
-              <p className="text-sm font-semibold text-[#172F52]">
-                {DEMO_TRIP.passengers}
-              </p>
+              <p className="text-sm font-semibold text-[#172F52]">{trip.passengers}</p>
             </div>
           </div>
 
-          {/* Luggage */}
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
               <Luggage className="h-4 w-4 text-[#172F52]" />
@@ -314,34 +242,28 @@ export default function ActiveTripPage() {
             <div>
               <p className="text-xs text-[#6B7280]">Luggage</p>
               <p className="text-sm font-semibold text-[#172F52]">
-                {DEMO_TRIP.luggage} bag{DEMO_TRIP.luggage !== 1 && "s"}
+                {trip.luggage} bag{trip.luggage !== 1 && "s"}
               </p>
             </div>
           </div>
 
-          {/* Distance */}
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
               <Ruler className="h-4 w-4 text-[#172F52]" />
             </div>
             <div>
               <p className="text-xs text-[#6B7280]">Distance</p>
-              <p className="text-sm font-semibold text-[#172F52]">
-                {DEMO_TRIP.estimatedDistance}
-              </p>
+              <p className="text-sm font-semibold text-[#172F52]">{trip.distanceMiles} miles</p>
             </div>
           </div>
 
-          {/* ETA */}
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
               <Clock className="h-4 w-4 text-[#172F52]" />
             </div>
             <div>
               <p className="text-xs text-[#6B7280]">Est. Time</p>
-              <p className="text-sm font-semibold text-[#172F52]">
-                {DEMO_TRIP.estimatedTime}
-              </p>
+              <p className="text-sm font-semibold text-[#172F52]">{trip.estimatedDuration} min</p>
             </div>
           </div>
         </div>
@@ -353,7 +275,7 @@ export default function ActiveTripPage() {
           <div>
             <p className="text-xs text-[#6B7280]">Special Requirements</p>
             <p className="text-sm font-medium text-[#172F52]">
-              {DEMO_TRIP.specialRequirements}
+              {trip.specialRequirements?.notes || "None"}
             </p>
           </div>
         </div>
@@ -362,8 +284,8 @@ export default function ActiveTripPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-[#6B7280]">Estimated Fare</p>
-            <p className="text-xl font-bold text-[#172F52]">{DEMO_TRIP.fare}</p>
+            <p className="text-xs text-[#6B7280]">Fare</p>
+            <p className="text-xl font-bold text-[#172F52]">£{trip.total.toFixed(2)}</p>
           </div>
         </div>
       </div>
@@ -372,45 +294,25 @@ export default function ActiveTripPage() {
       <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
         <h3 className="mb-4 text-base font-bold text-[#172F52]">Actions</h3>
 
-        {/* Navigation */}
-        <a
-          href={googleMapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mb-4 block"
-        >
-          <Button
-            variant="outline"
-            className="w-full border-2 border-[#172F52] text-[#172F52] hover:bg-[#172F52] hover:text-white"
-          >
+        <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="mb-4 block">
+          <Button variant="outline" className="w-full border-2 border-[#172F52] text-[#172F52] hover:bg-[#172F52] hover:text-white">
             <Navigation className="mr-2 h-4 w-4" />
             Open Navigation
             <ExternalLink className="ml-2 h-3.5 w-3.5" />
           </Button>
         </a>
 
-        <div className="mb-4 grid grid-cols-2 gap-3">
-          <a href={`tel:${DEMO_TRIP.passenger.phone}`}>
-            <Button
-              variant="outline"
-              className="w-full border-[#D9E0E8]"
-            >
+        {passengerPhone !== "N/A" && (
+          <a href={`tel:${passengerPhone}`} className="mb-4 block">
+            <Button variant="outline" className="w-full border-[#D9E0E8]">
               <Phone className="mr-2 h-4 w-4" />
               Call Passenger
             </Button>
           </a>
-          <Button
-            variant="outline"
-            className="w-full border-[#D9E0E8]"
-          >
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Message
-          </Button>
-        </div>
+        )}
 
         <Separator className="my-4" />
 
-        {/* Status Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
           {nextActions.map((action) => (
             <Button
@@ -425,7 +327,6 @@ export default function ActiveTripPage() {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
@@ -434,7 +335,7 @@ export default function ActiveTripPage() {
         confirmText={pendingAction?.label ?? "Confirm"}
         onConfirm={confirmStatusChange}
         variant={
-          pendingAction?.status === "cancelled" || pendingAction?.status === "no_show"
+          pendingAction?.status === BookingStatus.CancelledByDriver || pendingAction?.status === BookingStatus.NoShow
             ? "destructive"
             : "default"
         }

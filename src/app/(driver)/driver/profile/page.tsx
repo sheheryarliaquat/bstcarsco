@@ -1,35 +1,115 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   User,
   Mail,
   Phone,
-  MapPin,
   Camera,
   Save,
   CheckCircle2,
   Lock,
   Car,
   Star,
-  Edit,
+  AlertCircle,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { RatingStars } from "@/components/shared/RatingStars"
+import { useAuth } from "@/hooks/useAuth"
+import { getDriver, updateDriver } from "@/lib/services/driver-service"
+import { getVehicle } from "@/lib/services/vehicle-service"
+import { updateUser } from "@/lib/services/user-service"
+import { changePassword } from "@/lib/firebase/auth"
+import type { Driver, Vehicle } from "@/types"
 
 export default function DriverProfilePage() {
+  const { user } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState<Driver | null>(null)
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null)
+
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  function handleSave() {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [passwordSaving, setPasswordSaving] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
+  const [passwordSuccess, setPasswordSuccess] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    setLoading(true)
+    getDriver(user.uid)
+      .then((data) => {
+        setProfile(data)
+        if (data) {
+          setFirstName(data.firstName)
+          setLastName(data.lastName)
+          setPhone(data.phone)
+          if (data.vehicleId) {
+            getVehicle(data.vehicleId).then(setVehicle).catch(() => setVehicle(null))
+          }
+        }
+      })
+      .finally(() => setLoading(false))
+  }, [user])
+
+  async function handleSave() {
+    if (!user) return
+    setSaving(true)
+    try {
+      await Promise.all([
+        updateDriver(user.uid, { firstName, lastName, phone }),
+        updateUser(user.uid, { firstName, lastName, phone }),
+      ])
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } finally {
+      setSaving(false)
+    }
   }
+
+  async function handleChangePassword() {
+    setPasswordError("")
+    setPasswordSuccess(false)
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.")
+      return
+    }
+    setPasswordSaving(true)
+    try {
+      await changePassword(currentPassword, newPassword)
+      setPasswordSuccess(true)
+      setCurrentPassword("")
+      setNewPassword("")
+      setTimeout(() => setPasswordSuccess(false), 3000)
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : "Failed to change password.")
+    } finally {
+      setPasswordSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+      </div>
+    )
+  }
+
+  const initials = `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "D"
+  const isOnline = profile?.status === "online"
 
   return (
     <div className="space-y-6">
@@ -40,11 +120,10 @@ export default function DriverProfilePage() {
         </div>
         <Button
           onClick={handleSave}
+          disabled={saving}
           className={cn(
             "text-white",
-            saved
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-[#D4145A] hover:bg-[#D4145A]/90"
+            saved ? "bg-green-600 hover:bg-green-700" : "bg-[#D4145A] hover:bg-[#D4145A]/90"
           )}
         >
           {saved ? (
@@ -55,7 +134,7 @@ export default function DriverProfilePage() {
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              Save Changes
+              {saving ? "Saving..." : "Save Changes"}
             </>
           )}
         </Button>
@@ -67,7 +146,7 @@ export default function DriverProfilePage() {
           <div className="relative">
             <Avatar className="h-24 w-24">
               <AvatarFallback className="bg-[#172F52] text-2xl font-bold text-white">
-                MH
+                {initials}
               </AvatarFallback>
             </Avatar>
             <button className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#D4145A] text-white shadow-lg transition-colors hover:bg-[#D4145A]/90">
@@ -76,18 +155,18 @@ export default function DriverProfilePage() {
           </div>
           <div className="text-center sm:text-left">
             <h2 className="text-xl font-bold text-[#172F52]">
-              Mohammed Hassan
+              {firstName} {lastName}
             </h2>
-            <p className="text-sm text-[#6B7280]">
-              mohammed.hassan@driver.uk
-            </p>
+            <p className="text-sm text-[#6B7280]">{profile?.email}</p>
             <div className="mt-2 flex items-center justify-center gap-2 sm:justify-start">
-              <RatingStars rating={4.9} size="md" count={847} />
+              <RatingStars rating={profile?.rating ?? 0} size="md" count={profile?.totalReviews ?? 0} />
             </div>
-            <Badge className="mt-2 bg-green-50 text-green-700 border border-green-200">
-              <CheckCircle2 className="mr-1 h-3 w-3" />
-              Verified Driver
-            </Badge>
+            {profile?.isVerified && (
+              <Badge className="mt-2 bg-green-50 text-green-700 border border-green-200">
+                <CheckCircle2 className="mr-1 h-3 w-3" />
+                Verified Driver
+              </Badge>
+            )}
           </div>
         </div>
       </div>
@@ -107,7 +186,8 @@ export default function DriverProfilePage() {
               <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
               <Input
                 id="firstName"
-                defaultValue="Mohammed"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 className="h-10 pl-10"
               />
             </div>
@@ -120,7 +200,8 @@ export default function DriverProfilePage() {
               <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
               <Input
                 id="lastName"
-                defaultValue="Hassan"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 className="h-10 pl-10"
               />
             </div>
@@ -134,7 +215,8 @@ export default function DriverProfilePage() {
               <Input
                 id="email"
                 type="email"
-                defaultValue="mohammed.hassan@driver.uk"
+                value={profile?.email ?? ""}
+                disabled
                 className="h-10 pl-10"
               />
             </div>
@@ -148,20 +230,8 @@ export default function DriverProfilePage() {
               <Input
                 id="phone"
                 type="tel"
-                defaultValue="+447700901100"
-                className="h-10 pl-10"
-              />
-            </div>
-          </div>
-          <div className="sm:col-span-2">
-            <Label htmlFor="address" className="text-sm font-medium text-[#172033]">
-              Address
-            </Label>
-            <div className="relative mt-1.5">
-              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
-              <Input
-                id="address"
-                defaultValue="123 Kingsway, London WC2B 6PA"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="h-10 pl-10"
               />
             </div>
@@ -171,36 +241,31 @@ export default function DriverProfilePage() {
 
       {/* Vehicle Section */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-bold text-[#172F52]">My Vehicle</h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[#D4145A] hover:bg-[#D4145A]/10"
-          >
-            <Edit className="mr-1 h-3.5 w-3.5" />
-            Edit
-          </Button>
-        </div>
+        <h3 className="mb-4 text-base font-bold text-[#172F52]">My Vehicle</h3>
 
-        <div className="flex items-center gap-4 rounded-xl bg-[#F5F7FA] p-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#172F52]/10">
-            <Car className="h-7 w-7 text-[#172F52]" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-bold text-[#172F52]">
-              Toyota Prius 2024
-            </p>
-            <div className="flex items-center gap-4 text-xs text-[#6B7280]">
-              <span>LN24 TCO</span>
-              <span>White</span>
-              <span>Electric/Hybrid</span>
+        {vehicle ? (
+          <div className="flex items-center gap-4 rounded-xl bg-[#F5F7FA] p-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#172F52]/10">
+              <Car className="h-7 w-7 text-[#172F52]" />
             </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-[#172F52]">
+                {vehicle.make} {vehicle.model} {vehicle.year}
+              </p>
+              <div className="flex items-center gap-4 text-xs text-[#6B7280]">
+                <span>{vehicle.registration}</span>
+                <span>{vehicle.colour}</span>
+                {vehicle.isElectric && <span>Electric</span>}
+                {vehicle.isHybrid && <span>Hybrid</span>}
+              </div>
+            </div>
+            <Badge className={vehicle.isApproved ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}>
+              {vehicle.isApproved ? "Approved" : "Pending"}
+            </Badge>
           </div>
-          <Badge className="bg-green-50 text-green-700 border border-green-200">
-            Approved
-          </Badge>
-        </div>
+        ) : (
+          <p className="text-sm text-[#6B7280]">No vehicle assigned yet. Contact your operator or admin.</p>
+        )}
       </div>
 
       {/* Rating */}
@@ -213,8 +278,8 @@ export default function DriverProfilePage() {
             <Star className="h-8 w-8 fill-amber-400 text-amber-400" />
           </div>
           <div>
-            <p className="text-3xl font-bold text-[#172F52]">4.9</p>
-            <RatingStars rating={4.9} size="md" count={847} />
+            <p className="text-3xl font-bold text-[#172F52]">{(profile?.rating ?? 0).toFixed(1)}</p>
+            <RatingStars rating={profile?.rating ?? 0} size="md" count={profile?.totalReviews ?? 0} />
           </div>
         </div>
       </div>
@@ -234,6 +299,8 @@ export default function DriverProfilePage() {
               <Input
                 id="currentPassword"
                 type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
                 className="h-10 pl-10"
               />
@@ -248,14 +315,30 @@ export default function DriverProfilePage() {
               <Input
                 id="newPassword"
                 type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password"
                 className="h-10 pl-10"
               />
             </div>
           </div>
         </div>
-        <Button className="mt-4 bg-[#172F52] text-white hover:bg-[#172F52]/90">
-          Update Password
+        {passwordError && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            <AlertCircle className="h-4 w-4 shrink-0" /> {passwordError}
+          </div>
+        )}
+        {passwordSuccess && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+            <CheckCircle2 className="h-4 w-4 shrink-0" /> Password updated.
+          </div>
+        )}
+        <Button
+          onClick={handleChangePassword}
+          disabled={passwordSaving || !currentPassword || !newPassword}
+          className="mt-4 bg-[#172F52] text-white hover:bg-[#172F52]/90"
+        >
+          {passwordSaving ? "Updating..." : "Update Password"}
         </Button>
       </div>
 
@@ -264,14 +347,14 @@ export default function DriverProfilePage() {
         <h3 className="mb-4 text-base font-bold text-[#172F52]">
           Availability Status
         </h3>
-        <div className="flex items-center gap-3 rounded-xl bg-green-50 p-4">
-          <div className="h-3 w-3 rounded-full bg-green-500" />
+        <div className={cn("flex items-center gap-3 rounded-xl p-4", isOnline ? "bg-green-50" : "bg-gray-100")}>
+          <div className={cn("h-3 w-3 rounded-full", isOnline ? "bg-green-500" : "bg-gray-400")} />
           <div>
-            <p className="text-sm font-bold text-green-800">
-              Currently Online
+            <p className={cn("text-sm font-bold", isOnline ? "text-green-800" : "text-gray-600")}>
+              {isOnline ? "Currently Online" : "Currently Offline"}
             </p>
-            <p className="text-xs text-green-600">
-              You are available to receive trip requests
+            <p className={cn("text-xs", isOnline ? "text-green-600" : "text-gray-500")}>
+              {isOnline ? "You are available to receive trip requests" : "Go online from the sidebar to receive trips"}
             </p>
           </div>
         </div>
