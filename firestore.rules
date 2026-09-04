@@ -299,21 +299,23 @@ service cloud.firestore {
     // ============================================================
 
     match /reviews/{reviewId} {
+      // NOTE ON SCHEMA: the real Review documents use
+      // passengerId/driverId/operatorId/isApproved (see
+      // src/types/index.ts), not reviewerId/revieweeId/reviewerType —
+      // matched here so a passenger can actually submit a review of a
+      // completed trip.
       allow read: if isAuthenticated() || isAdmin();
 
       allow create: if isAuthenticated() &&
         request.resource.data.keys().hasAll([
-          'bookingId', 'reviewerId', 'revieweeId',
-          'rating', 'comment', 'createdAt', 'updatedAt',
-          'reviewerType', 'revieweeType'
+          'bookingId', 'passengerId', 'driverId', 'operatorId', 'rating'
         ]) &&
-        request.resource.data.reviewerId == request.auth.uid &&
-        request.resource.data.rating is int &&
+        request.resource.data.passengerId == request.auth.uid &&
+        request.resource.data.rating is number &&
         request.resource.data.rating >= 1 &&
-        request.resource.data.rating <= 5 &&
-        request.resource.data.reviewerType in ['passenger', 'driver'];
+        request.resource.data.rating <= 5;
 
-      allow update: if isOwner(get(/databases/$(database)/documents/reviews/$(reviewId)).data.reviewerId) || isAdmin();
+      allow update: if isOwner(get(/databases/$(database)/documents/reviews/$(reviewId)).data.passengerId) || isAdmin();
 
       allow delete: if isAdmin();
     }

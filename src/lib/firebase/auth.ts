@@ -4,6 +4,9 @@ import {
   signInWithPopup,
   signInAnonymously,
   GoogleAuthProvider,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword as firebaseUpdatePassword,
   signOut,
   sendPasswordResetEmail,
   updateProfile as firebaseUpdateProfile,
@@ -262,6 +265,17 @@ export async function signOutUser(): Promise<void> {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(DEMO_SESSION_KEY);
   }
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<void> {
+  const user = getAuth().currentUser;
+  if (!user || !user.email) throw new Error('No authenticated user.');
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user, credential);
+  await firebaseUpdatePassword(user, newPassword);
 }
 
 export async function resetPassword(email: string): Promise<void> {

@@ -135,7 +135,7 @@ export default function PassengerDashboardPage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Link href="/passenger/book">
+        <Link href="/">
           <div className="flex items-center gap-3 rounded-xl border border-[#D9E0E8] bg-white p-4 transition-colors hover:border-[#D4145A]/30 hover:shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4145A]/10 text-[#D4145A]">
               <Car className="h-5 w-5" />
@@ -223,7 +223,7 @@ export default function PassengerDashboardPage() {
                 </p>
               </div>
               <Link
-                href={`/passenger/bookings/${upcomingBooking.bookingNumber}`}
+                href={`/ings/${upcomingBooking.bookingNumber}`}
                 className="mt-3 block"
               >
                 <Button
@@ -240,7 +240,7 @@ export default function PassengerDashboardPage() {
               <p className="text-sm font-medium text-[#6B7280]">
                 No upcoming bookings
               </p>
-              <Link href="/passenger/book">
+              <Link href="/">
                 <Button className="mt-3 bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
                   Book Now
                 </Button>
@@ -256,7 +256,7 @@ export default function PassengerDashboardPage() {
               Recent Bookings
             </h2>
             <Link
-              href="/passenger/bookings"
+              href="/ings"
               className="text-xs font-medium text-[#D4145A] hover:underline"
             >
               View All

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Star, MessageSquarePlus, Calendar } from "lucide-react"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { EmptyState } from "@/components/shared/EmptyState"
@@ -8,37 +8,82 @@ import { Modal } from "@/components/shared/Modal"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { DEMO_DATA } from "@/constants"
-import { BookingStatus } from "@/types"
-
-const passengerReviews = DEMO_DATA.reviews.filter(
-  (r) => r.passengerId === "pass-001"
-)
-
-const completedWithoutReview = DEMO_DATA.bookings.filter(
-  (b) =>
-    b.passengerId === "pass-001" &&
-    b.bookingStatus === BookingStatus.TripCompleted &&
-    !passengerReviews.some((r) => r.bookingId === b.bookingNumber)
-)
-
-const averageRating =
-  passengerReviews.length > 0
-    ? passengerReviews.reduce((sum, r) => sum + r.rating, 0) /
-      passengerReviews.length
-    : 0
+import { BookingStatus, type Booking, type Driver, type Review } from "@/types"
+import { useAuth } from "@/hooks/useAuth"
+import { listenToPassengerBookings } from "@/lib/services/booking-service"
+import { listenToReviewsByPassenger, createReview } from "@/lib/services/review-service"
+import { getDriver } from "@/lib/services/driver-service"
 
 export default function ReviewsPage() {
+  const { user } = useAuth()
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [driverNames, setDriverNames] = useState<Record<string, string>>({})
   const [writeOpen, setWriteOpen] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState<string | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState("")
+  const [submitting, setSubmitting] = useState(false)
 
-  function handleSubmitReview() {
-    setWriteOpen(false)
-    setSelectedBooking(null)
-    setRating(0)
-    setComment("")
+  useEffect(() => {
+    if (!user) {
+      setBookings([])
+      setReviews([])
+      return
+    }
+    const unsub1 = listenToPassengerBookings(user.uid, setBookings, () => setBookings([]))
+    const unsub2 = listenToReviewsByPassenger(user.uid, setReviews, () => setReviews([]))
+    return () => {
+      unsub1()
+      unsub2()
+    }
+  }, [user])
+
+  useEffect(() => {
+    const driverIds = [...new Set(reviews.map((r) => r.driverId).filter(Boolean))]
+    Promise.all(driverIds.map((id) => getDriver(id).catch(() => null))).then((results) => {
+      const map: Record<string, string> = {}
+      results.forEach((d, i) => {
+        if (d) map[driverIds[i]] = `${d.firstName} ${d.lastName}`
+      })
+      setDriverNames(map)
+    })
+  }, [reviews])
+
+  const completedWithoutReview = useMemo(
+    () =>
+      bookings.filter(
+        (b) =>
+          b.bookingStatus === BookingStatus.TripCompleted &&
+          !reviews.some((r) => r.bookingId === b.bookingNumber)
+      ),
+    [bookings, reviews]
+  )
+
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0
+
+  async function handleSubmitReview() {
+    if (!user || !selectedBooking || rating === 0) return
+    setSubmitting(true)
+    try {
+      await createReview({
+        bookingId: selectedBooking.bookingNumber,
+        passengerId: user.uid,
+        driverId: selectedBooking.driverId,
+        operatorId: selectedBooking.operatorId,
+        rating,
+        comment: comment || undefined,
+      })
+      setWriteOpen(false)
+      setSelectedBooking(null)
+      setRating(0)
+      setComment("")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -59,12 +104,12 @@ export default function ReviewsPage() {
           <p className="text-3xl font-bold text-[#172F52]">
             {averageRating.toFixed(1)}
           </p>
-          <RatingStars rating={averageRating} size="md" count={passengerReviews.length} />
+          <RatingStars rating={averageRating} size="md" count={reviews.length} />
         </div>
         <div className="ml-auto text-right">
           <p className="text-sm text-[#6B7280]">Total Reviews</p>
           <p className="text-2xl font-bold text-[#172F52]">
-            {passengerReviews.length}
+            {reviews.length}
           </p>
         </div>
       </div>
@@ -84,7 +129,7 @@ export default function ReviewsPage() {
             </div>
             <Button
               onClick={() => {
-                setSelectedBooking(completedWithoutReview[0].bookingNumber)
+                setSelectedBooking(completedWithoutReview[0])
                 setWriteOpen(true)
               }}
               className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
@@ -96,7 +141,7 @@ export default function ReviewsPage() {
       )}
 
       {/* Reviews list */}
-      {passengerReviews.length === 0 ? (
+      {reviews.length === 0 ? (
         <EmptyState
           icon={<Star className="h-16 w-16" />}
           title="No reviews yet"
@@ -104,46 +149,41 @@ export default function ReviewsPage() {
         />
       ) : (
         <div className="space-y-4">
-          {passengerReviews.map((review) => {
-            const driver = DEMO_DATA.drivers.find(
-              (d) => d.uid === review.driverId
-            )
-            return (
-              <div
-                key={review.id}
-                className="rounded-xl border border-[#D9E0E8] bg-white p-5"
-              >
-                <div className="mb-3 flex items-start justify-between">
-                  <div>
-                    <div className="mb-1 flex items-center gap-3">
-                      <RatingStars rating={review.rating} size="md" />
-                      <span className="text-xs text-[#6B7280]">
-                        {review.bookingId}
-                      </span>
-                    </div>
-                    {driver && (
-                      <p className="text-sm text-[#6B7280]">
-                        Driver: {driver.firstName} {driver.lastName}
-                      </p>
-                    )}
+          {reviews.map((review) => (
+            <div
+              key={review.id}
+              className="rounded-xl border border-[#D9E0E8] bg-white p-5"
+            >
+              <div className="mb-3 flex items-start justify-between">
+                <div>
+                  <div className="mb-1 flex items-center gap-3">
+                    <RatingStars rating={review.rating} size="md" />
+                    <span className="text-xs text-[#6B7280]">
+                      {review.bookingId}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {new Date(review.createdAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </div>
+                  {driverNames[review.driverId] && (
+                    <p className="text-sm text-[#6B7280]">
+                      Driver: {driverNames[review.driverId]}
+                    </p>
+                  )}
                 </div>
-                {review.comment && (
-                  <p className="text-sm leading-relaxed text-[#172F52]">
-                    {review.comment}
-                  </p>
-                )}
+                <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {new Date(review.createdAt).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </div>
               </div>
-            )
-          })}
+              {review.comment && (
+                <p className="text-sm leading-relaxed text-[#172F52]">
+                  {review.comment}
+                </p>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -154,7 +194,7 @@ export default function ReviewsPage() {
         title="Write a Review"
         description={
           selectedBooking
-            ? `Review your trip ${selectedBooking}`
+            ? `Review your trip ${selectedBooking.bookingNumber}`
             : "Share your experience"
         }
         size="md"
@@ -187,10 +227,10 @@ export default function ReviewsPage() {
             </Button>
             <Button
               onClick={handleSubmitReview}
-              disabled={rating === 0}
+              disabled={rating === 0 || submitting}
               className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
             >
-              Submit Review
+              {submitting ? "Submitting..." : "Submit Review"}
             </Button>
           </div>
         </div>

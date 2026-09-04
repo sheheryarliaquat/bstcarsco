@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Home,
   Briefcase,
@@ -22,7 +22,13 @@ import { Label } from "@/components/ui/label"
 import { Modal } from "@/components/shared/Modal"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
+import { useAuth } from "@/hooks/useAuth"
+import {
+  createSavedLocation,
+  updateSavedLocation,
+  deleteSavedLocation,
+  listenToSavedLocations,
+} from "@/lib/services/saved-location-service"
 import type { SavedLocation } from "@/types"
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -76,9 +82,8 @@ const iconOptions = [
 ]
 
 export default function SavedLocationsPage() {
-  const [locations, setLocations] = useState<SavedLocation[]>(
-    DEMO_DATA.passengers[0].savedLocations
-  )
+  const { user } = useAuth()
+  const [locations, setLocations] = useState<SavedLocation[]>([])
   const [addOpen, setAddOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -88,10 +93,19 @@ export default function SavedLocationsPage() {
   const [formAddress, setFormAddress] = useState("")
   const [formIcon, setFormIcon] = useState("home")
 
-  function handleAdd() {
-    const newLoc: SavedLocation = {
-      id: `sl-${Date.now()}`,
-      userId: "pass-001",
+  useEffect(() => {
+    if (!user) {
+      setLocations([])
+      return
+    }
+    const unsub = listenToSavedLocations(user.uid, setLocations, () => setLocations([]))
+    return unsub
+  }, [user])
+
+  async function handleAdd() {
+    if (!user) return
+    await createSavedLocation({
+      userId: user.uid,
       label: formLabel,
       location: {
         formattedAddress: formAddress,
@@ -103,36 +117,28 @@ export default function SavedLocationsPage() {
         country: "United Kingdom",
       },
       icon: formIcon,
-    }
-    setLocations((prev) => [...prev, newLoc])
+    })
     resetForm()
     setAddOpen(false)
   }
 
-  function handleEdit() {
+  async function handleEdit() {
     if (!selectedLocation) return
-    setLocations((prev) =>
-      prev.map((l) =>
-        l.id === selectedLocation.id
-          ? {
-              ...l,
-              label: formLabel,
-              icon: formIcon,
-              location: {
-                ...l.location,
-                formattedAddress: formAddress,
-              },
-            }
-          : l
-      )
-    )
+    await updateSavedLocation(selectedLocation.id, {
+      label: formLabel,
+      icon: formIcon,
+      location: {
+        ...selectedLocation.location,
+        formattedAddress: formAddress,
+      },
+    })
     resetForm()
     setEditOpen(false)
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!selectedLocation) return
-    setLocations((prev) => prev.filter((l) => l.id !== selectedLocation.id))
+    await deleteSavedLocation(selectedLocation.id)
     setSelectedLocation(null)
     setDeleteOpen(false)
   }

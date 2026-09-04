@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Camera,
   Save,
@@ -9,40 +9,106 @@ import {
   Mail,
   Phone,
   User,
-  MapPin,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { DEMO_DATA } from "@/constants"
-
-const passenger = DEMO_DATA.passengers[0]
+import { useAuth } from "@/hooks/useAuth"
+import { updateUser } from "@/lib/services/user-service"
+import { changePassword, signOutUser } from "@/lib/firebase/auth"
+import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {
-  const [firstName, setFirstName] = useState(passenger.firstName)
-  const [lastName, setLastName] = useState(passenger.lastName)
-  const [email, setEmail] = useState(passenger.email)
-  const [phone, setPhone] = useState(passenger.phone)
-  const [defaultPickup, setDefaultPickup] = useState(
-    passenger.defaultPickup?.formattedAddress ?? ""
-  )
-  const [defaultDest, setDefaultDest] = useState(
-    passenger.defaultDestination?.formattedAddress ?? ""
-  )
-  const [notifications, setNotifications] = useState(
-    passenger.preferences.notifications
-  )
-  const [newsletter, setNewsletter] = useState(
-    passenger.preferences.emailUpdates
-  )
+  const router = useRouter()
+  const { user, userData, loading: authLoading } = useAuth()
+
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [phone, setPhone] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState("")
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [passwordSaving, setPasswordSaving] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
+  const [passwordSuccess, setPasswordSuccess] = useState(false)
+
+  useEffect(() => {
+    if (userData) {
+      setFirstName(userData.firstName ?? "")
+      setLastName(userData.lastName ?? "")
+      setPhone(userData.phone ?? "")
+    }
+  }, [userData])
+
+  async function handleSave() {
+    if (!user) return
+    setSaving(true)
+    setSaveError("")
+    setSaveSuccess(false)
+    try {
+      await updateUser(user.uid, { firstName, lastName, phone })
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 2500)
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save changes.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleChangePassword() {
+    setPasswordError("")
+    setPasswordSuccess(false)
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.")
+      return
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.")
+      return
+    }
+    setPasswordSaving(true)
+    try {
+      await changePassword(currentPassword, newPassword)
+      setPasswordSuccess(true)
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      setTimeout(() => setPasswordSuccess(false), 2500)
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : "Failed to change password.")
+    } finally {
+      setPasswordSaving(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (!user) return
+    // Firestore rules only allow a super_admin to hard-delete a user
+    // document, so this deactivates the account instead of deleting it
+    // outright.
+    await updateUser(user.uid, { status: "deleted" })
+    await signOutUser()
+    setDeleteOpen(false)
+    router.push("/")
+  }
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#D4145A] border-t-transparent" />
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -61,10 +127,10 @@ export default function ProfilePage() {
         <div className="flex items-center gap-5">
           <div className="relative">
             <Avatar size="lg" className="h-20 w-20">
-              <AvatarImage src={passenger.photoURL} alt={passenger.firstName} />
+              <AvatarImage src={userData?.photoURL} alt={firstName} />
               <AvatarFallback className="bg-[#172F52] text-lg text-white">
-                {passenger.firstName[0]}
-                {passenger.lastName[0]}
+                {firstName[0]}
+                {lastName[0]}
               </AvatarFallback>
             </Avatar>
             <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#D4145A] text-white shadow-sm hover:bg-[#D4145A]/90">
@@ -73,15 +139,17 @@ export default function ProfilePage() {
           </div>
           <div>
             <p className="text-sm font-medium text-[#172F52]">
-              {passenger.firstName} {passenger.lastName}
+              {firstName} {lastName}
             </p>
-            <p className="text-xs text-[#6B7280]">
-              Member since{" "}
-              {new Date(passenger.createdAt).toLocaleDateString("en-GB", {
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
+            {userData?.createdAt && (
+              <p className="text-xs text-[#6B7280]">
+                Member since{" "}
+                {new Date(userData.createdAt).toLocaleDateString("en-GB", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -120,8 +188,8 @@ export default function ProfilePage() {
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
               <Input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={userData?.email ?? ""}
+                disabled
                 className="h-9 pl-9"
               />
             </div>
@@ -139,73 +207,24 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Defaults */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
-          Default Locations
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <Label>Default Pickup</Label>
-            <div className="relative mt-1.5">
-              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4145A]" />
-              <Input
-                value={defaultPickup}
-                onChange={(e) => setDefaultPickup(e.target.value)}
-                placeholder="Set a default pickup location"
-                className="h-9 pl-9"
-              />
-            </div>
+        {saveError && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            <AlertCircle className="h-4 w-4 shrink-0" /> {saveError}
           </div>
-          <div>
-            <Label>Default Destination</Label>
-            <div className="relative mt-1.5">
-              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#172F52]" />
-              <Input
-                value={defaultDest}
-                onChange={(e) => setDefaultDest(e.target.value)}
-                placeholder="Set a default destination"
-                className="h-9 pl-9"
-              />
-            </div>
+        )}
+        {saveSuccess && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+            <CheckCircle2 className="h-4 w-4 shrink-0" /> Saved.
           </div>
-        </div>
-      </div>
-
-      {/* Preferences */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
-          Preferences
-        </h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-[#172F52]">
-                Push Notifications
-              </p>
-              <p className="text-xs text-[#6B7280]">
-                Receive notifications about your bookings
-              </p>
-            </div>
-            <Switch
-              checked={notifications}
-              onCheckedChange={setNotifications}
-            />
-          </div>
-          <Separator className="bg-[#F5F7FA]" />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-[#172F52]">
-                Email Newsletter
-              </p>
-              <p className="text-xs text-[#6B7280]">
-                Receive offers and updates via email
-              </p>
-            </div>
-            <Switch checked={newsletter} onCheckedChange={setNewsletter} />
-          </div>
+        )}
+        <div className="mt-4 flex justify-end">
+          <Button
+            className="bg-[#172F52] text-white hover:bg-[#172F52]/90"
+            onClick={handleSave}
+            disabled={saving || !user}
+          >
+            <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Changes"}
+          </Button>
         </div>
       </div>
 
@@ -256,13 +275,27 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+          {passwordError && (
+            <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              <AlertCircle className="h-4 w-4 shrink-0" /> {passwordError}
+            </div>
+          )}
+          {passwordSuccess && (
+            <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+              <CheckCircle2 className="h-4 w-4 shrink-0" /> Password updated.
+            </div>
+          )}
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              className="border-[#D9E0E8]"
+              onClick={handleChangePassword}
+              disabled={passwordSaving || !currentPassword || !newPassword}
+            >
+              {passwordSaving ? "Updating..." : "Update Password"}
+            </Button>
+          </div>
         </div>
-      </div>
-
-      <div className="flex justify-end">
-        <Button className="bg-[#172F52] text-white hover:bg-[#172F52]/90">
-          <Save className="h-4 w-4" /> Save Changes
-        </Button>
       </div>
 
       {/* Danger zone */}
@@ -271,8 +304,9 @@ export default function ProfilePage() {
           Danger Zone
         </h2>
         <p className="mb-4 text-xs text-[#6B7280]">
-          Permanently delete your account and all associated data. This action
-          cannot be undone.
+          Deactivate your account. Your bookings and reviews will be
+          preserved, but you won&apos;t be able to sign in until an admin
+          reactivates it.
         </p>
         <Button
           variant="destructive"
@@ -286,9 +320,9 @@ export default function ProfilePage() {
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         title="Delete Account"
-        description="Are you sure you want to delete your account? All your data, bookings, and reviews will be permanently removed. This cannot be undone."
+        description="Are you sure you want to deactivate your account? You will be signed out and won't be able to sign back in until this is reversed."
         confirmText="Yes, Delete My Account"
-        onConfirm={() => {}}
+        onConfirm={handleDeleteAccount}
         variant="destructive"
       />
     </div>

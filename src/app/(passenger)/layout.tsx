@@ -35,7 +35,7 @@ import { useAuth } from "@/hooks/useAuth"
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/passenger/dashboard", icon: LayoutDashboard },
-  { id: "book", label: "Book Taxi", path: "/passenger/book", icon: Car },
+  { id: "book", label: "Book Taxi", path: "/", icon: Car },
   { id: "bookings", label: "My Bookings", path: "/passenger/bookings", icon: ClipboardList },
   { id: "saved", label: "Saved Locations", path: "/passenger/saved-locations", icon: MapPin },
   { id: "payments", label: "Payments", path: "/passenger/payments", icon: CreditCard },

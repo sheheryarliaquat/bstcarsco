@@ -1,129 +1,66 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Download, Wallet, TrendingUp, CreditCard } from "lucide-react"
 import { DataTable, type Column } from "@/components/shared/DataTable"
 import { DashboardCard } from "@/components/shared/DashboardCard"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Button } from "@/components/ui/button"
-import { DEMO_DATA } from "@/constants"
-import type { Payment } from "@/types"
-
-const demoPayments: Payment[] = [
-  {
-    id: "pay-001",
-    bookingId: "UKTB-2026-000001",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_001",
-    stripeCustomerId: "cus_001",
-    amount: 51.0,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Visa •••• 4242",
-    createdAt: "2026-08-20T14:30:00Z",
-  },
-  {
-    id: "pay-002",
-    bookingId: "UKTB-2026-000002",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_002",
-    stripeCustomerId: "cus_001",
-    amount: 11.52,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Visa •••• 4242",
-    createdAt: "2026-08-24T16:00:00Z",
-  },
-  {
-    id: "pay-003",
-    bookingId: "UKTB-2026-000007",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_003",
-    stripeCustomerId: "cus_001",
-    amount: 17.4,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Mastercard •••• 8888",
-    createdAt: "2026-08-18T10:00:00Z",
-  },
-  {
-    id: "pay-004",
-    bookingId: "UKTB-2026-000008",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_004",
-    stripeCustomerId: "cus_001",
-    amount: 41.04,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Visa •••• 4242",
-    createdAt: "2026-08-13T12:00:00Z",
-  },
-  {
-    id: "pay-005",
-    bookingId: "UKTB-2026-000009",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_005",
-    stripeCustomerId: "cus_001",
-    amount: 153.36,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Visa •••• 4242",
-    createdAt: "2026-08-08T09:00:00Z",
-  },
-  {
-    id: "pay-006",
-    bookingId: "UKTB-2026-000011",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_006",
-    stripeCustomerId: "cus_001",
-    amount: 159.84,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Mastercard •••• 8888",
-    createdAt: "2026-07-25T14:00:00Z",
-  },
-  {
-    id: "pay-007",
-    bookingId: "UKTB-2026-000013",
-    userId: "pass-001",
-    stripePaymentIntentId: "pi_007",
-    stripeCustomerId: "cus_001",
-    amount: 6.6,
-    currency: "GBP",
-    status: "completed",
-    paymentMethod: "Visa •••• 4242",
-    createdAt: "2026-07-14T18:00:00Z",
-  },
-]
+import { useAuth } from "@/hooks/useAuth"
+import { listenToPassengerBookings } from "@/lib/services/booking-service"
+import type { Booking } from "@/types"
 
 export default function PaymentsPage() {
+  const { user } = useAuth()
+  const [bookings, setBookings] = useState<Booking[]>([])
   const [page, setPage] = useState(1)
   const pageSize = 10
 
+  useEffect(() => {
+    if (!user) {
+      setBookings([])
+      return
+    }
+    const unsub = listenToPassengerBookings(
+      user.uid,
+      (data) => setBookings(data),
+      () => setBookings([])
+    )
+    return unsub
+  }, [user])
+
+  const payments = useMemo(
+    () =>
+      [...bookings].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [bookings]
+  )
+
   const totalSpent = useMemo(
     () =>
-      demoPayments
-        .filter((p) => p.status === "completed")
-        .reduce((sum, p) => sum + p.amount, 0),
-    []
+      payments
+        .filter((p) => p.paymentStatus === "completed")
+        .reduce((sum, p) => sum + p.total, 0),
+    [payments]
   )
 
   const thisMonth = useMemo(() => {
     const now = new Date()
-    return demoPayments
+    return payments
       .filter(
         (p) =>
-          p.status === "completed" &&
+          p.paymentStatus === "completed" &&
           new Date(p.createdAt).getMonth() === now.getMonth() &&
           new Date(p.createdAt).getFullYear() === now.getFullYear()
       )
-      .reduce((sum, p) => sum + p.amount, 0)
-  }, [])
+      .reduce((sum, p) => sum + p.total, 0)
+  }, [payments])
 
   const paginated = useMemo(() => {
     const start = (page - 1) * pageSize
-    return demoPayments.slice(start, start + pageSize)
-  }, [page])
+    return payments.slice(start, start + pageSize)
+  }, [payments, page])
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -131,7 +68,7 @@ export default function PaymentsPage() {
       header: "Date",
       sortable: true,
       render: (row) => {
-        const p = row as unknown as Payment
+        const p = row as unknown as Booking
         return (
           <span className="text-sm text-[#172F52]">
             {new Date(p.createdAt).toLocaleDateString("en-GB", {
@@ -144,26 +81,26 @@ export default function PaymentsPage() {
       },
     },
     {
-      key: "bookingId",
+      key: "bookingNumber",
       header: "Booking ID",
       render: (row) => {
-        const p = row as unknown as Payment
+        const p = row as unknown as Booking
         return (
           <span className="text-xs font-medium text-[#6B7280]">
-            {p.bookingId}
+            {p.bookingNumber}
           </span>
         )
       },
     },
     {
-      key: "amount",
+      key: "total",
       header: "Amount",
       sortable: true,
       render: (row) => {
-        const p = row as unknown as Payment
+        const p = row as unknown as Booking
         return (
           <span className="text-sm font-semibold text-[#172F52]">
-            £{p.amount.toFixed(2)}
+            £{p.total.toFixed(2)}
           </span>
         )
       },
@@ -172,28 +109,30 @@ export default function PaymentsPage() {
       key: "paymentMethod",
       header: "Payment Method",
       render: (row) => {
-        const p = row as unknown as Payment
+        const p = row as unknown as Booking
         return (
           <div className="flex items-center gap-2">
             <CreditCard className="h-4 w-4 text-[#6B7280]" />
-            <span className="text-sm text-[#172F52]">{p.paymentMethod}</span>
+            <span className="text-sm capitalize text-[#172F52]">
+              {p.paymentMethod ?? "-"}
+            </span>
           </div>
         )
       },
     },
     {
-      key: "status",
+      key: "paymentStatus",
       header: "Status",
       render: (row) => {
-        const p = row as unknown as Payment
-        return <StatusBadge status={p.status} type="payment" />
+        const p = row as unknown as Booking
+        return <StatusBadge status={p.paymentStatus} type="payment" />
       },
     },
     {
       key: "receipt",
       header: "Receipt",
       render: () => (
-        <Button variant="ghost" size="sm" className="gap-1.5 text-[#D4145A]">
+        <Button variant="ghost" size="sm" className="gap-1.5 text-[#D4145A]" disabled>
           <Download className="h-3.5 w-3.5" /> Download
         </Button>
       ),
@@ -205,7 +144,7 @@ export default function PaymentsPage() {
       <div>
         <h1 className="text-2xl font-bold text-[#172F52]">Payments</h1>
         <p className="text-sm text-[#6B7280]">
-          View your payment history and download receipts.
+          View your payment history from your bookings.
         </p>
       </div>
 
@@ -225,11 +164,12 @@ export default function PaymentsPage() {
       <DataTable
         columns={columns}
         data={paginated as unknown as Record<string, unknown>[]}
-        keyExtractor={(row) => (row as unknown as Payment).id}
+        keyExtractor={(row) => (row as unknown as Booking).bookingNumber}
+        emptyMessage="No payments yet"
         pagination={{
           page,
           pageSize,
-          total: demoPayments.length,
+          total: payments.length,
           onPageChange: setPage,
         }}
       />
