@@ -7,6 +7,7 @@ import {
   deleteDocument,
   queryDocuments,
   onSnapshotListener,
+  batchSet,
 } from '@/lib/firebase/firestore';
 import type { Driver } from '@/types';
 
@@ -22,6 +23,20 @@ export async function createDriver(
   // same as every other Driver record.
   await updateDocument<Driver>(COLLECTION, id, { uid: id } as Partial<Driver>);
   return id;
+}
+
+/**
+ * Writes a driver profile at a caller-chosen document id — used when the
+ * driver already has a real Firebase Auth uid (see createDriverAccount in
+ * lib/firebase/auth.ts) so the drivers/{uid} doc can be looked up directly
+ * from the signed-in driver's own session instead of needing a separate
+ * lookup/link step.
+ */
+export async function setDriverProfile(
+  uid: string,
+  data: Omit<Driver, 'createdAt' | 'updatedAt'>
+): Promise<void> {
+  await batchSet([{ collectionName: COLLECTION, id: uid, data }]);
 }
 
 export async function getDriver(id: string): Promise<Driver | null> {

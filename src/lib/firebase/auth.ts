@@ -20,7 +20,7 @@ import {
   getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { auth as getAuth, db as getDb, isFirebaseConfigured } from './config';
+import { auth as getAuth, db as getDb, isFirebaseConfigured, secondaryAuth } from './config';
 import type { User as AppUser, UserRole } from '@/types';
 
 interface SignUpData {
@@ -265,6 +265,46 @@ export async function signOutUser(): Promise<void> {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(DEMO_SESSION_KEY);
   }
+}
+
+/**
+ * Admin flow for onboarding a driver: creates their real Firebase Auth
+ * account (so they can actually log in) and a matching users/{uid} doc,
+ * without touching the admin's own signed-in session — see
+ * getSecondaryAuthInstance()'s docstring in ./config for why a second app
+ * instance is needed here.
+ */
+export async function createDriverAccount(
+  email: string,
+  password: string,
+  profile: { firstName: string; lastName: string; phone: string }
+): Promise<{ uid: string }> {
+  if (!isFirebaseAvailable()) {
+    throw new Error('Firebase is not configured — cannot create a real driver login.');
+  }
+  const secondary = secondaryAuth();
+  const credential = await createUserWithEmailAndPassword(secondary, email, password);
+  const uid = credential.user.uid;
+  await signOut(secondary);
+
+  await setDoc(doc(getDb(), 'users', uid), {
+    uid,
+    email,
+    role: 'driver' as UserRole,
+    displayName: `${profile.firstName} ${profile.lastName}`,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    phone: profile.phone,
+    status: 'active',
+    photoURL: '',
+    emailVerified: false,
+    active: true,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    lastLoginAt: serverTimestamp(),
+  });
+
+  return { uid };
 }
 
 export async function changePassword(

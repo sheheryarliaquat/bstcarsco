@@ -107,8 +107,14 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
 
-      allow create: if isAuthenticated() &&
-        request.auth.uid == userId &&
+      // Self-signup (uid == userId) covers passengers/operators registering
+      // themselves. isAdmin() is also allowed so an admin creating a
+      // driver's login (see createDriverAccount in src/lib/firebase/auth.ts
+      // — it provisions the Auth account on a secondary app instance, then
+      // writes this profile from the admin's own session) can write a
+      // users/{uid} doc whose id isn't their own.
+      allow create: if (isAuthenticated() &&
+        (request.auth.uid == userId || isAdmin()) &&
         request.resource.data.keys().hasAll(['email', 'role', 'displayName', 'createdAt', 'updatedAt', 'emailVerified', 'active']) &&
         request.resource.data.role in ['passenger', 'driver', 'operator', 'admin', 'super_admin'] &&
         request.resource.data.email is string &&
@@ -116,7 +122,7 @@ service cloud.firestore {
         request.resource.data.createdAt is timestamp &&
         request.resource.data.updatedAt is timestamp &&
         request.resource.data.emailVerified is bool &&
-        request.resource.data.active is bool;
+        request.resource.data.active is bool);
 
       allow update: if isOwner(userId) || isAdmin();
 

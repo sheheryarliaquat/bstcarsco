@@ -23,7 +23,8 @@ import { StatusBadge } from "@/components/shared/StatusBadge"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import { createDriver, listenToDrivers, updateDriver } from "@/lib/services/driver-service"
+import { setDriverProfile, listenToDrivers, updateDriver } from "@/lib/services/driver-service"
+import { createDriverAccount } from "@/lib/firebase/auth"
 import { getVehicle } from "@/lib/services/vehicle-service"
 import { getDocument } from "@/lib/firebase/firestore"
 import type { Driver, DriverStatus, Operator } from "@/types"
@@ -60,6 +61,9 @@ export default function AdminDriversPage() {
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [showCreate, setShowCreate] = useState(false)
   const [newDriver, setNewDriver] = useState<NewDriver>(EMPTY_DRIVER)
+  const [creatingDriver, setCreatingDriver] = useState(false)
+  const [createError, setCreateError] = useState("")
+  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null)
   const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
   const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
 
@@ -120,37 +124,60 @@ export default function AdminDriversPage() {
     return result
   }, [search, statusFilter, tab, pendingDrivers, drivers])
 
-  function handleCreateDriver() {
+  function generateTempPassword() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"
+    let pw = ""
+    for (let i = 0; i < 10; i++) pw += chars[Math.floor(Math.random() * chars.length)]
+    return pw + "!1"
+  }
+
+  async function handleCreateDriver() {
     if (!newDriver.firstName || !newDriver.lastName || !newDriver.email) return
-    const now = new Date().toISOString()
-    createDriver({
-      role: "driver",
-      firstName: newDriver.firstName,
-      lastName: newDriver.lastName,
-      email: newDriver.email,
-      phone: newDriver.phone,
-      status: "online",
-      lastLoginAt: now,
-      operatorId: newDriver.operatorId,
-      vehicleId: newDriver.vehicleId,
-      rating: 0,
-      totalReviews: 0,
-      licenceNumber: newDriver.licenceNumber,
-      documents: [],
-      lastLocation: { latitude: 0, longitude: 0, updatedAt: now },
-      isVerified: false,
-      availability: {
-        monday: [],
-        tuesday: [],
-        wednesday: [],
-        thursday: [],
-        friday: [],
-        saturday: [],
-        sunday: [],
-      },
-    })
-    setNewDriver(EMPTY_DRIVER)
-    setShowCreate(false)
+    setCreatingDriver(true)
+    setCreateError("")
+    try {
+      const password = generateTempPassword()
+      const { uid } = await createDriverAccount(newDriver.email, password, {
+        firstName: newDriver.firstName,
+        lastName: newDriver.lastName,
+        phone: newDriver.phone,
+      })
+      const now = new Date().toISOString()
+      await setDriverProfile(uid, {
+        uid,
+        role: "driver",
+        firstName: newDriver.firstName,
+        lastName: newDriver.lastName,
+        email: newDriver.email,
+        phone: newDriver.phone,
+        status: "online",
+        lastLoginAt: now,
+        operatorId: newDriver.operatorId,
+        vehicleId: newDriver.vehicleId,
+        rating: 0,
+        totalReviews: 0,
+        licenceNumber: newDriver.licenceNumber,
+        documents: [],
+        lastLocation: { latitude: 0, longitude: 0, updatedAt: now },
+        isVerified: false,
+        availability: {
+          monday: [],
+          tuesday: [],
+          wednesday: [],
+          thursday: [],
+          friday: [],
+          saturday: [],
+          sunday: [],
+        },
+      })
+      setNewDriver(EMPTY_DRIVER)
+      setShowCreate(false)
+      setCreatedCredentials({ email: newDriver.email, password })
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Failed to create driver account.")
+    } finally {
+      setCreatingDriver(false)
+    }
   }
 
   const totalPages = Math.ceil(filtered.length / pageSize)
@@ -482,6 +509,10 @@ export default function AdminDriversPage() {
             </div>
           </div>
 
+          {createError && (
+            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{createError}</div>
+          )}
+
           <div className="flex items-center justify-end gap-3 border-t border-[#D9E0E8] pt-4">
             <Button variant="outline" onClick={() => setShowCreate(false)}>
               Cancel
@@ -489,13 +520,43 @@ export default function AdminDriversPage() {
             <Button
               className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
               onClick={handleCreateDriver}
-              disabled={!newDriver.firstName || !newDriver.lastName || !newDriver.email}
+              disabled={!newDriver.firstName || !newDriver.lastName || !newDriver.email || creatingDriver}
             >
               <Plus className="mr-1.5 h-4 w-4" />
-              Add Driver
+              {creatingDriver ? "Creating..." : "Add Driver"}
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Driver Credentials Modal */}
+      <Modal
+        open={!!createdCredentials}
+        onOpenChange={(open) => { if (!open) setCreatedCredentials(null) }}
+        title="Driver Account Created"
+        description="Share these login credentials with the driver securely — they won't be shown again. They should change their password after first login."
+        size="md"
+      >
+        {createdCredentials && (
+          <div className="space-y-3">
+            <div className="rounded-lg bg-[#F5F7FA] p-3">
+              <p className="text-xs font-semibold uppercase text-[#6B7280]">Email</p>
+              <p className="font-mono text-sm text-[#172F52]">{createdCredentials.email}</p>
+            </div>
+            <div className="rounded-lg bg-[#F5F7FA] p-3">
+              <p className="text-xs font-semibold uppercase text-[#6B7280]">Temporary Password</p>
+              <p className="font-mono text-sm text-[#172F52]">{createdCredentials.password}</p>
+            </div>
+            <div className="flex justify-end pt-2">
+              <Button
+                className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                onClick={() => setCreatedCredentials(null)}
+              >
+                Done
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* Driver Detail Modal */}

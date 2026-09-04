@@ -58,7 +58,33 @@ function getStorageInstance(): FirebaseStorage {
   return getStorage(getFirebaseApp());
 }
 
-export { getApp as app, getAuthInstance as auth, getFirestoreInstance as db, getStorageInstance as storage };
+const SECONDARY_APP_NAME = 'AdminCreateUser';
+
+/**
+ * A second, independent Firebase App instance pointed at the same project.
+ * Firebase Auth's client SDK signs the browser in as whichever account
+ * `createUserWithEmailAndPassword` just created, on the SAME app instance
+ * the caller was already signed in on — so creating a driver's login from
+ * an admin's own session would silently sign the admin out. Using a
+ * separate named app for that one call keeps the admin's primary session
+ * (and every other `auth`/`db` caller in this file) untouched.
+ */
+function getSecondaryAuthInstance(): Auth {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase is not configured.');
+  }
+  const existing = getApps().find((a) => a.name === SECONDARY_APP_NAME);
+  const secondaryApp = existing ?? initializeApp(firebaseConfig, SECONDARY_APP_NAME);
+  return getAuth(secondaryApp);
+}
+
+export {
+  getApp as app,
+  getAuthInstance as auth,
+  getFirestoreInstance as db,
+  getStorageInstance as storage,
+  getSecondaryAuthInstance as secondaryAuth,
+};
 
 export function isFirebaseConfigured(): boolean {
   return Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);

@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   ClipboardList,
@@ -13,11 +13,11 @@ import {
   Bell,
   User,
   LogOut,
-  Star,
   Clock,
   Menu,
   X,
   ChevronRight,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -31,16 +31,17 @@ import {
 } from "@/components/ui/sheet"
 import { Switch } from "@/components/ui/switch"
 import { useAuth } from "@/hooks/useAuth"
+import { signOutUser } from "@/lib/firebase/auth"
+import { getDriver, updateDriver } from "@/lib/services/driver-service"
+import type { DriverStatus } from "@/types"
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", path: "/driver/dashboard", icon: LayoutDashboard },
   { id: "trips", label: "My Trips", path: "/driver/bookings", icon: ClipboardList },
   { id: "active", label: "Active Trip", path: "/driver/active-trip", icon: Navigation },
   { id: "availability", label: "Availability", path: "/driver/availability", icon: Clock },
-  { id: "vehicle", label: "Vehicle", path: "/driver/vehicle", icon: Car },
   { id: "documents", label: "Documents", path: "/driver/documents", icon: FileText },
   { id: "earnings", label: "Earnings", path: "/driver/earnings", icon: Wallet },
-  { id: "reviews", label: "Reviews", path: "/driver/reviews", icon: Star },
   { id: "notifications", label: "Notifications", path: "/driver/notifications", icon: Bell },
   { id: "profile", label: "Profile", path: "/driver/profile", icon: User },
 ] as const
@@ -49,10 +50,12 @@ function DriverSidebarContent({
   isOnline,
   setIsOnline,
   onNavClick,
+  onLogout,
 }: {
   isOnline: boolean
   setIsOnline: (v: boolean) => void
   onNavClick?: () => void
+  onLogout: () => void
 }) {
   const pathname = usePathname()
   const { userData } = useAuth()
@@ -131,7 +134,10 @@ function DriverSidebarContent({
       <Separator className="mx-5" />
 
       <div className="px-3 py-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600">
+        <button
+          onClick={onLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600"
+        >
           <LogOut className="h-5 w-5 shrink-0" />
           <span>Logout</span>
         </button>
@@ -158,13 +164,60 @@ function DriverSidebarContent({
   )
 }
 
+function FullScreenLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+    </div>
+  )
+}
+
 export default function DriverLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isOnline, setIsOnline] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
+  const { user, userData, loading } = useAuth()
+  const [isOnline, setIsOnlineState] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const isLoginPage = pathname === "/driver/login"
+  const isDriver = !!user && !!userData && userData.role === "driver"
+
+  useEffect(() => {
+    if (isLoginPage) return
+    if (!loading && !isDriver) {
+      router.replace("/driver/login")
+    }
+  }, [isLoginPage, loading, isDriver, router])
+
+  useEffect(() => {
+    if (!user || !isDriver) return
+    getDriver(user.uid)
+      .then((profile) => setIsOnlineState(profile?.status === "online"))
+      .catch(() => {})
+  }, [user, isDriver])
+
+  function setIsOnline(next: boolean) {
+    setIsOnlineState(next)
+    if (!user) return
+    updateDriver(user.uid, { status: next ? "online" : "offline" }).catch(() => {})
+  }
+
+  async function handleLogout() {
+    await signOutUser()
+    router.replace("/driver/login")
+  }
+
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  if (loading || !isDriver) {
+    return <FullScreenLoader />
+  }
 
   return (
     <div className="flex min-h-screen bg-[#F5F7FA]">
@@ -173,6 +226,7 @@ export default function DriverLayout({
         <DriverSidebarContent
           isOnline={isOnline}
           setIsOnline={setIsOnline}
+          onLogout={handleLogout}
         />
       </aside>
 
@@ -193,6 +247,7 @@ export default function DriverLayout({
               isOnline={isOnline}
               setIsOnline={setIsOnline}
               onNavClick={() => setMobileOpen(false)}
+              onLogout={handleLogout}
             />
           </SheetContent>
         </Sheet>
