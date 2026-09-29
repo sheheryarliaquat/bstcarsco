@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sheet"
 
 const NAV_LINKS = [
-  { label: "Book a Taxi", href: "/book" },
+  { label: "Book a Car", href: "/book" },
   { label: "Airport Transfers", href: "/airport-transfers" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "For Business", href: "/business" },

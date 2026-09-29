@@ -1,5 +1,5 @@
 /**
- * Firebase Seed Script for UK Taxi Booking Platform
+ * Firebase Seed Script for UK Private Hire Booking Platform
  *
  * Usage:
  *   npx tsx scripts/seed-data.ts
@@ -441,7 +441,7 @@ const operators = [
       phone: '+442071234567',
       status: 'active',
       companyName: 'Kingsley Travel',
-      description: 'Premium taxi operator serving Central and Greater London.',
+      description: 'Premium private hire operator serving Central and Greater London.',
       rating: 4.8,
       totalReviews: 3245,
       fleetSize: 45,
@@ -457,11 +457,11 @@ const operators = [
       role: 'operator',
       firstName: 'Fiona',
       lastName: 'McGregor',
-      email: 'fiona@northerntaxi.co.uk',
+      email: 'fiona@northernminicab.co.uk',
       phone: '+441619876543',
       status: 'active',
-      companyName: 'Northern Taxi Services',
-      description: 'Reliable taxi services across Manchester and the North West.',
+      companyName: 'Northern Minicab Services',
+      description: 'Reliable private hire services across Manchester and the North West.',
       rating: 4.6,
       totalReviews: 1890,
       fleetSize: 32,
@@ -477,11 +477,11 @@ const operators = [
       role: 'operator',
       firstName: 'Ewan',
       lastName: 'Campbell',
-      email: 'ewan@capitaltaxis.edinburgh.co.uk',
+      email: 'ewan@capitalminicabs.edinburgh.co.uk',
       phone: '+441315551234',
       status: 'active',
-      companyName: 'Capital Taxis Edinburgh',
-      description: "Edinburgh's trusted taxi operator, providing wheelchair accessible and standard vehicles.",
+      companyName: 'Capital Minicabs Edinburgh',
+      description: "Edinburgh's trusted private hire operator, providing wheelchair accessible and standard vehicles.",
       rating: 4.7,
       totalReviews: 987,
       fleetSize: 22,
@@ -542,20 +542,20 @@ const bookings = [
 
 const quotes = [
   { id: 'qt-001', data: { bookingId: 'UKTB-2026-000004', operatorId: 'op-001', operatorName: 'Kingsley Travel', vehicleType: 'minibus', vehicleDescription: 'VW Caravelle Minibus - 7 Seats', passengerCapacity: 7, luggageCapacity: 6, rating: 4.8, totalReviews: 3245, estimatedJourneyTime: 35, isElectric: false, isHybrid: false, price: 45.6, paymentTypes: ['card', 'cash'], features: ['Free waiting time', 'Meet and greet'], isLowestPrice: true } },
-  { id: 'qt-002', data: { bookingId: 'UKTB-2026-000004', operatorId: 'op-002', operatorName: 'Northern Taxi Services', vehicleType: 'mpv', vehicleDescription: 'Ford Galaxy MPV - 6 Seats', passengerCapacity: 6, luggageCapacity: 5, rating: 4.6, totalReviews: 1890, estimatedJourneyTime: 40, isElectric: false, isHybrid: true, price: 48.2, originalPrice: 52.0, discountPercent: 7, paymentTypes: ['card', 'cash'], features: ['Free waiting time', 'Hybrid vehicle'], isLowestPrice: false } },
-  { id: 'qt-003', data: { bookingId: 'UKTB-2026-000004', operatorId: 'op-003', operatorName: 'Capital Taxis Edinburgh', vehicleType: 'minibus', vehicleDescription: 'Mercedes Vito Minibus - 8 Seats', passengerCapacity: 8, luggageCapacity: 7, rating: 4.7, totalReviews: 987, estimatedJourneyTime: 32, isElectric: false, isHybrid: false, price: 51.0, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Free waiting time', 'Meet and greet'], isLowestPrice: false } },
+  { id: 'qt-002', data: { bookingId: 'UKTB-2026-000004', operatorId: 'op-002', operatorName: 'Northern Minicab Services', vehicleType: 'mpv', vehicleDescription: 'Ford Galaxy MPV - 6 Seats', passengerCapacity: 6, luggageCapacity: 5, rating: 4.6, totalReviews: 1890, estimatedJourneyTime: 40, isElectric: false, isHybrid: true, price: 48.2, originalPrice: 52.0, discountPercent: 7, paymentTypes: ['card', 'cash'], features: ['Free waiting time', 'Hybrid vehicle'], isLowestPrice: false } },
+  { id: 'qt-003', data: { bookingId: 'UKTB-2026-000004', operatorId: 'op-003', operatorName: 'Capital Minicabs Edinburgh', vehicleType: 'minibus', vehicleDescription: 'Mercedes Vito Minibus - 8 Seats', passengerCapacity: 8, luggageCapacity: 7, rating: 4.7, totalReviews: 987, estimatedJourneyTime: 32, isElectric: false, isHybrid: false, price: 51.0, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Free waiting time', 'Meet and greet'], isLowestPrice: false } },
   { id: 'qt-004', data: { bookingId: 'UKTB-2026-000002', operatorId: 'op-001', operatorName: 'Kingsley Travel', vehicleType: 'executive', vehicleDescription: 'Mercedes E-Class', passengerCapacity: 3, luggageCapacity: 2, rating: 4.8, totalReviews: 3245, estimatedJourneyTime: 15, isElectric: false, isHybrid: false, price: 11.52, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: true } },
   { id: 'qt-005', data: { bookingId: 'UKTB-2026-000006', operatorId: 'op-001', operatorName: 'Kingsley Travel', vehicleType: 'saloon', vehicleDescription: 'Toyota Prius Electric', passengerCapacity: 3, luggageCapacity: 2, rating: 4.9, totalReviews: 847, estimatedJourneyTime: 18, isElectric: true, isHybrid: true, price: 13.8, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Zero emissions', 'Free waiting time'], isLowestPrice: true } },
-  { id: 'qt-006', data: { bookingId: 'UKTB-2026-000003', operatorId: 'op-002', operatorName: 'Northern Taxi Services', vehicleType: 'estate', vehicleDescription: 'Ford Mondeo Estate', passengerCapacity: 3, luggageCapacity: 4, rating: 4.7, totalReviews: 312, estimatedJourneyTime: 120, isElectric: false, isHybrid: true, price: 102.6, paymentTypes: ['card', 'cash'], features: ['Free waiting time', 'Hybrid vehicle', 'Large luggage space'], isLowestPrice: true } },
-  { id: 'qt-007', data: { bookingId: 'UKTB-2026-000005', operatorId: 'op-003', operatorName: 'Capital Taxis Edinburgh', vehicleType: 'wheelchair_accessible', vehicleDescription: 'Citroen Berlingo WAV', passengerCapacity: 2, luggageCapacity: 1, rating: 4.9, totalReviews: 456, estimatedJourneyTime: 65, isElectric: false, isHybrid: false, price: 59.4, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Wheelchair ramp', 'Free waiting time'], isLowestPrice: true } },
-  { id: 'qt-008', data: { bookingId: 'UKTB-2026-000007', operatorId: 'op-003', operatorName: 'Capital Taxis Edinburgh', vehicleType: 'mpv', vehicleDescription: 'Toyota Verso MPV - 5 Seats', passengerCapacity: 5, luggageCapacity: 3, rating: 4.6, totalReviews: 198, estimatedJourneyTime: 22, isElectric: false, isHybrid: false, price: 26.4, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: true } },
+  { id: 'qt-006', data: { bookingId: 'UKTB-2026-000003', operatorId: 'op-002', operatorName: 'Northern Minicab Services', vehicleType: 'estate', vehicleDescription: 'Ford Mondeo Estate', passengerCapacity: 3, luggageCapacity: 4, rating: 4.7, totalReviews: 312, estimatedJourneyTime: 120, isElectric: false, isHybrid: true, price: 102.6, paymentTypes: ['card', 'cash'], features: ['Free waiting time', 'Hybrid vehicle', 'Large luggage space'], isLowestPrice: true } },
+  { id: 'qt-007', data: { bookingId: 'UKTB-2026-000005', operatorId: 'op-003', operatorName: 'Capital Minicabs Edinburgh', vehicleType: 'wheelchair_accessible', vehicleDescription: 'Citroen Berlingo WAV', passengerCapacity: 2, luggageCapacity: 1, rating: 4.9, totalReviews: 456, estimatedJourneyTime: 65, isElectric: false, isHybrid: false, price: 59.4, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Wheelchair ramp', 'Free waiting time'], isLowestPrice: true } },
+  { id: 'qt-008', data: { bookingId: 'UKTB-2026-000007', operatorId: 'op-003', operatorName: 'Capital Minicabs Edinburgh', vehicleType: 'mpv', vehicleDescription: 'Toyota Verso MPV - 5 Seats', passengerCapacity: 5, luggageCapacity: 3, rating: 4.6, totalReviews: 198, estimatedJourneyTime: 22, isElectric: false, isHybrid: false, price: 26.4, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: true } },
   { id: 'qt-009', data: { bookingId: 'UKTB-2026-000001', operatorId: 'op-001', operatorName: 'Kingsley Travel', vehicleType: 'executive', vehicleDescription: 'Mercedes E-Class', passengerCapacity: 3, luggageCapacity: 2, rating: 4.8, totalReviews: 3245, estimatedJourneyTime: 45, isElectric: false, isHybrid: false, price: 51.0, paymentTypes: ['card', 'cash'], features: ['Meet and greet', 'Free waiting time', 'Flight tracking'], isLowestPrice: true } },
   { id: 'qt-010', data: { bookingId: 'UKTB-2026-000008', operatorId: 'op-001', operatorName: 'Kingsley Travel', vehicleType: 'mpv', vehicleDescription: 'Ford Galaxy MPV - 6 Seats', passengerCapacity: 6, luggageCapacity: 4, rating: 4.7, totalReviews: 356, estimatedJourneyTime: 50, isElectric: false, isHybrid: false, price: 62.64, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: true } },
-  { id: 'qt-011', data: { bookingId: 'UKTB-2026-000008', operatorId: 'op-002', operatorName: 'Northern Taxi Services', vehicleType: 'mpv', vehicleDescription: 'VW Touran MPV', passengerCapacity: 6, luggageCapacity: 4, rating: 4.6, totalReviews: 1890, estimatedJourneyTime: 55, isElectric: false, isHybrid: false, price: 68.5, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: false } },
+  { id: 'qt-011', data: { bookingId: 'UKTB-2026-000008', operatorId: 'op-002', operatorName: 'Northern Minicab Services', vehicleType: 'mpv', vehicleDescription: 'VW Touran MPV', passengerCapacity: 6, luggageCapacity: 4, rating: 4.6, totalReviews: 1890, estimatedJourneyTime: 55, isElectric: false, isHybrid: false, price: 68.5, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: false } },
   { id: 'qt-012', data: { bookingId: 'UKTB-2026-000012', operatorId: 'op-001', operatorName: 'Kingsley Travel', vehicleType: 'executive', vehicleDescription: 'Mercedes E-Class', passengerCapacity: 3, luggageCapacity: 2, rating: 4.8, totalReviews: 3245, estimatedJourneyTime: 55, isElectric: false, isHybrid: false, price: 81.6, paymentTypes: ['card', 'cash'], features: ['Meet and greet', 'Free waiting time'], isLowestPrice: true } },
-  { id: 'qt-013', data: { bookingId: 'UKTB-2026-000012', operatorId: 'op-002', operatorName: 'Northern Taxi Services', vehicleType: 'executive', vehicleDescription: 'BMW 5 Series', passengerCapacity: 3, luggageCapacity: 2, rating: 4.5, totalReviews: 410, estimatedJourneyTime: 60, isElectric: false, isHybrid: false, price: 88.0, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: false } },
-  { id: 'qt-014', data: { bookingId: 'UKTB-2026-000001', operatorId: 'op-003', operatorName: 'Capital Taxis Edinburgh', vehicleType: 'saloon', vehicleDescription: 'Toyota Prius', passengerCapacity: 3, luggageCapacity: 2, rating: 4.7, totalReviews: 987, estimatedJourneyTime: 50, isElectric: true, isHybrid: true, price: 45.0, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Zero emissions', 'Free waiting time'], isLowestPrice: false } },
-  { id: 'qt-015', data: { bookingId: 'UKTB-2026-000003', operatorId: 'op-003', operatorName: 'Capital Taxis Edinburgh', vehicleType: 'estate', vehicleDescription: 'Kia Niro Estate', passengerCapacity: 3, luggageCapacity: 4, rating: 4.7, totalReviews: 987, estimatedJourneyTime: 130, isElectric: true, isHybrid: true, price: 98.0, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Zero emissions', 'Free waiting time'], isLowestPrice: false } },
+  { id: 'qt-013', data: { bookingId: 'UKTB-2026-000012', operatorId: 'op-002', operatorName: 'Northern Minicab Services', vehicleType: 'executive', vehicleDescription: 'BMW 5 Series', passengerCapacity: 3, luggageCapacity: 2, rating: 4.5, totalReviews: 410, estimatedJourneyTime: 60, isElectric: false, isHybrid: false, price: 88.0, paymentTypes: ['card', 'cash'], features: ['Free waiting time'], isLowestPrice: false } },
+  { id: 'qt-014', data: { bookingId: 'UKTB-2026-000001', operatorId: 'op-003', operatorName: 'Capital Minicabs Edinburgh', vehicleType: 'saloon', vehicleDescription: 'Toyota Prius', passengerCapacity: 3, luggageCapacity: 2, rating: 4.7, totalReviews: 987, estimatedJourneyTime: 50, isElectric: true, isHybrid: true, price: 45.0, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Zero emissions', 'Free waiting time'], isLowestPrice: false } },
+  { id: 'qt-015', data: { bookingId: 'UKTB-2026-000003', operatorId: 'op-003', operatorName: 'Capital Minicabs Edinburgh', vehicleType: 'estate', vehicleDescription: 'Kia Niro Estate', passengerCapacity: 3, luggageCapacity: 4, rating: 4.7, totalReviews: 987, estimatedJourneyTime: 130, isElectric: true, isHybrid: true, price: 98.0, paymentTypes: ['card', 'cash', 'apple_pay'], features: ['Zero emissions', 'Free waiting time'], isLowestPrice: false } },
 ]
 
 // ---------------------------------------------------------------------------

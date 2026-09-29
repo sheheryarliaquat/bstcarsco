@@ -28,7 +28,7 @@ export const BRAND = {
   name: 'Blue Star Airport Transfers LTD',
   tagline: 'Your Journey, Your Way',
   description:
-    'Blue Star Airport Transfers LTD is a premium taxi booking platform connecting passengers with licensed taxi operators across the United Kingdom. Compare quotes, track your ride, and travel with confidence.',
+    'Blue Star Airport Transfers LTD is a premium private hire booking platform connecting passengers with licensed private hire operators across the United Kingdom. Compare quotes, track your ride, and travel with confidence.',
 } as const;
 
 export const COLORS = {
@@ -1107,8 +1107,8 @@ export const DEMO_DATA = {
       id: 'qt-002',
       bookingId: 'UKTB-2026-000004',
       operatorId: 'op-002',
-      operatorName: 'Northern Taxi Services',
-      operatorLogo: '/logos/northern-taxi.png',
+      operatorName: 'Northern Minicab Services',
+      operatorLogo: '/logos/northern-minicab.png',
       vehicleType: 'mpv' as VehicleType,
       vehicleDescription: 'Ford Galaxy MPV - 6 Seats',
       vehicleImage: '/vehicles/ford-galaxy.jpg',
@@ -1130,8 +1130,8 @@ export const DEMO_DATA = {
       id: 'qt-003',
       bookingId: 'UKTB-2026-000004',
       operatorId: 'op-003',
-      operatorName: 'Capital Taxis Edinburgh',
-      operatorLogo: '/logos/capital-taxis.png',
+      operatorName: 'Capital Minicabs Edinburgh',
+      operatorLogo: '/logos/capital-minicabs.png',
       vehicleType: 'minibus' as VehicleType,
       vehicleDescription: 'Mercedes Vito Minibus - 8 Seats',
       vehicleImage: '/vehicles/mercedes-vito.jpg',

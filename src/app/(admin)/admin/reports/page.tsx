@@ -19,34 +19,34 @@ import { DashboardCard } from "@/components/shared/DashboardCard"
 const BOOKING_REPORT_DATA = [
   { id: "UKTB-2026-000001", date: "2026-08-20", passenger: "James Wilson", operator: "Kingsley Travel", pickup: "London", destination: "Heathrow", status: "completed", total: 51.00 },
   { id: "UKTB-2026-000002", date: "2026-08-24", passenger: "Emma Thompson", operator: "Kingsley Travel", pickup: "London", destination: "Westminster", status: "active", total: 11.52 },
-  { id: "UKTB-2026-000003", date: "2026-08-22", passenger: "Raj Patel", operator: "Northern Taxi", pickup: "Birmingham", destination: "Manchester", status: "confirmed", total: 102.60 },
+  { id: "UKTB-2026-000003", date: "2026-08-22", passenger: "Raj Patel", operator: "Northern Minicab", pickup: "Birmingham", destination: "Manchester", status: "confirmed", total: 102.60 },
   { id: "UKTB-2026-000004", date: "2026-08-25", passenger: "Sophie Clarkson", operator: "Kingsley Travel", pickup: "London", destination: "Heathrow", status: "pending", total: 45.60 },
-  { id: "UKTB-2026-000005", date: "2026-08-23", passenger: "David Morgan", operator: "Capital Taxis", pickup: "Edinburgh", destination: "Glasgow", status: "active", total: 410.40 },
+  { id: "UKTB-2026-000005", date: "2026-08-23", passenger: "David Morgan", operator: "Capital Minicabs", pickup: "Edinburgh", destination: "Glasgow", status: "active", total: 410.40 },
   { id: "UKTB-2026-000006", date: "2026-08-25", passenger: "James Wilson", operator: "Kingsley Travel", pickup: "London", destination: "Westminster", status: "failed", total: 13.80 },
 ]
 
 const REVENUE_REPORT_DATA = [
   { operator: "Kingsley Travel", bookings: 62, revenue: 12450, commission: 1867.50, net: 10582.50 },
-  { operator: "Northern Taxi Services", bookings: 41, revenue: 8320, commission: 1497.60, net: 6822.40 },
-  { operator: "Capital Taxis Edinburgh", bookings: 28, revenue: 5680, commission: 681.60, net: 4998.40 },
+  { operator: "Northern Minicab Services", bookings: 41, revenue: 8320, commission: 1497.60, net: 6822.40 },
+  { operator: "Capital Minicabs Edinburgh", bookings: 28, revenue: 5680, commission: 681.60, net: 4998.40 },
   { operator: "City Cars Bristol", bookings: 15, revenue: 2890, commission: 346.80, net: 2543.20 },
-  { operator: "Highland Cabs", bookings: 8, revenue: 1560, commission: 249.60, net: 1310.40 },
+  { operator: "Highland Minicabs", bookings: 8, revenue: 1560, commission: 249.60, net: 1310.40 },
 ]
 
 const DRIVER_REPORT_DATA = [
   { name: "Mohammed Hassan", operator: "Kingsley Travel", trips: 48, revenue: 2150, rating: 4.9, status: "online" },
   { name: "Sarah O'Brien", operator: "Kingsley Travel", trips: 42, revenue: 1890, rating: 4.8, status: "online" },
-  { name: "Amit Sharma", operator: "Northern Taxi", trips: 35, revenue: 1540, rating: 4.7, status: "busy" },
-  { name: "Peter Davies", operator: "Northern Taxi", trips: 28, revenue: 1120, rating: 4.6, status: "offline" },
-  { name: "Linda Nguyen", operator: "Capital Taxis", trips: 38, revenue: 1780, rating: 4.9, status: "online" },
+  { name: "Amit Sharma", operator: "Northern Minicab", trips: 35, revenue: 1540, rating: 4.7, status: "busy" },
+  { name: "Peter Davies", operator: "Northern Minicab", trips: 28, revenue: 1120, rating: 4.6, status: "offline" },
+  { name: "Linda Nguyen", operator: "Capital Minicabs", trips: 38, revenue: 1780, rating: 4.9, status: "online" },
 ]
 
 const OPERATOR_REPORT_DATA = [
   { name: "Kingsley Travel", drivers: 45, bookings: 62, revenue: 12450, avgRating: 4.8, responseTime: "2.1m" },
-  { name: "Northern Taxi Services", drivers: 32, bookings: 41, revenue: 8320, avgRating: 4.6, responseTime: "3.2m" },
-  { name: "Capital Taxis Edinburgh", drivers: 22, bookings: 28, revenue: 5680, avgRating: 4.7, responseTime: "2.8m" },
+  { name: "Northern Minicab Services", drivers: 32, bookings: 41, revenue: 8320, avgRating: 4.6, responseTime: "3.2m" },
+  { name: "Capital Minicabs Edinburgh", drivers: 22, bookings: 28, revenue: 5680, avgRating: 4.7, responseTime: "2.8m" },
   { name: "City Cars Bristol", drivers: 15, bookings: 15, revenue: 2890, avgRating: 4.5, responseTime: "4.1m" },
-  { name: "Highland Cabs", drivers: 10, bookings: 8, revenue: 1560, avgRating: 4.4, responseTime: "5.0m" },
+  { name: "Highland Minicabs", drivers: 10, bookings: 8, revenue: 1560, avgRating: 4.4, responseTime: "5.0m" },
 ]
 
 const POPULAR_ROUTES_DATA = [

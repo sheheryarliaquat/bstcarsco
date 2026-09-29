@@ -79,14 +79,14 @@ const DEMO_TICKETS: TicketRecord[] = [
     userName: "Emma Thompson",
     userRole: "passenger",
     category: "lost_property",
-    subject: "Left phone in taxi - Edinburgh to Glasgow trip",
-    message: "I left my phone (iPhone 15 Pro, black) in the back seat of my taxi from Edinburgh to Glasgow yesterday. Booking ref: UKTB-2026-000005.",
+    subject: "Left phone in car - Edinburgh to Glasgow trip",
+    message: "I left my phone (iPhone 15 Pro, black) in the back seat of my car from Edinburgh to Glasgow yesterday. Booking ref: UKTB-2026-000005.",
     priority: "high",
     status: "open",
     assignedAdmin: null,
     createdAt: "2026-08-25T10:00:00Z",
     messages: [
-      { sender: "Emma Thompson", senderRole: "passenger", message: "I left my phone (iPhone 15 Pro, black) in the back seat of my taxi from Edinburgh to Glasgow yesterday. Booking ref: UKTB-2026-000005.", timestamp: "2026-08-25T10:00:00Z" },
+      { sender: "Emma Thompson", senderRole: "passenger", message: "I left my phone (iPhone 15 Pro, black) in the back seat of my car from Edinburgh to Glasgow yesterday. Booking ref: UKTB-2026-000005.", timestamp: "2026-08-25T10:00:00Z" },
     ],
   },
   {

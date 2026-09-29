@@ -1,7 +1,7 @@
 {
-  "name": "uk-taxi-platform-functions",
+  "name": "uk-private-hire-platform-functions",
   "version": "1.0.0",
-  "description": "Cloud Functions for UK Taxi Booking Platform",
+  "description": "Cloud Functions for UK Private Hire Booking Platform",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",

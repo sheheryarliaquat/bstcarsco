@@ -142,7 +142,7 @@ export default function PassengerDashboardPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-[#172F52]">
-                Book a Taxi
+                Book a Car
               </p>
               <p className="text-xs text-[#6B7280]">Get a quote now</p>
             </div>

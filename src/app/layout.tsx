@@ -10,22 +10,22 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: {
-    default: "Blue Star Airport Transfers LTD | Compare & Book UK Taxi Services",
+    default: "Blue Star Airport Transfers LTD | UK Private Hire Booking",
     template: "%s | Blue Star Airport Transfers LTD",
   },
   description:
-    "Compare trusted UK taxi providers and book your journey at the best available price. Airport transfers, corporate travel, and more across the United Kingdom.",
+    "Compare trusted UK private hire providers and book your journey at the best available price. Airport transfers, corporate travel, and more across the United Kingdom.",
   keywords: [
-    "UK taxi booking",
-    "taxi comparison",
+    "UK car hire booking",
+    "private hire comparison",
     "airport transfer UK",
-    "book taxi online",
+    "book car hire online",
     "UK minicab",
   ],
   openGraph: {
     title: "Blue Star Airport Transfers LTD",
     description:
-      "Compare trusted UK taxi providers and book your journey at the best available price.",
+      "Compare trusted UK private hire providers and book your journey at the best available price.",
     locale: "en_GB",
     type: "website",
   },

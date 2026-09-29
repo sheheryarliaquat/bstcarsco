@@ -7,7 +7,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 export const metadata: Metadata = {
   title: "Areas We Cover",
   description:
-    "Blue Star Airport Transfers LTD provides taxi services across the entire United Kingdom. Find your area and book a ride today.",
+    "Blue Star Airport Transfers LTD provides private hire services across the entire United Kingdom. Find your area and book a ride today.",
 };
 
 const REGIONS = [
@@ -66,7 +66,7 @@ export default function AreasPage() {
             Areas We Cover
           </h1>
           <p className="mt-4 text-lg text-gray-300">
-            Taxi services across the entire United Kingdom
+            Private hire services across the entire United Kingdom
           </p>
         </div>
       </section>

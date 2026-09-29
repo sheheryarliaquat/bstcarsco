@@ -46,7 +46,7 @@ export default function CorporatePage() {
             Corporate Travel
           </h1>
           <p className="mt-4 text-lg text-gray-300">
-            Professional taxi solutions for businesses of all sizes
+            Professional private hire solutions for businesses of all sizes
           </p>
         </div>
       </section>
@@ -84,7 +84,7 @@ export default function CorporatePage() {
               <p className="mt-4 text-gray-600">
                 Streamline your business travel with a dedicated corporate account.
                 Enjoy fixed rates, centralised billing, and full visibility over your
-                company&apos;s taxi spend.
+                company&apos;s car hire spend.
               </p>
               <ul className="mt-8 space-y-3">
                 {BENEFITS.map((b) => (

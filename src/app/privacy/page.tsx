@@ -66,7 +66,7 @@ export default function PrivacyPage() {
           <h2 className="text-2xl font-bold text-[#172F52]">3. How We Use Your Information</h2>
           <p className="text-gray-600">We use your information to:</p>
           <ul className="list-disc space-y-2 pl-6 text-gray-600">
-            <li>Process and manage your taxi bookings</li>
+            <li>Process and manage your car bookings</li>
             <li>Communicate booking confirmations, updates, and receipts</li>
             <li>Process payments and handle refunds</li>
             <li>Provide customer support</li>
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
           <ul className="list-disc space-y-2 pl-6 text-gray-600">
             <li>
               <strong>Contract:</strong> Processing necessary to fulfil our
-              contract with you (providing taxi booking services).
+              contract with you (providing car hire booking services).
             </li>
             <li>
               <strong>Legitimate Interests:</strong> Processing necessary for our
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
           </p>
           <ul className="list-disc space-y-2 pl-6 text-gray-600">
             <li>
-              <strong>Taxi Providers:</strong> To fulfil your booking, we share
+              <strong>Private Hire Providers:</strong> To fulfil your booking, we share
               your name, phone number, pickup location, and destination with your
               assigned driver/operator.
             </li>

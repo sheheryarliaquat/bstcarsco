@@ -39,9 +39,9 @@ export default function TermsPage() {
           <h2 className="text-2xl font-bold text-[#172F52]">2. Definitions</h2>
           <p className="text-gray-600">
             &quot;User&quot;, &quot;you&quot;, &quot;your&quot; — any person who accesses or uses the
-            Platform. &quot;Provider&quot; — a licensed taxi operator or driver registered
-            on the Platform. &quot;Booking&quot; — a request for taxi services made
-            through the Platform. &quot;Passenger&quot; — a user who books a taxi through
+            Platform. &quot;Provider&quot; — a licensed private hire operator or driver registered
+            on the Platform. &quot;Booking&quot; — a request for private hire services made
+            through the Platform. &quot;Passenger&quot; — a user who books a car through
             the Platform.
           </p>
 
@@ -55,7 +55,7 @@ export default function TermsPage() {
           <h2 className="text-2xl font-bold text-[#172F52]">4. Booking &amp; Payment</h2>
           <p className="text-gray-600">
             When you make a booking through the Platform, you enter into a
-            contract directly with the taxi provider. Blue Star Airport Transfers LTD acts as an
+            contract directly with the private hire provider. Blue Star Airport Transfers LTD acts as an
             intermediary to facilitate the booking. Prices displayed are set by
             individual providers and include all applicable taxes unless stated
             otherwise.

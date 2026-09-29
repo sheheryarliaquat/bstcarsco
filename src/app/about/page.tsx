@@ -15,7 +15,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Learn about Blue Star Airport Transfers LTD — our mission to make taxi travel easier, fairer, and more transparent across the United Kingdom.",
+    "Learn about Blue Star Airport Transfers LTD — our mission to make private hire travel easier, fairer, and more transparent across the United Kingdom.",
 };
 
 const VALUES = [
@@ -23,7 +23,7 @@ const VALUES = [
     icon: Target,
     title: "Our Mission",
     description:
-      "To make booking a taxi across the UK as simple, transparent, and affordable as possible for every passenger.",
+      "To make booking a car across the UK as simple, transparent, and affordable as possible for every passenger.",
   },
   {
     icon: Heart,
@@ -35,7 +35,7 @@ const VALUES = [
     icon: Users,
     title: "Our Community",
     description:
-      "We support local taxi drivers and operators, helping them reach more passengers and grow their businesses.",
+      "We support local private hire drivers and operators, helping them reach more passengers and grow their businesses.",
   },
 ];
 
@@ -62,7 +62,7 @@ export default function AboutPage() {
             About Blue Star Airport Transfers LTD
           </h1>
           <p className="mt-4 text-lg text-gray-300">
-            Making UK taxi travel simpler, fairer, and more accessible since
+            Making UK private hire travel simpler, fairer, and more accessible since
             2018.
           </p>
         </div>
@@ -73,13 +73,13 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-[#172F52]">Our Story</h2>
           <div className="mt-6 space-y-4 text-gray-600">
             <p>
-              Blue Star Airport Transfers LTD was born out of a simple frustration: booking a taxi
+              Blue Star Airport Transfers LTD was born out of a simple frustration: booking a car
               in the UK was too complicated. Passengers had no easy way to
               compare prices, and drivers struggled to reach new customers.
             </p>
             <p>
               We built a platform that connects passengers with trusted, licensed
-              taxi operators across the United Kingdom. By letting providers
+              private hire operators across the United Kingdom. By letting providers
               compete on price and quality, we ensure you always get the best
               deal — without compromising on safety or reliability.
             </p>
@@ -87,7 +87,7 @@ export default function AboutPage() {
               Today, we serve over 200 cities and towns across the UK, with
               thousands of drivers and operators on our platform. Whether you need
               a quick trip across town or a long-distance airport transfer, UK
-              Taxi Book is here to help.
+              Private Hire Book is here to help.
             </p>
           </div>
         </div>

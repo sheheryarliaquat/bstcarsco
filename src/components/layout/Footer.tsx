@@ -23,7 +23,7 @@ const FOOTER_COLUMNS = [
   {
     title: "For Passengers",
     links: [
-      { label: "Book a Taxi", href: "/book" },
+      { label: "Book a Car", href: "/book" },
       { label: "My Bookings", href: "/passenger/bookings" },
       { label: "Support", href: "/support" },
       { label: "FAQs", href: "/faqs" },
@@ -68,7 +68,7 @@ export function Footer() {
               <span className="text-lg font-bold">Blue Star Airport Transfers LTD</span>
             </Link>
             <p className="mb-4 max-w-xs text-sm text-gray-300">
-              Your trusted platform for booking taxis across the United Kingdom.
+              Your trusted platform for booking cars across the United Kingdom.
               Compare quotes, track your ride, and travel with confidence.
             </p>
             <div className="flex flex-col gap-2 text-sm text-gray-300">

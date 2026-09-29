@@ -32,7 +32,7 @@ const HOW_IT_WORKS_STEPS = [
     icon: GitCompareArrows,
     title: "Compare",
     description:
-      "Instantly compare prices from multiple trusted taxi providers in your area.",
+      "Instantly compare prices from multiple trusted private hire providers in your area.",
   },
   {
     icon: CreditCard,
@@ -70,7 +70,7 @@ const FEATURES = [
   {
     icon: Clock,
     title: "24/7 Available",
-    description: "Book a taxi anytime, day or night. We never stop working for you.",
+    description: "Book a car anytime, day or night. We never stop working for you.",
   },
   {
     icon: Shield,
@@ -122,10 +122,10 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
         <div className="relative mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Book Your Taxi Online
+            Book Your Car Online
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-300 sm:text-xl">
-            Compare trusted UK taxi providers and book your journey at the best
+            Compare trusted UK private hire providers and book your journey at the best
             available price.
           </p>
           <div className="mx-auto mt-8 max-w-3xl">
@@ -139,7 +139,7 @@ export default function HomePage() {
           <div className="text-center">
             <h2 className="text-3xl font-bold text-[#172F52]">How It Works</h2>
             <p className="mt-2 text-gray-600">
-              Book your taxi in four simple steps
+              Book your car in four simple steps
             </p>
           </div>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -234,7 +234,7 @@ export default function HomePage() {
               Areas We Cover
             </h2>
             <p className="mt-2 text-gray-600">
-              Taxi services across the entire United Kingdom
+              Private hire services across the entire United Kingdom
             </p>
           </div>
           <div className="mt-12 grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -302,7 +302,7 @@ export default function HomePage() {
             Ready to Book Your Journey?
           </h2>
           <p className="mt-4 text-lg text-gray-300">
-            Compare prices from trusted UK taxi providers and save on your next
+            Compare prices from trusted UK minicab providers and save on your next
             trip.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -313,7 +313,7 @@ export default function HomePage() {
               nativeButton={false}
             >
               <Car className="mr-2 h-5 w-5" />
-              Book a Taxi
+              Book a Car
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button

@@ -51,7 +51,7 @@ const DEMO_REVIEWS: ReviewRecord[] = [
     isApproved: false,
     passengerName: "Sophie Clarkson",
     driverName: "Peter Davies",
-    operatorName: "Northern Taxi Services",
+    operatorName: "Northern Minicab Services",
     moderationStatus: "pending" as const,
   },
   {

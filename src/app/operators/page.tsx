@@ -20,13 +20,13 @@ const BENEFITS = [
     icon: Globe,
     title: "Wider Reach",
     description:
-      "Access thousands of passengers searching for taxi services every day in your area.",
+      "Access thousands of passengers searching for private hire services every day in your area.",
   },
   {
     icon: BarChart3,
     title: "Grow Your Business",
     description:
-      "Increase your bookings and revenue by listing on the UK's fastest-growing taxi platform.",
+      "Increase your bookings and revenue by listing on the UK's fastest-growing private hire platform.",
   },
   {
     icon: Cpu,
@@ -74,7 +74,7 @@ export default function OperatorsPage() {
             For Operators
           </h1>
           <p className="mt-4 text-lg text-gray-300">
-            Partner with Blue Star Airport Transfers LTD and grow your taxi business
+            Partner with Blue Star Airport Transfers LTD and grow your car hire business
           </p>
         </div>
       </section>

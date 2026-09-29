@@ -50,7 +50,7 @@ const BENEFITS = [
 
 const REQUIREMENTS = [
   "Valid UK driving licence (full, not provisional)",
-  "Private Hire or Hackney carriage licence from your local council",
+  "Valid PHV (Private Hire Vehicle) licence from your local council",
   "Right to work in the United Kingdom",
   "DBS (Disclosure and Barring Service) check",
   "Valid motor insurance with hire and reward cover",

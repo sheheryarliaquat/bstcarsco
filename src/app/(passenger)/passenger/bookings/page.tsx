@@ -268,7 +268,7 @@ export default function BookingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-[#172F52]">My Bookings</h1>
         <p className="text-sm text-[#6B7280]">
-          View and manage all your taxi bookings.
+          View and manage all your car bookings.
         </p>
       </div>
 

@@ -274,7 +274,7 @@ async function sendNotification(
         android: {
           priority: "high",
           notification: {
-            channelId: "uk-taxi-platform",
+            channelId: "uk-private-hire",
             priority: "max",
           },
         },

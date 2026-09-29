@@ -21,7 +21,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 export const metadata: Metadata = {
   title: "How It Works",
   description:
-    "Learn how to book a taxi with Blue Star Airport Transfers LTD in five simple steps. Search, compare, book, travel, and review.",
+    "Learn how to book a car with Blue Star Airport Transfers LTD in five simple steps. Search, compare, book, travel, and review.",
 };
 
 const STEPS = [
@@ -37,7 +37,7 @@ const STEPS = [
     number: 2,
     title: "Compare",
     description:
-      "Instantly view prices from multiple licensed taxi providers in your area. Compare vehicle types, estimated arrival times, and customer ratings — all in one place.",
+      "Instantly view prices from multiple licensed private hire providers in your area. Compare vehicle types, estimated arrival times, and customer ratings — all in one place.",
   },
   {
     icon: CreditCard,
@@ -64,7 +64,7 @@ const STEPS = [
 
 const FAQS = [
   {
-    question: "How do I book a taxi?",
+    question: "How do I book a car?",
     answer:
       "Simply enter your pickup and destination on our search form, select your preferred date and time, compare the available options, and confirm your booking. You'll receive instant confirmation via email and SMS.",
   },
@@ -76,7 +76,7 @@ const FAQS = [
   {
     question: "How are prices calculated?",
     answer:
-      "Each taxi provider sets their own pricing. We display all available options so you can compare and choose the best value. Prices are fixed at the time of booking — no hidden fees.",
+      "Each private hire provider sets their own pricing. We display all available options so you can compare and choose the best value. Prices are fixed at the time of booking — no hidden fees.",
   },
   {
     question: "Can I cancel my booking?",
@@ -114,7 +114,7 @@ export default function HowItWorksPage() {
             How It Works
           </h1>
           <p className="mt-4 text-lg text-gray-300">
-            Book your taxi in five simple steps
+            Book your car in five simple steps
           </p>
         </div>
       </section>
@@ -174,7 +174,7 @@ export default function HowItWorksPage() {
             Ready to Get Started?
           </h2>
           <p className="mt-4 text-gray-300">
-            Search, compare, and book your next taxi journey today.
+            Search, compare, and book your next car journey today.
           </p>
           <Button
             size="lg"
@@ -183,7 +183,7 @@ export default function HowItWorksPage() {
             nativeButton={false}
           >
             <Car className="mr-2 h-5 w-5" />
-            Book a Taxi
+            Book a Car
           </Button>
         </div>
       </section>

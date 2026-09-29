@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/about',
     '/how-it-works',
-    '/taxi-services',
+    '/private-hire-services',
     '/airport-transfers',
     '/corporate',
     '/areas-we-cover',

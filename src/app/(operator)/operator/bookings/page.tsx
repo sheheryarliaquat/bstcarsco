@@ -251,7 +251,7 @@ export default function OperatorBookingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#172F52]">Bookings</h1>
-          <p className="text-sm text-[#6B7280]">Manage all your taxi bookings.</p>
+          <p className="text-sm text-[#6B7280]">Manage all your car bookings.</p>
         </div>
       </div>
 

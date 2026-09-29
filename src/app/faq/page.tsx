@@ -13,7 +13,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 export const metadata: Metadata = {
   title: "Frequently Asked Questions",
   description:
-    "Find answers to the most common questions about booking taxis with Blue Star Airport Transfers LTD. Payment, cancellations, airports, and more.",
+    "Find answers to the most common questions about booking cars with Blue Star Airport Transfers LTD. Payment, cancellations, airports, and more.",
 };
 
 const FAQ_SECTIONS = [
@@ -21,14 +21,14 @@ const FAQ_SECTIONS = [
     title: "Booking & Pricing",
     faqs: [
       {
-        question: "How do I book a taxi?",
+        question: "How do I book a car?",
         answer:
           "Enter your pickup and destination on our search form, select your preferred date and time, compare the available options, and confirm your booking. You'll receive instant confirmation via email and SMS.",
       },
       {
         question: "How are prices calculated?",
         answer:
-          "Each taxi provider sets their own pricing. We display all available options so you can compare and choose the best value. Prices are fixed at the time of booking — no hidden fees or surge pricing.",
+          "Each private hire provider sets their own pricing. We display all available options so you can compare and choose the best value. Prices are fixed at the time of booking — no hidden fees or surge pricing.",
       },
       {
         question: "Can I get an estimate before booking?",

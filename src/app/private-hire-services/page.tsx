@@ -14,9 +14,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 
 export const metadata: Metadata = {
-  title: "Taxi Services",
+  title: "Private Hire Services",
   description:
-    "Explore our full range of UK taxi services — airport transfers, corporate travel, minibus hire, executive travel, wheelchair accessible vehicles, and long-distance journeys.",
+    "Explore our full range of UK private hire services — airport transfers, corporate travel, minibus hire, executive travel, wheelchair accessible vehicles, and long-distance journeys.",
 };
 
 const SERVICES = [
@@ -64,13 +64,13 @@ const SERVICES = [
   },
 ];
 
-export default function TaxiServicesPage() {
+export default function PrivateHireServicesPage() {
   return (
     <PublicLayout>
       <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Our Taxi Services
+            Our Private Hire Services
           </h1>
           <p className="mt-4 text-lg text-gray-300">
             Comprehensive transport solutions for every occasion across the UK
