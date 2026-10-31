@@ -40,7 +40,7 @@ const BENEFITS = [
 export default function CorporatePage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Corporate Travel
@@ -54,7 +54,7 @@ export default function CorporatePage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Why Choose Corporate Account?
             </h2>
           </div>
@@ -62,10 +62,10 @@ export default function CorporatePage() {
             {FEATURES.map((f) => (
               <Card key={f.title}>
                 <CardContent className="flex flex-col gap-3 p-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FCE7EF]">
-                    <f.icon className="h-6 w-6 text-[#D4145A]" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E7EEFF]">
+                    <f.icon className="h-6 w-6 text-[#1F4FD8]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-[#172F52]">{f.title}</h3>
+                  <h3 className="text-lg font-semibold text-[#0F1B2D]">{f.title}</h3>
                   <p className="text-sm text-gray-600">{f.description}</p>
                 </CardContent>
               </Card>
@@ -74,11 +74,11 @@ export default function CorporatePage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl font-bold text-[#172F52]">
+              <h2 className="text-3xl font-bold text-[#0F1B2D]">
                 Benefits of a Corporate Account
               </h2>
               <p className="mt-4 text-gray-600">
@@ -89,7 +89,7 @@ export default function CorporatePage() {
               <ul className="mt-8 space-y-3">
                 {BENEFITS.map((b) => (
                   <li key={b} className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#D4145A]" />
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#1F4FD8]" />
                     <span className="text-sm text-gray-700">{b}</span>
                   </li>
                 ))}
@@ -98,7 +98,7 @@ export default function CorporatePage() {
             <div>
               <Card>
                 <CardContent className="p-8">
-                  <h3 className="text-xl font-bold text-[#172F52]">Request a Corporate Account</h3>
+                  <h3 className="text-xl font-bold text-[#0F1B2D]">Request a Corporate Account</h3>
                   <p className="mt-2 text-sm text-gray-600">
                     Fill in the form below and our team will be in touch within 24 hours.
                   </p>
@@ -113,7 +113,7 @@ export default function CorporatePage() {
                     <Textarea placeholder="Tell us about your company's travel needs..." className="min-h-24" />
                     <Button
                       type="submit"
-                      className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                      className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
                     >
                       Submit Request
                       <ArrowRight className="ml-2 h-4 w-4" />

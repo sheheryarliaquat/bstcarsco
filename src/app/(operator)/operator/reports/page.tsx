@@ -53,11 +53,11 @@ export default function OperatorReportsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Reports</h1>
-          <p className="text-sm text-[#6B7280]">Analytics and performance insights.</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Reports</h1>
+          <p className="text-sm text-[#5B6577]">Analytics and performance insights.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex gap-1 rounded-lg border border-[#D9E0E8] bg-white p-1">
+          <div className="flex gap-1 rounded-lg border border-[#E2E6EC] bg-white p-1">
             {REPORT_PERIODS.map((p) => (
               <button
                 key={p.value}
@@ -65,19 +65,19 @@ export default function OperatorReportsPage() {
                 className={cn(
                   "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
                   period === p.value
-                    ? "bg-[#172F52] text-white"
-                    : "text-[#6B7280] hover:bg-[#F5F7FA]"
+                    ? "bg-[#0F1B2D] text-white"
+                    : "text-[#5B6577] hover:bg-[#F4F6F9]"
                 )}
               >
                 {p.label}
               </button>
             ))}
           </div>
-          <Button variant="outline" className="border-[#D9E0E8]">
+          <Button variant="outline" className="border-[#E2E6EC]">
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" className="border-[#D9E0E8]">
+          <Button variant="outline" className="border-[#E2E6EC]">
             <FileText className="mr-2 h-4 w-4" />
             Export PDF
           </Button>
@@ -117,28 +117,28 @@ export default function OperatorReportsPage() {
       {/* Charts */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Bookings by Day */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-          <h3 className="mb-1 text-base font-bold text-[#172F52]">Bookings by Day</h3>
-          <p className="mb-4 text-xs text-[#6B7280]">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+          <h3 className="mb-1 text-base font-bold text-[#0F1B2D]">Bookings by Day</h3>
+          <p className="mb-4 text-xs text-[#5B6577]">
             Average: {avgBookings} bookings/day
           </p>
           <div className="space-y-3">
             {dailyData.map((item) => (
               <div key={item.day} className="flex items-center gap-3">
-                <span className="w-8 text-xs font-medium text-[#6B7280]">
+                <span className="w-8 text-xs font-medium text-[#5B6577]">
                   {item.day}
                 </span>
                 <div className="flex-1">
-                  <div className="h-6 w-full overflow-hidden rounded-md bg-[#F5F7FA]">
+                  <div className="h-6 w-full overflow-hidden rounded-md bg-[#F4F6F9]">
                     <div
-                      className="h-full rounded-md bg-[#172F52] transition-all duration-500"
+                      className="h-full rounded-md bg-[#0F1B2D] transition-all duration-500"
                       style={{
                         width: `${(item.bookings / maxBookings) * 100}%`,
                       }}
                     />
                   </div>
                 </div>
-                <span className="w-10 text-right text-xs font-bold text-[#172F52]">
+                <span className="w-10 text-right text-xs font-bold text-[#0F1B2D]">
                   {item.bookings}
                 </span>
               </div>
@@ -147,28 +147,28 @@ export default function OperatorReportsPage() {
         </div>
 
         {/* Revenue by Day */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-          <h3 className="mb-1 text-base font-bold text-[#172F52]">Revenue by Day</h3>
-          <p className="mb-4 text-xs text-[#6B7280]">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+          <h3 className="mb-1 text-base font-bold text-[#0F1B2D]">Revenue by Day</h3>
+          <p className="mb-4 text-xs text-[#5B6577]">
             Total: £{totalRevenue.toLocaleString()} this period
           </p>
           <div className="space-y-3">
             {dailyData.map((item) => (
               <div key={item.day} className="flex items-center gap-3">
-                <span className="w-8 text-xs font-medium text-[#6B7280]">
+                <span className="w-8 text-xs font-medium text-[#5B6577]">
                   {item.day}
                 </span>
                 <div className="flex-1">
-                  <div className="h-6 w-full overflow-hidden rounded-md bg-[#F5F7FA]">
+                  <div className="h-6 w-full overflow-hidden rounded-md bg-[#F4F6F9]">
                     <div
-                      className="h-full rounded-md bg-[#D4145A] transition-all duration-500"
+                      className="h-full rounded-md bg-[#1F4FD8] transition-all duration-500"
                       style={{
                         width: `${(item.revenue / maxRevenue) * 100}%`,
                       }}
                     />
                   </div>
                 </div>
-                <span className="w-16 text-right text-xs font-bold text-[#172F52]">
+                <span className="w-16 text-right text-xs font-bold text-[#0F1B2D]">
                   £{item.revenue.toLocaleString()}
                 </span>
               </div>
@@ -178,54 +178,54 @@ export default function OperatorReportsPage() {
       </div>
 
       {/* Driver Performance */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
-        <div className="border-b border-[#D9E0E8] px-6 py-4">
-          <h3 className="text-base font-bold text-[#172F52]">Driver Performance</h3>
-          <p className="text-xs text-[#6B7280]">Top performing drivers this period</p>
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
+        <div className="border-b border-[#E2E6EC] px-6 py-4">
+          <h3 className="text-base font-bold text-[#0F1B2D]">Driver Performance</h3>
+          <p className="text-xs text-[#5B6577]">Top performing drivers this period</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Driver</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Trips</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Rating</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Revenue</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Completion</th>
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Driver</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Trips</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Rating</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Revenue</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Completion</th>
               </tr>
             </thead>
             <tbody>
               {driverPerformance.map((driver, i) => (
                 <tr
                   key={driver.name}
-                  className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
+                  className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50"
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52]/10 text-xs font-bold text-[#172F52]">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0F1B2D]/10 text-xs font-bold text-[#0F1B2D]">
                         {i + 1}
                       </span>
-                      <span className="font-medium text-[#172F52]">{driver.name}</span>
+                      <span className="font-medium text-[#0F1B2D]">{driver.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-medium text-[#172F52]">
+                  <td className="px-4 py-3 font-medium text-[#0F1B2D]">
                     {driver.trips}
                   </td>
                   <td className="px-4 py-3">
                     <RatingStars rating={driver.rating} size="sm" />
                   </td>
-                  <td className="px-4 py-3 font-semibold text-[#172F52]">
+                  <td className="px-4 py-3 font-semibold text-[#0F1B2D]">
                     {driver.revenue}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-16 overflow-hidden rounded-full bg-[#F5F7FA]">
+                      <div className="h-2 w-16 overflow-hidden rounded-full bg-[#F4F6F9]">
                         <div
                           className="h-full rounded-full bg-[#28A745]"
                           style={{ width: driver.completion }}
                         />
                       </div>
-                      <span className="text-xs font-medium text-[#172F52]">
+                      <span className="text-xs font-medium text-[#0F1B2D]">
                         {driver.completion}
                       </span>
                     </div>

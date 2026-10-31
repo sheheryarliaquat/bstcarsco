@@ -66,7 +66,7 @@ export function RatingStars({
       {count !== undefined && (
         <span
           className={cn(
-            "ml-1 text-[#6B7280]",
+            "ml-1 text-[#5B6577]",
             size === "sm" && "text-[10px]",
             size === "md" && "text-xs",
             size === "lg" && "text-sm"

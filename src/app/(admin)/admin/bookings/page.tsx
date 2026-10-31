@@ -213,7 +213,7 @@ export default function AdminBookingsPage() {
       sortable: true,
       className: "font-mono text-xs",
       render: (row) => (
-        <span className="font-mono text-xs font-medium text-[#172F52]">
+        <span className="font-mono text-xs font-medium text-[#0F1B2D]">
           {row.bookingNumber as string}
         </span>
       ),
@@ -223,7 +223,7 @@ export default function AdminBookingsPage() {
       header: "Passenger",
       sortable: true,
       render: (row) => (
-        <span className="text-[#172F52]">{getPassengerName(row.passengerId as string)}</span>
+        <span className="text-[#0F1B2D]">{getPassengerName(row.passengerId as string)}</span>
       ),
     },
     {
@@ -232,7 +232,7 @@ export default function AdminBookingsPage() {
       render: (row) => {
         const b = row as unknown as Booking
         return (
-          <span className="max-w-[140px] truncate text-[#6B7280]">
+          <span className="max-w-[140px] truncate text-[#5B6577]">
             {b.pickup.formattedAddress.split(",")[0]}
           </span>
         )
@@ -244,7 +244,7 @@ export default function AdminBookingsPage() {
       render: (row) => {
         const b = row as unknown as Booking
         return (
-          <span className="max-w-[140px] truncate text-[#6B7280]">
+          <span className="max-w-[140px] truncate text-[#5B6577]">
             {b.destination.formattedAddress.split(",")[0]}
           </span>
         )
@@ -254,18 +254,18 @@ export default function AdminBookingsPage() {
       key: "date",
       header: "Date",
       sortable: true,
-      render: (row) => <span className="text-[#6B7280]">{row.date as string}</span>,
+      render: (row) => <span className="text-[#5B6577]">{row.date as string}</span>,
     },
     {
       key: "pickupTime",
       header: "Time",
-      render: (row) => <span className="text-[#6B7280]">{row.pickupTime as string}</span>,
+      render: (row) => <span className="text-[#5B6577]">{row.pickupTime as string}</span>,
     },
     {
       key: "operatorId",
       header: "Operator",
       render: (row) => (
-        <span className="text-[#172F52]">{getOperatorName(row.operatorId as string)}</span>
+        <span className="text-[#0F1B2D]">{getOperatorName(row.operatorId as string)}</span>
       ),
     },
     {
@@ -274,7 +274,7 @@ export default function AdminBookingsPage() {
       render: (row) => {
         const name = getDriverName(row.driverId as string)
         return (
-          <span className={cn("text-sm", name === "Unassigned" ? "italic text-[#6B7280]" : "text-[#172F52]")}>
+          <span className={cn("text-sm", name === "Unassigned" ? "italic text-[#5B6577]" : "text-[#0F1B2D]")}>
             {name}
           </span>
         )
@@ -284,7 +284,7 @@ export default function AdminBookingsPage() {
       key: "vehicleId",
       header: "Vehicle",
       render: (row) => (
-        <span className="text-[#6B7280]">{getVehicleInfo(row.vehicleId as string)}</span>
+        <span className="text-[#5B6577]">{getVehicleInfo(row.vehicleId as string)}</span>
       ),
     },
     {
@@ -292,7 +292,7 @@ export default function AdminBookingsPage() {
       header: "Price",
       sortable: true,
       render: (row) => (
-        <span className="font-semibold text-[#172F52]">
+        <span className="font-semibold text-[#0F1B2D]">
           £{(row.total as number).toFixed(2)}
         </span>
       ),
@@ -313,8 +313,8 @@ export default function AdminBookingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Bookings</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Bookings</h1>
+          <p className="text-sm text-[#5B6577]">
             Manage all platform bookings ({filtered.length} total)
           </p>
         </div>
@@ -322,7 +322,7 @@ export default function AdminBookingsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="border-[#D9E0E8]"
+            className="border-[#E2E6EC]"
             onClick={exportCsv}
             disabled={filtered.length === 0}
           >
@@ -333,10 +333,10 @@ export default function AdminBookingsPage() {
       </div>
 
       {/* Filters */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
@@ -348,7 +348,7 @@ export default function AdminBookingsPage() {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Statuses</option>
             {BOOKING_STATUSES.map((s) => (
@@ -359,7 +359,7 @@ export default function AdminBookingsPage() {
           <select
             value={paymentFilter}
             onChange={(e) => { setPaymentFilter(e.target.value); setPage(1) }}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Payments</option>
             {PAYMENT_STATUSES.map((s) => (
@@ -370,7 +370,7 @@ export default function AdminBookingsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="border-[#D9E0E8]"
+            className="border-[#E2E6EC]"
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="mr-1.5 h-3.5 w-3.5" />
@@ -380,14 +380,14 @@ export default function AdminBookingsPage() {
         </div>
 
         {showFilters && (
-          <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[#F5F7FA] pt-3">
-            <select className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]">
+          <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[#F4F6F9] pt-3">
+            <select className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]">
               <option value="all">All Pickup Areas</option>
               {UK_CITIES.map((c) => (
                 <option key={c.name} value={c.name}>{c.name}</option>
               ))}
             </select>
-            <select className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]">
+            <select className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]">
               <option value="all">All Destination Areas</option>
               {UK_CITIES.map((c) => (
                 <option key={c.name} value={c.name}>{c.name}</option>
@@ -395,14 +395,14 @@ export default function AdminBookingsPage() {
             </select>
             <input
               type="date"
-              className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+              className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
             />
-            <span className="text-xs text-[#6B7280]">to</span>
+            <span className="text-xs text-[#5B6577]">to</span>
             <input
               type="date"
-              className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+              className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
             />
-            <select className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]">
+            <select className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]">
               <option value="all">All Operators</option>
               {Object.entries(operatorNames).map(([id, name]) => (
                 <option key={id} value={id}>{name}</option>
@@ -413,18 +413,18 @@ export default function AdminBookingsPage() {
       </div>
 
       {/* Data Table */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]" />
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]" />
                 {columns.map((col) => (
                   <th
                     key={col.key}
                     className={cn(
-                      "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]",
-                      col.sortable && "cursor-pointer select-none hover:text-[#172F52]"
+                      "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]",
+                      col.sortable && "cursor-pointer select-none hover:text-[#0F1B2D]"
                     )}
                   >
                     {col.header}
@@ -435,7 +435,7 @@ export default function AdminBookingsPage() {
             <tbody>
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length + 1} className="px-4 py-12 text-center text-[#6B7280]">
+                  <td colSpan={columns.length + 1} className="px-4 py-12 text-center text-[#5B6577]">
                     No bookings found
                   </td>
                 </tr>
@@ -445,11 +445,11 @@ export default function AdminBookingsPage() {
                   return (
                     <React.Fragment key={booking.bookingNumber}>
                       <tr
-                        className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50 cursor-pointer"
+                        className="border-b border-[#F4F6F9] transition-colors last:border-0 hover:bg-[#F4F6F9]/50 cursor-pointer"
                         onClick={() => setExpandedRow(isExpanded ? null : booking.bookingNumber)}
                       >
                         <td className="px-4 py-3">
-                          <button className="text-[#6B7280] hover:text-[#172F52]">
+                          <button className="text-[#5B6577] hover:text-[#0F1B2D]">
                             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                           </button>
                         </td>
@@ -463,44 +463,44 @@ export default function AdminBookingsPage() {
                       </tr>
                       {isExpanded && (
                         <tr key={`${booking.bookingNumber}-detail`}>
-                          <td colSpan={columns.length + 1} className="bg-[#F5F7FA]/30 px-8 py-4">
+                          <td colSpan={columns.length + 1} className="bg-[#F4F6F9]/30 px-8 py-4">
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                               <div className="space-y-2">
-                                <p className="text-xs font-semibold uppercase text-[#6B7280]">Pickup Details</p>
+                                <p className="text-xs font-semibold uppercase text-[#5B6577]">Pickup Details</p>
                                 <div className="flex items-start gap-2">
-                                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4145A]" />
-                                  <p className="text-sm text-[#172F52]">{booking.pickup.formattedAddress}</p>
+                                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#1F4FD8]" />
+                                  <p className="text-sm text-[#0F1B2D]">{booking.pickup.formattedAddress}</p>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <p className="text-xs font-semibold uppercase text-[#6B7280]">Destination Details</p>
+                                <p className="text-xs font-semibold uppercase text-[#5B6577]">Destination Details</p>
                                 <div className="flex items-start gap-2">
                                   <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-600" />
-                                  <p className="text-sm text-[#172F52]">{booking.destination.formattedAddress}</p>
+                                  <p className="text-sm text-[#0F1B2D]">{booking.destination.formattedAddress}</p>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <p className="text-xs font-semibold uppercase text-[#6B7280]">Journey Info</p>
-                                <p className="text-sm text-[#172F52]">Distance: {booking.distanceMiles} miles</p>
-                                <p className="text-sm text-[#172F52]">Duration: {booking.estimatedDuration} mins</p>
-                                <p className="text-sm text-[#172F52]">Passengers: {booking.passengers}</p>
-                                <p className="text-sm text-[#172F52]">Luggage: {booking.luggage}</p>
+                                <p className="text-xs font-semibold uppercase text-[#5B6577]">Journey Info</p>
+                                <p className="text-sm text-[#0F1B2D]">Distance: {booking.distanceMiles} miles</p>
+                                <p className="text-sm text-[#0F1B2D]">Duration: {booking.estimatedDuration} mins</p>
+                                <p className="text-sm text-[#0F1B2D]">Passengers: {booking.passengers}</p>
+                                <p className="text-sm text-[#0F1B2D]">Luggage: {booking.luggage}</p>
                               </div>
                               <div className="space-y-2">
-                                <p className="text-xs font-semibold uppercase text-[#6B7280]">Pricing</p>
-                                <p className="text-sm text-[#172F52]">Subtotal: £{booking.price.toFixed(2)}</p>
+                                <p className="text-xs font-semibold uppercase text-[#5B6577]">Pricing</p>
+                                <p className="text-sm text-[#0F1B2D]">Subtotal: £{booking.price.toFixed(2)}</p>
                                 {booking.discount > 0 && (
                                   <p className="text-sm text-green-600">Discount: -£{booking.discount.toFixed(2)}</p>
                                 )}
-                                <p className="text-sm text-[#172F52]">Tax: £{booking.tax.toFixed(2)}</p>
-                                <p className="text-sm font-bold text-[#172F52]">Total: £{booking.total.toFixed(2)}</p>
+                                <p className="text-sm text-[#0F1B2D]">Tax: £{booking.tax.toFixed(2)}</p>
+                                <p className="text-sm font-bold text-[#0F1B2D]">Total: £{booking.total.toFixed(2)}</p>
                               </div>
                             </div>
                             <div className="mt-4 flex items-center gap-2 border-t border-[#E5E7EB] pt-4">
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="border-[#D9E0E8]"
+                                className="border-[#E2E6EC]"
                                 onClick={(e) => { e.stopPropagation(); handleViewBooking(booking) }}
                               >
                                 <Eye className="mr-1 h-3.5 w-3.5" />
@@ -509,7 +509,7 @@ export default function AdminBookingsPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="border-[#D9E0E8]"
+                                className="border-[#E2E6EC]"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <Printer className="mr-1 h-3.5 w-3.5" />
@@ -561,15 +561,15 @@ export default function AdminBookingsPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#D9E0E8] px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E2E6EC] px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#6B7280]">
+            <span className="text-xs text-[#5B6577]">
               Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length}
             </span>
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
-              className="h-7 rounded border border-[#D9E0E8] bg-white px-2 text-xs text-[#172F52]"
+              className="h-7 rounded border border-[#E2E6EC] bg-white px-2 text-xs text-[#0F1B2D]"
             >
               {PAGE_SIZES.map((s) => (
                 <option key={s} value={s}>{s} per page</option>
@@ -583,7 +583,7 @@ export default function AdminBookingsPage() {
             <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(page - 1)}>
               ‹
             </Button>
-            <span className="px-2 text-sm font-medium text-[#172F52]">{page} / {totalPages || 1}</span>
+            <span className="px-2 text-sm font-medium text-[#0F1B2D]">{page} / {totalPages || 1}</span>
             <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
               ›
             </Button>
@@ -605,46 +605,46 @@ export default function AdminBookingsPage() {
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Passenger</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Passenger</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {getPassengerName(selectedBooking.passengerId)}
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Operator</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Operator</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {getOperatorName(selectedBooking.operatorId)}
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Pickup</p>
-                <p className="text-sm text-[#172F52]">{selectedBooking.pickup.formattedAddress}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Pickup</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedBooking.pickup.formattedAddress}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Destination</p>
-                <p className="text-sm text-[#172F52]">{selectedBooking.destination.formattedAddress}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Destination</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedBooking.destination.formattedAddress}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Date & Time</p>
-                <p className="text-sm text-[#172F52]">{selectedBooking.date} at {selectedBooking.pickupTime}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Date & Time</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedBooking.date} at {selectedBooking.pickupTime}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Vehicle Type</p>
-                <p className="text-sm text-[#172F52] capitalize">{selectedBooking.vehicleType.replace("_", " ")}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Vehicle Type</p>
+                <p className="text-sm text-[#0F1B2D] capitalize">{selectedBooking.vehicleType.replace("_", " ")}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 border-t border-[#F5F7FA] pt-4">
+            <div className="flex items-center gap-4 border-t border-[#F4F6F9] pt-4">
               <div>
-                <p className="text-xs text-[#6B7280]">Status</p>
+                <p className="text-xs text-[#5B6577]">Status</p>
                 <StatusBadge status={selectedBooking.bookingStatus} type="booking" />
               </div>
               <div>
-                <p className="text-xs text-[#6B7280]">Payment</p>
+                <p className="text-xs text-[#5B6577]">Payment</p>
                 <StatusBadge status={selectedBooking.paymentStatus} type="payment" />
               </div>
               <div className="ml-auto text-right">
-                <p className="text-xs text-[#6B7280]">Total</p>
-                <p className="text-lg font-bold text-[#172F52]">£{selectedBooking.total.toFixed(2)}</p>
+                <p className="text-xs text-[#5B6577]">Total</p>
+                <p className="text-lg font-bold text-[#0F1B2D]">£{selectedBooking.total.toFixed(2)}</p>
               </div>
             </div>
           </div>

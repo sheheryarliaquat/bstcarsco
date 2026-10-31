@@ -42,12 +42,12 @@ export function NotificationBell({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <button className="relative rounded-lg p-2 text-[#6B7280] transition-colors hover:bg-[#F5F7FA] hover:text-[#172033]" />
+          <button className="relative rounded-lg p-2 text-[#5B6577] transition-colors hover:bg-[#F4F6F9] hover:text-[#0F1B2D]" />
         }
       >
         <Bell className="h-5 w-5" />
         {count > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#D4145A] px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#1F4FD8] px-1 text-[10px] font-bold text-white">
             {count > 99 ? "99+" : count}
           </span>
         )}
@@ -58,7 +58,7 @@ export function NotificationBell({
           {count > 0 && (
             <button
               onClick={onMarkAllRead}
-              className="flex items-center gap-1 text-xs font-normal text-[#D4145A] hover:text-[#D4145A]/80"
+              className="flex items-center gap-1 text-xs font-normal text-[#1F4FD8] hover:text-[#1F4FD8]/80"
             >
               <CheckCheck className="h-3 w-3" />
               Mark all read
@@ -67,7 +67,7 @@ export function NotificationBell({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {notifications.length === 0 ? (
-          <div className="py-8 text-center text-sm text-[#6B7280]">
+          <div className="py-8 text-center text-sm text-[#5B6577]">
             No notifications
           </div>
         ) : (
@@ -77,17 +77,17 @@ export function NotificationBell({
               onClick={() => !n.read && onMarkAsRead?.(n.id)}
               className={cn(
                 "flex flex-col gap-0.5 py-2.5",
-                !n.read && "bg-[#D4145A]/5"
+                !n.read && "bg-[#1F4FD8]/5"
               )}
             >
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-medium text-[#172033]">{n.title}</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">{n.title}</p>
                 {!n.read && (
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#D4145A]" />
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#1F4FD8]" />
                 )}
               </div>
-              <p className="text-xs text-[#6B7280]">{n.message}</p>
-              <p className="text-[10px] text-[#6B7280]/70">
+              <p className="text-xs text-[#5B6577]">{n.message}</p>
+              <p className="text-[10px] text-[#5B6577]/70">
                 {formatDistanceToNow(new Date(n.createdAt), {
                   addSuffix: true,
                 })}

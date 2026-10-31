@@ -58,11 +58,11 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Admin Dashboard</h1>
-          <p className="text-sm text-[#6B7280]">Overview of platform activity and performance</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Admin Dashboard</h1>
+          <p className="text-sm text-[#5B6577]">Overview of platform activity and performance</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#6B7280]">Last updated: Just now</span>
+          <span className="text-xs text-[#5B6577]">Last updated: Just now</span>
           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
         </div>
       </div>
@@ -84,44 +84,44 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Bookings by Day */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#172F52]">Bookings by Day</h3>
-            <span className="text-xs text-[#6B7280]">This week</span>
+            <h3 className="text-base font-bold text-[#0F1B2D]">Bookings by Day</h3>
+            <span className="text-xs text-[#5B6577]">This week</span>
           </div>
           <div className="flex items-end gap-3 h-40">
             {BOOKINGS_BY_DAY.map((item) => (
               <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
-                <span className="text-xs font-semibold text-[#172F52]">{item.count}</span>
+                <span className="text-xs font-semibold text-[#0F1B2D]">{item.count}</span>
                 <div className="w-full flex justify-center">
                   <div
-                    className="w-full max-w-[36px] rounded-t-lg bg-[#D4145A] transition-all duration-500"
+                    className="w-full max-w-[36px] rounded-t-lg bg-[#1F4FD8] transition-all duration-500"
                     style={{ height: `${(item.count / maxBookings) * 120}px` }}
                   />
                 </div>
-                <span className="text-xs text-[#6B7280]">{item.day}</span>
+                <span className="text-xs text-[#5B6577]">{item.day}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Revenue by Day */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#172F52]">Revenue by Day</h3>
-            <span className="text-xs text-[#6B7280]">This week</span>
+            <h3 className="text-base font-bold text-[#0F1B2D]">Revenue by Day</h3>
+            <span className="text-xs text-[#5B6577]">This week</span>
           </div>
           <div className="flex items-end gap-3 h-40">
             {REVENUE_BY_DAY.map((item) => (
               <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
-                <span className="text-xs font-semibold text-[#172F52]">£{(item.amount / 1000).toFixed(1)}k</span>
+                <span className="text-xs font-semibold text-[#0F1B2D]">£{(item.amount / 1000).toFixed(1)}k</span>
                 <div className="w-full flex justify-center">
                   <div
-                    className="w-full max-w-[36px] rounded-t-lg bg-[#172F52] transition-all duration-500"
+                    className="w-full max-w-[36px] rounded-t-lg bg-[#0F1B2D] transition-all duration-500"
                     style={{ height: `${(item.amount / maxRevenue) * 120}px` }}
                   />
                 </div>
-                <span className="text-xs text-[#6B7280]">{item.day}</span>
+                <span className="text-xs text-[#5B6577]">{item.day}</span>
               </div>
             ))}
           </div>
@@ -131,40 +131,40 @@ export default function AdminDashboardPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Bookings */}
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Recent Bookings</h3>
-              <Link href="/admin/bookings" className="text-sm font-medium text-[#D4145A] hover:underline">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Recent Bookings</h3>
+              <Link href="/admin/bookings" className="text-sm font-medium text-[#1F4FD8] hover:underline">
                 View All
               </Link>
             </div>
             <div className="overflow-x-auto">
               {RECENT_BOOKINGS.length === 0 ? (
                 <div className="px-6 py-8 text-center">
-                  <p className="text-sm text-[#6B7280]">No recent bookings to display</p>
+                  <p className="text-sm text-[#5B6577]">No recent bookings to display</p>
                 </div>
               ) : (
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">ID</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Passenger</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Route</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Time</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Price</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
+                    <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Passenger</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Route</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Time</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Price</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {RECENT_BOOKINGS.map((booking) => (
-                      <tr key={booking.id} className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50">
-                        <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{booking.id}</td>
-                        <td className="px-4 py-3 text-[#172F52]">{booking.passenger}</td>
-                        <td className="max-w-[200px] truncate px-4 py-3 text-[#6B7280]">
+                      <tr key={booking.id} className="border-b border-[#F4F6F9] transition-colors last:border-0 hover:bg-[#F4F6F9]/50">
+                        <td className="px-4 py-3 font-mono text-xs font-medium text-[#0F1B2D]">{booking.id}</td>
+                        <td className="px-4 py-3 text-[#0F1B2D]">{booking.passenger}</td>
+                        <td className="max-w-[200px] truncate px-4 py-3 text-[#5B6577]">
                           {booking.pickup.split(",")[0]} → {booking.destination.split(",")[0]}
                         </td>
-                        <td className="px-4 py-3 text-[#6B7280]">{booking.time}</td>
-                        <td className="px-4 py-3 font-semibold text-[#172F52]">{booking.price}</td>
+                        <td className="px-4 py-3 text-[#5B6577]">{booking.time}</td>
+                        <td className="px-4 py-3 font-semibold text-[#0F1B2D]">{booking.price}</td>
                         <td className="px-4 py-3"><StatusBadge status={booking.status} type="booking" /></td>
                       </tr>
                     ))}
@@ -177,21 +177,21 @@ export default function AdminDashboardPage() {
 
         {/* Online Drivers + Alerts */}
         <div className="space-y-6">
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Online Drivers</h3>
-              <span className="text-xs text-[#6B7280]">{ONLINE_DRIVERS.length} active</span>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Online Drivers</h3>
+              <span className="text-xs text-[#5B6577]">{ONLINE_DRIVERS.length} active</span>
             </div>
-            <div className="divide-y divide-[#F5F7FA]">
+            <div className="divide-y divide-[#F4F6F9]">
               {ONLINE_DRIVERS.length === 0 ? (
                 <div className="px-6 py-8 text-center">
-                  <p className="text-sm text-[#6B7280]">No online drivers at the moment</p>
+                  <p className="text-sm text-[#5B6577]">No online drivers at the moment</p>
                 </div>
               ) : (
                 ONLINE_DRIVERS.map((driver) => (
                   <div key={driver.uid} className="flex items-center gap-3 px-6 py-3">
                     <div className="relative">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52] text-xs font-semibold text-white">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0F1B2D] text-xs font-semibold text-white">
                         {driver.firstName[0]}{driver.lastName[0]}
                       </div>
                       <span
@@ -201,7 +201,7 @@ export default function AdminDashboardPage() {
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-[#172F52]">
+                      <p className="truncate text-sm font-medium text-[#0F1B2D]">
                         {driver.firstName} {driver.lastName}
                       </p>
                       <RatingStars rating={driver.rating} size="sm" />
@@ -218,20 +218,20 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* System Alerts */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
               <div className="flex items-center gap-2">
-                <Bell className="h-4 w-4 text-[#D4145A]" />
-                <h3 className="text-base font-bold text-[#172F52]">System Alerts</h3>
+                <Bell className="h-4 w-4 text-[#1F4FD8]" />
+                <h3 className="text-base font-bold text-[#0F1B2D]">System Alerts</h3>
               </div>
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D4145A] text-[10px] font-bold text-white">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1F4FD8] text-[10px] font-bold text-white">
                 {SYSTEM_ALERTS.length}
               </span>
             </div>
-            <div className="divide-y divide-[#F5F7FA]">
+            <div className="divide-y divide-[#F4F6F9]">
               {SYSTEM_ALERTS.length === 0 ? (
                 <div className="px-6 py-8 text-center">
-                  <p className="text-sm text-[#6B7280]">No system alerts</p>
+                  <p className="text-sm text-[#5B6577]">No system alerts</p>
                 </div>
               ) : (
                 SYSTEM_ALERTS.map((alert) => (
@@ -244,8 +244,8 @@ export default function AdminDashboardPage() {
                       }`} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm text-[#172F52]">{alert.message}</p>
-                      <p className="mt-0.5 text-xs text-[#6B7280]">{alert.time}</p>
+                      <p className="text-sm text-[#0F1B2D]">{alert.message}</p>
+                      <p className="mt-0.5 text-xs text-[#5B6577]">{alert.time}</p>
                     </div>
                   </div>
                 ))
@@ -256,16 +256,16 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Operator Performance */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
-        <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-          <h3 className="text-base font-bold text-[#172F52]">Operator Performance</h3>
-          <Link href="/admin/operators" className="text-sm font-medium text-[#D4145A] hover:underline">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
+        <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+          <h3 className="text-base font-bold text-[#0F1B2D]">Operator Performance</h3>
+          <Link href="/admin/operators" className="text-sm font-medium text-[#1F4FD8] hover:underline">
             View All
           </Link>
         </div>
         <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="col-span-full text-center py-8">
-            <p className="text-sm text-[#6B7280]">No operators to display</p>
+            <p className="text-sm text-[#5B6577]">No operators to display</p>
           </div>
         </div>
       </div>

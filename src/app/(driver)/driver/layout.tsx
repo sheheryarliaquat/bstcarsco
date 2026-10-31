@@ -71,14 +71,14 @@ function DriverSidebarContent({
     <div className="flex h-full flex-col bg-white">
       <div className="px-5 pt-6 pb-4">
         <Link href="/driver/dashboard" className="flex items-center gap-2.5" onClick={onNavClick}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D4145A]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1F4FD8]">
             <Car className="h-5 w-5 text-white" />
           </div>
-          <span className="text-lg font-bold text-[#172F52]">Blue Star Airport Transfers LTD</span>
+          <span className="text-lg font-bold text-[#0F1B2D]">Blue Star Airport Transfers LTD</span>
         </Link>
       </div>
 
-      <div className="mx-5 mb-4 rounded-xl bg-[#F5F7FA] p-4">
+      <div className="mx-5 mb-4 rounded-xl bg-[#F4F6F9] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span
@@ -87,7 +87,7 @@ function DriverSidebarContent({
                 isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"
               )}
             />
-            <span className="text-sm font-medium text-[#172F52]">
+            <span className="text-sm font-medium text-[#0F1B2D]">
               {isOnline ? "Online" : "Offline"}
             </span>
           </div>
@@ -115,14 +115,14 @@ function DriverSidebarContent({
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-[#D4145A]/10 text-[#D4145A]"
-                      : "text-[#6B7280] hover:bg-[#F5F7FA] hover:text-[#172F52]"
+                      ? "bg-[#1F4FD8]/10 text-[#1F4FD8]"
+                      : "text-[#5B6577] hover:bg-[#F4F6F9] hover:text-[#0F1B2D]"
                   )}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <span className="flex-1">{item.label}</span>
                   {isActive && (
-                    <ChevronRight className="h-4 w-4 shrink-0 text-[#D4145A]" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-[#1F4FD8]" />
                   )}
                 </Link>
               </li>
@@ -136,7 +136,7 @@ function DriverSidebarContent({
       <div className="px-3 py-3">
         <button
           onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6B7280] transition-colors hover:bg-red-50 hover:text-red-600"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#5B6577] transition-colors hover:bg-red-50 hover:text-red-600"
         >
           <LogOut className="h-5 w-5 shrink-0" />
           <span>Logout</span>
@@ -147,15 +147,15 @@ function DriverSidebarContent({
 
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
-          <AvatarFallback className="bg-[#172F52] text-sm font-semibold text-white">
+          <AvatarFallback className="bg-[#0F1B2D] text-sm font-semibold text-white">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[#172F52]">
+          <p className="truncate text-sm font-semibold text-[#0F1B2D]">
             {displayName}
           </p>
-          <p className="truncate text-[11px] text-[#6B7280]">
+          <p className="truncate text-[11px] text-[#5B6577]">
             {email}
           </p>
         </div>
@@ -166,8 +166,8 @@ function DriverSidebarContent({
 
 function FullScreenLoader() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
-      <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+    <div className="flex min-h-screen items-center justify-center bg-[#F4F6F9]">
+      <Loader2 className="h-8 w-8 animate-spin text-[#1F4FD8]" />
     </div>
   )
 }
@@ -220,7 +220,7 @@ export default function DriverLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#F5F7FA]">
+    <div className="flex min-h-screen bg-[#F4F6F9]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r border-[#E5E7EB]">
         <DriverSidebarContent
@@ -236,7 +236,7 @@ export default function DriverLayout({
           <SheetTrigger
             render={
               <Button variant="ghost" size="icon" className="shrink-0">
-                <Menu className="h-5 w-5 text-[#172F52]" />
+                <Menu className="h-5 w-5 text-[#0F1B2D]" />
                 <span className="sr-only">Open menu</span>
               </Button>
             }
@@ -253,10 +253,10 @@ export default function DriverLayout({
         </Sheet>
 
         <Link href="/driver/dashboard" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4145A]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1F4FD8]">
             <Car className="h-4 w-4 text-white" />
           </div>
-          <span className="font-bold text-[#172F52]">Blue Star Airport Transfers LTD</span>
+          <span className="font-bold text-[#0F1B2D]">Blue Star Airport Transfers LTD</span>
         </Link>
 
         <div className="ml-auto flex items-center gap-2">
@@ -267,7 +267,7 @@ export default function DriverLayout({
             )}
           />
           <Link href="/driver/notifications" className="relative">
-            <Bell className="h-5 w-5 text-[#6B7280]" />
+            <Bell className="h-5 w-5 text-[#5B6577]" />
           </Link>
         </div>
       </div>

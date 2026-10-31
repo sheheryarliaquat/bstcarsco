@@ -96,11 +96,11 @@ export default function OperatorDriversPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Drivers</h1>
-          <p className="text-sm text-[#6B7280]">Manage your fleet drivers and their documents.</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Drivers</h1>
+          <p className="text-sm text-[#5B6577]">Manage your fleet drivers and their documents.</p>
         </div>
         <Button
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
           onClick={() => setAddModalOpen(true)}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -111,7 +111,7 @@ export default function OperatorDriversPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -127,8 +127,8 @@ export default function OperatorDriversPage() {
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                 statusFilter === f
-                  ? "bg-[#172F52] text-white"
-                  : "bg-white text-[#6B7280] hover:bg-[#F5F7FA] border border-[#D9E0E8]"
+                  ? "bg-[#0F1B2D] text-white"
+                  : "bg-white text-[#5B6577] hover:bg-[#F4F6F9] border border-[#E2E6EC]"
               )}
             >
               {f}
@@ -156,12 +156,12 @@ export default function OperatorDriversPage() {
             return (
               <div
                 key={driver.uid}
-                className="rounded-xl border border-[#D9E0E8] bg-white p-5 transition-shadow hover:shadow-md"
+                className="rounded-xl border border-[#E2E6EC] bg-white p-5 transition-shadow hover:shadow-md"
               >
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#172F52] text-sm font-bold text-white">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0F1B2D] text-sm font-bold text-white">
                         {driver.firstName[0]}{driver.lastName[0]}
                       </div>
                       <span
@@ -176,7 +176,7 @@ export default function OperatorDriversPage() {
                       />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#172F52]">
+                      <p className="text-sm font-bold text-[#0F1B2D]">
                         {driver.firstName} {driver.lastName}
                       </p>
                       <RatingStars rating={driver.rating} size="sm" count={driver.totalReviews} />
@@ -186,15 +186,15 @@ export default function OperatorDriversPage() {
                 </div>
 
                 <div className="mb-4 space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-[#6B7280]">
+                  <div className="flex items-center gap-2 text-[#5B6577]">
                     <Phone className="h-3.5 w-3.5" />
                     <span>{driver.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[#6B7280]">
+                  <div className="flex items-center gap-2 text-[#5B6577]">
                     <Mail className="h-3.5 w-3.5" />
                     <span className="truncate">{driver.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[#6B7280]">
+                  <div className="flex items-center gap-2 text-[#5B6577]">
                     <Car className="h-3.5 w-3.5" />
                     <span>
                       {vehicle
@@ -204,7 +204,7 @@ export default function OperatorDriversPage() {
                   </div>
                 </div>
 
-                <div className="mb-4 flex items-center gap-4 border-t border-[#F5F7FA] pt-3">
+                <div className="mb-4 flex items-center gap-4 border-t border-[#F4F6F9] pt-3">
                   <div className="flex items-center gap-1.5">
                     <Badge
                       className={cn(
@@ -223,18 +223,18 @@ export default function OperatorDriversPage() {
                         : "Offline"}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-[#6B7280]">
+                  <div className="flex items-center gap-1 text-xs text-[#5B6577]">
                     <Clock className="h-3 w-3" />
                     <span>{tripsToday} trips today</span>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1 border-[#D9E0E8]">
+                  <Button size="sm" variant="outline" className="flex-1 border-[#E2E6EC]">
                     <Eye className="mr-1 h-3 w-3" />
                     Profile
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1 border-[#D9E0E8]">
+                  <Button size="sm" variant="outline" className="flex-1 border-[#E2E6EC]">
                     <Edit className="mr-1 h-3 w-3" />
                     Edit
                   </Button>
@@ -270,7 +270,7 @@ export default function OperatorDriversPage() {
         <div className="space-y-4 pt-2">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">First Name</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">First Name</label>
               <Input
                 value={newDriver.firstName}
                 onChange={(e) => setNewDriver((p) => ({ ...p, firstName: e.target.value }))}
@@ -278,7 +278,7 @@ export default function OperatorDriversPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Last Name</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Last Name</label>
               <Input
                 value={newDriver.lastName}
                 onChange={(e) => setNewDriver((p) => ({ ...p, lastName: e.target.value }))}
@@ -287,7 +287,7 @@ export default function OperatorDriversPage() {
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Email Address</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Email Address</label>
             <Input
               type="email"
               value={newDriver.email}
@@ -296,7 +296,7 @@ export default function OperatorDriversPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Phone Number</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Phone Number</label>
             <Input
               type="tel"
               value={newDriver.phone}
@@ -305,7 +305,7 @@ export default function OperatorDriversPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Licence Number</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Licence Number</label>
             <Input
               value={newDriver.licenceNumber}
               onChange={(e) => setNewDriver((p) => ({ ...p, licenceNumber: e.target.value }))}
@@ -313,11 +313,11 @@ export default function OperatorDriversPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Assign Vehicle</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Assign Vehicle</label>
             <select
               value={newDriver.vehicleId}
               onChange={(e) => setNewDriver((p) => ({ ...p, vehicleId: e.target.value }))}
-              className="flex h-9 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A] focus:ring-2 focus:ring-[#D4145A]/20"
+              className="flex h-9 w-full rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8] focus:ring-2 focus:ring-[#1F4FD8]/20"
             >
               <option value="">Select a vehicle...</option>
               {DEMO_DATA.vehicles.map((v) => (
@@ -327,12 +327,12 @@ export default function OperatorDriversPage() {
               ))}
             </select>
           </div>
-          <div className="flex justify-end gap-2 border-t border-[#F5F7FA] pt-4">
-            <Button variant="outline" className="border-[#D9E0E8]" onClick={() => setAddModalOpen(false)}>
+          <div className="flex justify-end gap-2 border-t border-[#F4F6F9] pt-4">
+            <Button variant="outline" className="border-[#E2E6EC]" onClick={() => setAddModalOpen(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
               onClick={handleAddDriver}
             >
               <Plus className="mr-2 h-4 w-4" />

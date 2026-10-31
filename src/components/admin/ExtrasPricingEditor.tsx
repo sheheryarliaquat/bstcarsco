@@ -49,13 +49,13 @@ export function ExtrasPricingEditor() {
   }
 
   return (
-    <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+    <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-bold text-[#172F52]">Extras customers can add</h3>
-          <p className="text-xs text-[#6B7280]">Shown with the price on the booking page. Leave at 0 to offer it free.</p>
+          <h3 className="text-base font-bold text-[#0F1B2D]">Extras customers can add</h3>
+          <p className="text-xs text-[#5B6577]">Shown with the price on the booking page. Leave at 0 to offer it free.</p>
         </div>
-        <Button onClick={save} disabled={!dirty || saving} className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+        <Button onClick={save} disabled={!dirty || saving} className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
           <Save className="mr-1.5 h-4 w-4" />
           {saving ? "Saving..." : dirty ? "Save extras" : "Saved"}
         </Button>
@@ -67,9 +67,9 @@ export function ExtrasPricingEditor() {
       )}
       <div className="grid gap-4 sm:grid-cols-3">
         {FIELDS.map((f) => (
-          <label key={f.key} className="block rounded-lg bg-[#F5F7FA] p-4">
-            <span className="flex items-center gap-2 text-sm font-semibold text-[#172F52]">
-              <f.icon className="h-4 w-4 text-[#D4145A]" />
+          <label key={f.key} className="block rounded-lg bg-[#F4F6F9] p-4">
+            <span className="flex items-center gap-2 text-sm font-semibold text-[#0F1B2D]">
+              <f.icon className="h-4 w-4 text-[#1F4FD8]" />
               {f.label} ({f.unit})
             </span>
             <Input
@@ -84,7 +84,7 @@ export function ExtrasPricingEditor() {
               }}
               className="mt-2 h-9 bg-white"
             />
-            <span className="mt-1.5 block text-xs text-[#6B7280]">{f.hint}</span>
+            <span className="mt-1.5 block text-xs text-[#5B6577]">{f.hint}</span>
           </label>
         ))}
       </div>

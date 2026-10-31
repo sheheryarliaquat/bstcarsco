@@ -58,27 +58,27 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col bg-white">
       <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D4145A]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1F4FD8]">
           <Car className="h-5 w-5 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-[#172F52]">Blue Star Airport Transfers LTD</p>
-          <p className="text-[10px] text-[#6B7280]">Operator Portal</p>
+          <p className="text-sm font-bold text-[#0F1B2D]">Blue Star Airport Transfers LTD</p>
+          <p className="text-[10px] text-[#5B6577]">Operator Portal</p>
         </div>
       </div>
 
-      <Separator className="bg-[#F5F7FA]" />
+      <Separator className="bg-[#F4F6F9]" />
 
-      <div className="mx-4 mt-4 rounded-xl bg-[#172F52]/5 p-3">
+      <div className="mx-4 mt-4 rounded-xl bg-[#0F1B2D]/5 p-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52] text-white text-xs font-bold">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D] text-white text-xs font-bold">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-[#172F52]">
+            <p className="truncate text-sm font-semibold text-[#0F1B2D]">
               {displayName}
             </p>
-            <p className="text-[10px] text-[#6B7280]">Operator account</p>
+            <p className="text-[10px] text-[#5B6577]">Operator account</p>
           </div>
         </div>
       </div>
@@ -95,8 +95,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-[#D4145A]/10 text-[#D4145A]"
-                  : "text-[#6B7280] hover:bg-[#F5F7FA] hover:text-[#172F52]"
+                  ? "bg-[#1F4FD8]/10 text-[#1F4FD8]"
+                  : "text-[#5B6577] hover:bg-[#F4F6F9] hover:text-[#0F1B2D]"
               )}
             >
               <item.icon className="h-[18px] w-[18px]" />
@@ -109,7 +109,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <Separator className="bg-[#F5F7FA]" />
+      <Separator className="bg-[#F4F6F9]" />
 
       <div className="px-3 py-3">
         <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#DC2626] transition-colors hover:bg-red-50">
@@ -118,19 +118,19 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </button>
       </div>
 
-      <Separator className="bg-[#F5F7FA]" />
+      <Separator className="bg-[#F4F6F9]" />
 
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
-          <AvatarFallback className="bg-[#172F52] text-xs font-semibold text-white">
+          <AvatarFallback className="bg-[#0F1B2D] text-xs font-semibold text-white">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[#172F52]">
+          <p className="truncate text-sm font-semibold text-[#0F1B2D]">
             {displayName}
           </p>
-          <p className="truncate text-[11px] text-[#6B7280]">
+          <p className="truncate text-[11px] text-[#5B6577]">
             {email}
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function OperatorLayout({
   const [sheetOpen, setSheetOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-[#F5F7FA]">
+    <div className="flex min-h-screen bg-[#F4F6F9]">
       {/* Desktop sidebar */}
       <aside className="hidden w-72 shrink-0 border-r border-[#E5E7EB] lg:fixed lg:inset-y-0 lg:z-50 lg:block">
         <SidebarContent />
@@ -161,7 +161,7 @@ export default function OperatorLayout({
               <SheetTrigger
                 render={
                   <Button variant="ghost" size="icon" className="shrink-0">
-                    <Menu className="h-5 w-5 text-[#172F52]" />
+                    <Menu className="h-5 w-5 text-[#0F1B2D]" />
                     <span className="sr-only">Open menu</span>
                   </Button>
                 }
@@ -172,14 +172,14 @@ export default function OperatorLayout({
               </SheetContent>
             </Sheet>
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4145A]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1F4FD8]">
                 <Car className="h-4 w-4 text-white" />
               </div>
-              <span className="font-bold text-[#172F52]">Blue Star Airport Transfers LTD</span>
+              <span className="font-bold text-[#0F1B2D]">Blue Star Airport Transfers LTD</span>
             </div>
           </div>
           <Link href="/operator/notifications" className="relative">
-            <Bell className="h-5 w-5 text-[#6B7280]" />
+            <Bell className="h-5 w-5 text-[#5B6577]" />
           </Link>
         </div>
 

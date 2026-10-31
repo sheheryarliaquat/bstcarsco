@@ -1,21 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  MapPin,
-  ArrowUpDown,
-  Calendar,
-  Clock,
-  Users,
-  Briefcase,
-  Plane,
-  Baby,
-  Accessibility,
-  UserCheck,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Accessibility, Baby, Calendar, Clock, Plane, UserCheck } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
@@ -25,11 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import { LocationAutocomplete } from "./LocationAutocomplete"
 import type { Location, TripType, SpecialRequirements } from "@/types"
 import { format } from "date-fns"
@@ -59,42 +43,40 @@ export interface BookingSearchParams {
 
 interface BookingSearchProps {
   onSearch?: (params: BookingSearchParams) => void
-  compact?: boolean
+  /** Pre-fill the form, e.g. with the current search on the car selection page. */
+  initial?: Partial<BookingSearchParams>
+  className?: string
 }
 
-export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
-  const router = useRouter()
-  const [pickup, setPickup] = useState<Location | null>(null)
-  const [pickupText, setPickupText] = useState("")
-  const [destination, setDestination] = useState<Location | null>(null)
-  const [destinationText, setDestinationText] = useState("")
-  const [tripType, setTripType] = useState<TripType>("one_way")
-  const [date, setDate] = useState<Date | undefined>(undefined)
-  const [time, setTime] = useState("09:00")
-  const [passengers, setPassengers] = useState(1)
-  const [luggage, setLuggage] = useState(1)
-  const [childSeat, setChildSeat] = useState(false)
-  const [wheelchair, setWheelchair] = useState(false)
-  const [meetGreet, setMeetGreet] = useState(false)
-  const [flightNumber, setFlightNumber] = useState("")
-  const [dateOpen, setDateOpen] = useState(false)
+const LABEL = "mb-1.5 block text-[13px] font-semibold text-[#4A5568]"
+const FIELD =
+  "flex h-12 w-full items-center gap-2 rounded-[10px] border border-[#CBD2DC] bg-white px-3 text-left text-[15px] text-[#0F1B2D] transition-colors hover:border-[#0F1B2D]/40 focus:border-[#1F4FD8] focus:outline-none"
 
-  useEffect(() => {
-    setDate(new Date())
-  }, [])
+export function BookingSearch({ onSearch, initial, className }: BookingSearchProps) {
+  const router = useRouter()
+  const [pickup, setPickup] = useState<Location | null>(initial?.pickup ?? null)
+  const [pickupText, setPickupText] = useState(initial?.pickup?.formattedAddress ?? "")
+  const [destination, setDestination] = useState<Location | null>(initial?.destination ?? null)
+  const [destinationText, setDestinationText] = useState(initial?.destination?.formattedAddress ?? "")
+  const tripType: TripType = initial?.tripType ?? "one_way"
+  const [date, setDate] = useState<Date | undefined>(() => initial?.date ?? new Date())
+  const [time, setTime] = useState(initial?.time ?? "09:00")
+  const [passengers, setPassengers] = useState(initial?.passengers ?? 1)
+  const [luggage, setLuggage] = useState(initial?.luggage ?? 1)
+  const [childSeat, setChildSeat] = useState(initial?.specialRequirements?.childSeat ?? false)
+  const [wheelchair, setWheelchair] = useState(initial?.specialRequirements?.wheelchairAccessible ?? false)
+  const [meetGreet, setMeetGreet] = useState(initial?.specialRequirements?.meetAndGreet ?? false)
+  const [flightNumber, setFlightNumber] = useState(initial?.specialRequirements?.flightNumber ?? "")
+  const [dateOpen, setDateOpen] = useState(false)
 
   const isAirport =
     destination?.formattedAddress?.toLowerCase().includes("airport") ||
     pickup?.formattedAddress?.toLowerCase().includes("airport")
 
-  function swapLocations() {
-    setPickup(destination)
-    setPickupText(destinationText)
-    setDestination(pickup)
-    setDestinationText(pickupText)
-  }
+  const ready = Boolean(pickup && destination)
 
   function handleSearch() {
+    if (!ready) return
     if (onSearch) {
       onSearch({
         pickup,
@@ -108,7 +90,7 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
           childSeat,
           wheelchairAccessible: wheelchair,
           meetAndGreet: meetGreet,
-          flightNumber: isAirport ? flightNumber : undefined,
+          ...(isAirport && flightNumber.trim() && { flightNumber: flightNumber.trim().toUpperCase() }),
         },
       })
       return
@@ -141,89 +123,46 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
   }
 
   return (
-    <div className="w-full rounded-2xl bg-white p-4 shadow-lg ring-1 ring-black/5 sm:p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <h2 className="text-lg font-bold text-[#172F52]">
-          Book Your Journey
-        </h2>
-      </div>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleSearch()
+      }}
+      className={cn(
+        "w-full rounded-2xl bg-white p-4 text-left shadow-[0_12px_32px_rgba(15,27,45,0.12)] sm:p-5",
+        className
+      )}
+    >
+      <div className="grid grid-cols-2 items-end gap-3.5 lg:grid-cols-6">
+        <LocationAutocomplete
+          id="pickup"
+          label="Pick-up address or postcode"
+          value={pickupText}
+          onChange={setPickupText}
+          onLocationSelect={setPickup}
+          placeholder="e.g. SW1A 2AA or 10 Downing Street"
+          icon="MapPin"
+          geoButton="icon"
+          className="col-span-2"
+        />
+        <LocationAutocomplete
+          id="destination"
+          label="Drop-off"
+          value={destinationText}
+          onChange={setDestinationText}
+          onLocationSelect={setDestination}
+          placeholder="e.g. Heathrow Terminal 5"
+          icon="Plane"
+          geoButton="icon"
+          className="col-span-2"
+        />
 
-      <div className="mb-4 flex gap-2">
-        <Button
-          variant={tripType === "one_way" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setTripType("one_way")}
-          className={
-            tripType === "one_way"
-              ? "bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-              : ""
-          }
-        >
-          One Way
-        </Button>
-        <Button
-          variant={tripType === "return" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setTripType("return")}
-          className={
-            tripType === "return"
-              ? "bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-              : ""
-          }
-        >
-          Return
-        </Button>
-      </div>
-
-      <div className="relative mb-4">
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <LocationAutocomplete
-              id="pickup"
-              label="Pickup Location"
-              value={pickupText}
-              onChange={setPickupText}
-              onLocationSelect={setPickup}
-              placeholder="Enter pickup address"
-              icon="MapPin"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={swapLocations}
-            className="mt-7 flex h-10 w-10 shrink-0 items-center justify-center self-start rounded-full border border-[#D9E0E8] text-[#6B7280] transition-colors hover:bg-[#F5F7FA] hover:text-[#D4145A]"
-          >
-            <ArrowUpDown className="h-4 w-4" />
-          </button>
-          <div className="flex-1">
-            <LocationAutocomplete
-              id="destination"
-              label="Destination"
-              value={destinationText}
-              onChange={setDestinationText}
-              onLocationSelect={setDestination}
-              placeholder="Enter destination"
-              icon="MapPin"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
-            Date
-          </label>
+          <span className={LABEL} id="date-label">Date</span>
           <Popover open={dateOpen} onOpenChange={setDateOpen}>
-            <PopoverTrigger
-              render={
-                <button className="flex h-11 w-full items-center gap-2 rounded-lg border border-[#D9E0E8] px-3 text-left text-sm transition-colors hover:border-[#172F52]/30 focus:border-[#D4145A] focus:outline-none" />
-              }
-            >
-              <Calendar className="h-4 w-4 text-[#6B7280]" />
-              <span className={date ? "text-[#172033]" : "text-[#6B7280]"}>
-                {date ? format(date, "dd MMM yyyy") : "Select date"}
-              </span>
+            <PopoverTrigger render={<button type="button" aria-labelledby="date-label" className={FIELD} />}>
+              <Calendar className="h-4 w-4 shrink-0 text-[#5B6577]" />
+              <span suppressHydrationWarning className={date ? "" : "text-[#5B6577]"}>{date ? format(date, "dd MMM yyyy") : "Select date"}</span>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" side="bottom">
               <CalendarComponent
@@ -240,12 +179,10 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
-            Time
-          </label>
+          <span className={LABEL} id="time-label">Pick-up time</span>
           <Select value={time} onValueChange={(v) => v && setTime(v)}>
-            <SelectTrigger className="h-11 w-full">
-              <Clock className="mr-1.5 h-4 w-4 text-[#6B7280]" />
+            <SelectTrigger aria-labelledby="time-label" className="h-12 w-full rounded-[10px] border-[#CBD2DC] text-[15px] data-[size=default]:h-12">
+              <Clock className="mr-1.5 h-4 w-4 text-[#5B6577]" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -259,21 +196,15 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
-            Passengers
-          </label>
-          <Select
-            value={String(passengers)}
-            onValueChange={(v) => v && setPassengers(Number(v))}
-          >
-            <SelectTrigger className="h-11 w-full">
-              <Users className="mr-1.5 h-4 w-4 text-[#6B7280]" />
+          <span className={LABEL} id="pax-label">Passengers</span>
+          <Select value={String(passengers)} onValueChange={(v) => v && setPassengers(Number(v))}>
+            <SelectTrigger aria-labelledby="pax-label" className="h-12 w-full rounded-[10px] border-[#CBD2DC] text-[15px] data-[size=default]:h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => (
+              {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
                 <SelectItem key={n} value={String(n)}>
-                  {n} {n === 1 ? "Passenger" : "Passengers"}
+                  {n}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -281,82 +212,71 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
-            Luggage
-          </label>
-          <Select
-            value={String(luggage)}
-            onValueChange={(v) => v && setLuggage(Number(v))}
-          >
-            <SelectTrigger className="h-11 w-full">
-              <Briefcase className="mr-1.5 h-4 w-4 text-[#6B7280]" />
+          <span className={LABEL} id="bags-label">Suitcases</span>
+          <Select value={String(luggage)} onValueChange={(v) => v && setLuggage(Number(v))}>
+            <SelectTrigger aria-labelledby="bags-label" className="h-12 w-full rounded-[10px] border-[#CBD2DC] text-[15px] data-[size=default]:h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({ length: 9 }, (_, i) => i).map((n) => (
+              {Array.from({ length: 13 }, (_, i) => i).map((n) => (
                 <SelectItem key={n} value={String(n)}>
-                  {n} {n === 1 ? "Bag" : "Bags"}
+                  {n}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-      </div>
 
-      {isAirport && (
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
-            Flight Number (optional)
+        <div className={isAirport ? "col-span-2" : "hidden"}>
+          <label htmlFor="flight" className={LABEL}>
+            Flight number (optional)
           </label>
           <div className="relative">
-            <Plane className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
-            <Input
+            <Plane className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" aria-hidden="true" />
+            <input
+              id="flight"
               value={flightNumber}
               onChange={(e) => setFlightNumber(e.target.value)}
-              placeholder="e.g. BA117"
-              className="h-11 pl-10"
+              placeholder="e.g. BA 117"
+              className={cn(FIELD, "pl-9 uppercase placeholder:normal-case")}
             />
           </div>
         </div>
-      )}
 
-      <div className="mb-5 flex flex-wrap gap-4">
-        <label className="flex items-center gap-2 text-sm text-[#172033]">
-          <Checkbox checked={childSeat} onCheckedChange={(c) => setChildSeat(c === true)} />
-          <Baby className="h-4 w-4 text-[#6B7280]" />
-          Child Seat
-        </label>
-        <label className="flex items-center gap-2 text-sm text-[#172033]">
-          <Checkbox
-            checked={wheelchair}
-            onCheckedChange={(c) => setWheelchair(c === true)}
-          />
-          <Accessibility className="h-4 w-4 text-[#6B7280]" />
-          Wheelchair
-        </label>
-        <label className="flex items-center gap-2 text-sm text-[#172033]">
-          <Checkbox
-            checked={meetGreet}
-            onCheckedChange={(c) => setMeetGreet(c === true)}
-          />
-          <UserCheck className="h-4 w-4 text-[#6B7280]" />
-          Meet &amp; Greet
-        </label>
+        <button
+          type="submit"
+          disabled={!ready}
+          className={cn(
+            "col-span-2 h-12 rounded-[10px] bg-[#F2B233] text-base font-bold text-[#0F1B2D] transition-colors hover:bg-[#E5A41F] disabled:cursor-not-allowed disabled:opacity-60",
+            isAirport ? "lg:col-span-2" : "lg:col-span-4"
+          )}
+        >
+          Get prices
+        </button>
       </div>
 
-      <Button
-        onClick={handleSearch}
-        disabled={!pickup || !destination}
-        className="h-12 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <MapPin className="mr-2 h-5 w-5" />
-        Get prices
-      </Button>
-      {(!pickup || !destination) && (pickupText || destinationText) && (
-        <p className="text-center text-xs text-[#6B7280]">
-          Select a pickup and destination from the suggestions to continue.
-        </p>
-      )}
-    </div>
+      <div className="mt-3.5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#0F1B2D]">
+        <label className="flex items-center gap-2">
+          <Checkbox checked={meetGreet} onCheckedChange={(c) => setMeetGreet(c === true)} />
+          <UserCheck className="h-4 w-4 text-[#5B6577]" aria-hidden="true" />
+          Meet &amp; greet
+        </label>
+        <label className="flex items-center gap-2">
+          <Checkbox checked={childSeat} onCheckedChange={(c) => setChildSeat(c === true)} />
+          <Baby className="h-4 w-4 text-[#5B6577]" aria-hidden="true" />
+          Child seat
+        </label>
+        <label className="flex items-center gap-2">
+          <Checkbox checked={wheelchair} onCheckedChange={(c) => setWheelchair(c === true)} />
+          <Accessibility className="h-4 w-4 text-[#5B6577]" aria-hidden="true" />
+          Wheelchair accessible
+        </label>
+        {!ready && (pickupText || destinationText) && (
+          <span className="text-xs text-[#5B6577] sm:ml-auto">
+            Choose your pick-up and drop-off from the suggestions to continue.
+          </span>
+        )}
+      </div>
+    </form>
   )
 }

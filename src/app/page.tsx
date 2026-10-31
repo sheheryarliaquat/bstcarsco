@@ -118,44 +118,39 @@ const TESTIMONIALS = [
 export default function HomePage() {
   return (
     <PublicLayout>
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#172F52] to-[#102544] px-4 pb-24 pt-16 sm:px-6 sm:pb-32 sm:pt-24 lg:px-8">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_1.25fr]">
-          <div className="text-center lg:text-left">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white">
-              <Plane className="h-4 w-4" /> Heathrow · Gatwick · Stansted · Luton · Manchester
-            </p>
-            <h1 className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Airport transfers across the UK
-            </h1>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-gray-300 sm:text-xl lg:mx-0">
-              Fixed prices you see before you book. Licensed drivers, meet &amp; greet and child seats
-              available.
-            </p>
-            <ul className="mx-auto mt-6 grid max-w-md gap-3 text-left text-sm text-white sm:grid-cols-2 lg:mx-0">
-              {[
-                "Fixed fare, no surprises",
-                "Licensed, vetted drivers",
-                "Free cancellation up to 2 hours",
-                "Book online in two minutes",
-              ].map((point) => (
-                <li key={point} className="flex items-center gap-2">
-                  <BadgeCheck className="h-5 w-5 shrink-0 text-[#F2B233]" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="text-left">
-            <BookingSearch />
-          </div>
+      <section className="bg-[#0F1B2D] px-4 pb-28 pt-12 sm:px-6 sm:pt-16 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Airport transfers across the UK
+          </h1>
+          <p className="mt-3 max-w-2xl text-lg text-[#C9D2E0]">
+            Fixed fares you see before you book. Licensed drivers, meet &amp; greet and child seats on request.
+          </p>
+        </div>
+      </section>
+      <section className="relative z-10 -mt-20 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <BookingSearch />
+          <ul className="mt-5 flex flex-wrap gap-x-8 gap-y-2 text-sm font-medium text-[#0F1B2D]">
+            {[
+              "Fixed fare, no surge pricing",
+              "Licensed, vetted drivers",
+              "Free cancellation up to 2 hours before",
+              "Heathrow, Gatwick, Stansted, Luton & Manchester",
+            ].map((point) => (
+              <li key={point} className="flex items-center gap-2">
+                <BadgeCheck className="h-5 w-5 shrink-0 text-[#1E6B44]" aria-hidden="true" />
+                {point}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">How It Works</h2>
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">How It Works</h2>
             <p className="mt-2 text-gray-600">
               Book your car in four simple steps
             </p>
@@ -163,13 +158,13 @@ export default function HomePage() {
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {HOW_IT_WORKS_STEPS.map((step, i) => (
               <div key={step.title} className="relative text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#D4145A] text-white">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1F4FD8] text-white">
                   <step.icon className="h-8 w-8" />
                 </div>
-                <div className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52] text-sm font-bold text-white">
+                <div className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#0F1B2D] text-sm font-bold text-white">
                   {i + 1}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[#172F52]">
+                <h3 className="mt-4 text-lg font-semibold text-[#0F1B2D]">
                   {step.title}
                 </h3>
                 <p className="mt-2 text-sm text-gray-600">
@@ -184,7 +179,7 @@ export default function HomePage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Popular Airport Transfers
             </h2>
             <p className="mt-2 text-gray-600">
@@ -196,11 +191,11 @@ export default function HomePage() {
               <Link key={airport.code} href="/airport-transfers">
                 <Card className="transition-shadow hover:shadow-lg">
                   <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
-                    <Plane className="h-10 w-10 text-[#D4145A]" />
-                    <span className="text-2xl font-bold text-[#172F52]">
+                    <Plane className="h-10 w-10 text-[#1F4FD8]" />
+                    <span className="text-2xl font-bold text-[#0F1B2D]">
                       {airport.code}
                     </span>
-                    <span className="text-sm font-medium text-[#172F52]">
+                    <span className="text-sm font-medium text-[#0F1B2D]">
                       {airport.name}
                     </span>
                     <span className="text-xs text-gray-500">
@@ -214,10 +209,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Why Choose Us
             </h2>
             <p className="mt-2 text-gray-600">
@@ -230,10 +225,10 @@ export default function HomePage() {
                 key={feature.title}
                 className="rounded-xl bg-white p-6 text-center shadow-sm ring-1 ring-black/5"
               >
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#FCE7EF]">
-                  <feature.icon className="h-7 w-7 text-[#D4145A]" />
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E7EEFF]">
+                  <feature.icon className="h-7 w-7 text-[#1F4FD8]" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[#172F52]">
+                <h3 className="mt-4 text-lg font-semibold text-[#0F1B2D]">
                   {feature.title}
                 </h3>
                 <p className="mt-2 text-sm text-gray-600">
@@ -248,7 +243,7 @@ export default function HomePage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Areas We Cover
             </h2>
             <p className="mt-2 text-gray-600">
@@ -260,10 +255,10 @@ export default function HomePage() {
               <Link
                 key={region}
                 href="/areas-we-cover"
-                className="group flex items-center gap-3 rounded-xl border border-[#D9E0E8] bg-white p-4 transition-colors hover:border-[#D4145A] hover:bg-[#FCE7EF]"
+                className="group flex items-center gap-3 rounded-xl border border-[#E2E6EC] bg-white p-4 transition-colors hover:border-[#1F4FD8] hover:bg-[#E7EEFF]"
               >
-                <MapPin className="h-5 w-5 text-[#D4145A]" />
-                <span className="text-sm font-medium text-[#172F52] group-hover:text-[#D4145A]">
+                <MapPin className="h-5 w-5 text-[#1F4FD8]" />
+                <span className="text-sm font-medium text-[#0F1B2D] group-hover:text-[#1F4FD8]">
                   {region}
                 </span>
               </Link>
@@ -272,10 +267,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               What Our Passengers Say
             </h2>
             <p className="mt-2 text-gray-600">
@@ -292,17 +287,17 @@ export default function HomePage() {
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <Star
                       key={i}
-                      className="h-4 w-4 fill-[#D4145A] text-[#D4145A]"
+                      className="h-4 w-4 fill-[#1F4FD8] text-[#1F4FD8]"
                     />
                   ))}
                 </div>
                 <p className="mt-4 text-sm text-gray-600">&ldquo;{t.text}&rdquo;</p>
                 <div className="mt-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#172F52] text-sm font-bold text-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F1B2D] text-sm font-bold text-white">
                     {t.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#172F52]">
+                    <p className="text-sm font-semibold text-[#0F1B2D]">
                       {t.name}
                     </p>
                     <p className="text-xs text-gray-500">{t.location}</p>
@@ -314,7 +309,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-r from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             Ready to Book Your Journey?
@@ -326,8 +321,8 @@ export default function HomePage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               size="lg"
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-              render={<Link href="/book" />}
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
+              render={<Link href="/" />}
               nativeButton={false}
             >
               <Car className="mr-2 h-5 w-5" />

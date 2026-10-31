@@ -107,8 +107,8 @@ export default function AdminReviewsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Reviews</h1>
-          <p className="text-sm text-[#6B7280]">Moderate and manage platform reviews</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Reviews</h1>
+          <p className="text-sm text-[#5B6577]">Moderate and manage platform reviews</p>
         </div>
       </div>
 
@@ -118,10 +118,10 @@ export default function AdminReviewsPage() {
         <DashboardCard title="Pending Moderation" value={pendingCount} icon={<AlertTriangle className="h-5 w-5" />} />
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -132,7 +132,7 @@ export default function AdminReviewsPage() {
           <select
             value={ratingFilter}
             onChange={(e) => setRatingFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Ratings</option>
             {[5, 4, 3, 2, 1].map((r) => (
@@ -142,7 +142,7 @@ export default function AdminReviewsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Statuses</option>
             <option value="approved">Approved</option>
@@ -152,7 +152,7 @@ export default function AdminReviewsPage() {
           <select
             value={operatorFilter}
             onChange={(e) => setOperatorFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Operators</option>
             {DEMO_DATA.operators.map((o) => (
@@ -162,26 +162,26 @@ export default function AdminReviewsPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">ID</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Passenger</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Driver</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Operator</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Rating</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Review</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Date</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Actions</th>
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">ID</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Passenger</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Driver</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Operator</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Rating</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Review</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Status</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Date</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-[#6B7280]">
+                  <td colSpan={9} className="px-4 py-12 text-center text-[#5B6577]">
                     No reviews found
                   </td>
                 </tr>
@@ -189,16 +189,16 @@ export default function AdminReviewsPage() {
                 filtered.map((review) => (
                   <tr
                     key={review.id}
-                    className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50"
+                    className="border-b border-[#F4F6F9] transition-colors last:border-0 hover:bg-[#F4F6F9]/50"
                   >
-                    <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{review.id}</td>
-                    <td className="px-4 py-3 text-[#172F52]">{review.passengerName}</td>
-                    <td className="px-4 py-3 text-[#172F52]">{review.driverName}</td>
-                    <td className="px-4 py-3 text-[#6B7280]">{review.operatorName}</td>
+                    <td className="px-4 py-3 font-mono text-xs font-medium text-[#0F1B2D]">{review.id}</td>
+                    <td className="px-4 py-3 text-[#0F1B2D]">{review.passengerName}</td>
+                    <td className="px-4 py-3 text-[#0F1B2D]">{review.driverName}</td>
+                    <td className="px-4 py-3 text-[#5B6577]">{review.operatorName}</td>
                     <td className="px-4 py-3">
                       <RatingStars rating={review.rating} size="sm" />
                     </td>
-                    <td className="max-w-[200px] truncate px-4 py-3 text-[#6B7280]">
+                    <td className="max-w-[200px] truncate px-4 py-3 text-[#5B6577]">
                       {review.comment || <span className="italic">No comment</span>}
                     </td>
                     <td className="px-4 py-3">
@@ -213,7 +213,7 @@ export default function AdminReviewsPage() {
                         {review.moderationStatus}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#6B7280]">
+                    <td className="px-4 py-3 text-xs text-[#5B6577]">
                       {new Date(review.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3">
@@ -221,7 +221,7 @@ export default function AdminReviewsPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-[#D9E0E8]"
+                          className="border-[#E2E6EC]"
                           onClick={() => { setDetailTarget(review); setDetailOpen(true) }}
                         >
                           <Eye className="h-3.5 w-3.5" />
@@ -267,39 +267,39 @@ export default function AdminReviewsPage() {
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Passenger</p>
-                <p className="text-sm font-medium text-[#172F52]">{detailTarget.passengerName}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Passenger</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">{detailTarget.passengerName}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Driver</p>
-                <p className="text-sm font-medium text-[#172F52]">{detailTarget.driverName}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Driver</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">{detailTarget.driverName}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Operator</p>
-                <p className="text-sm text-[#172F52]">{detailTarget.operatorName}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Operator</p>
+                <p className="text-sm text-[#0F1B2D]">{detailTarget.operatorName}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Booking Ref</p>
-                <p className="font-mono text-sm text-[#172F52]">{detailTarget.bookingId}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Booking Ref</p>
+                <p className="font-mono text-sm text-[#0F1B2D]">{detailTarget.bookingId}</p>
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase text-[#6B7280]">Rating</p>
+              <p className="text-xs font-semibold uppercase text-[#5B6577]">Rating</p>
               <RatingStars rating={detailTarget.rating} size="lg" />
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase text-[#6B7280]">Comment</p>
-              <p className="text-sm text-[#172F52]">{detailTarget.comment || "No comment provided"}</p>
+              <p className="text-xs font-semibold uppercase text-[#5B6577]">Comment</p>
+              <p className="text-sm text-[#0F1B2D]">{detailTarget.comment || "No comment provided"}</p>
             </div>
-            <div className="flex items-center gap-4 border-t border-[#F5F7FA] pt-4">
+            <div className="flex items-center gap-4 border-t border-[#F4F6F9] pt-4">
               <div className="space-y-1">
-                <p className="text-xs text-[#6B7280]">Date</p>
-                <p className="text-sm text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Date</p>
+                <p className="text-sm text-[#0F1B2D]">
                   {new Date(detailTarget.createdAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-[#6B7280]">Status</p>
+                <p className="text-xs text-[#5B6577]">Status</p>
                 <span
                   className={cn(
                     "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",

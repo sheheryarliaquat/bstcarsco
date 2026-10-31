@@ -122,10 +122,10 @@ export default function DriverDashboardPage() {
               <Power className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-[#172F52]">
+              <h2 className="text-xl font-bold text-[#0F1B2D]">
                 {isOnline ? "You are Online" : "You are Offline"}
               </h2>
-              <p className="text-sm text-[#6B7280]">
+              <p className="text-sm text-[#5B6577]">
                 {isOnline
                   ? "You are available to receive trip requests"
                   : "Go online to start receiving trip requests"}
@@ -176,13 +176,13 @@ export default function DriverDashboardPage() {
 
       {/* Current Trip */}
       {isOnline && currentTrip && (
-        <div className="rounded-2xl border-2 border-[#D4145A]/20 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border-2 border-[#1F4FD8]/20 bg-white p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 animate-pulse rounded-full bg-green-500" />
-              <h3 className="text-lg font-bold text-[#172F52]">Current Trip</h3>
+              <h3 className="text-lg font-bold text-[#0F1B2D]">Current Trip</h3>
             </div>
-            <Badge className="bg-[#D4145A]/10 text-[#D4145A]">
+            <Badge className="bg-[#1F4FD8]/10 text-[#1F4FD8]">
               {currentTrip.bookingNumber}
             </Badge>
           </div>
@@ -190,12 +190,12 @@ export default function DriverDashboardPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-[#D4145A]" />
+                <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-[#1F4FD8]" />
                 <div>
-                  <p className="text-xs font-medium uppercase text-[#6B7280]">
+                  <p className="text-xs font-medium uppercase text-[#5B6577]">
                     Pickup
                   </p>
-                  <p className="text-sm font-semibold text-[#172F52]">
+                  <p className="text-sm font-semibold text-[#0F1B2D]">
                     {currentTrip.pickup.formattedAddress}
                   </p>
                 </div>
@@ -203,10 +203,10 @@ export default function DriverDashboardPage() {
               <div className="flex items-start gap-3">
                 <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-green-500" />
                 <div>
-                  <p className="text-xs font-medium uppercase text-[#6B7280]">
+                  <p className="text-xs font-medium uppercase text-[#5B6577]">
                     Destination
                   </p>
-                  <p className="text-sm font-semibold text-[#172F52]">
+                  <p className="text-sm font-semibold text-[#0F1B2D]">
                     {currentTrip.destination.formattedAddress}
                   </p>
                 </div>
@@ -215,20 +215,20 @@ export default function DriverDashboardPage() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#172F52]">
+                <Users className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#0F1B2D]">
                   Passengers: <span className="font-medium">{currentTrip.passengers}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#172F52]">
+                <Clock className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#0F1B2D]">
                   Pickup: <span className="font-medium">{currentTrip.pickupTime}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#172F52]">
+                <Wallet className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#0F1B2D]">
                   Fare: <span className="font-bold text-green-600">£{currentTrip.total.toFixed(2)}</span>
                 </span>
               </div>
@@ -237,12 +237,12 @@ export default function DriverDashboardPage() {
 
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href="/driver/active-trip">
-              <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+              <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
                 <Navigation className="mr-2 h-4 w-4" />
                 View Active Trip
               </Button>
             </Link>
-            <Button variant="outline" className="border-[#D9E0E8]">
+            <Button variant="outline" className="border-[#E2E6EC]">
               <Phone className="mr-2 h-4 w-4" />
               Call Passenger
             </Button>
@@ -255,43 +255,43 @@ export default function DriverDashboardPage() {
         <div className="lg:col-span-2">
           <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Recent Trips</h3>
+              <h3 className="text-base font-bold text-[#0F1B2D]">Recent Trips</h3>
               <Link
                 href="/driver/bookings"
-                className="text-sm font-medium text-[#D4145A] hover:underline"
+                className="text-sm font-medium text-[#1F4FD8] hover:underline"
               >
                 View All
               </Link>
             </div>
-            <div className="divide-y divide-[#F5F7FA]">
+            <div className="divide-y divide-[#F4F6F9]">
               {recentTrips.length === 0 ? (
                 <div className="px-6 py-8 text-center">
-                  <p className="text-sm text-[#6B7280]">No recent trips to display</p>
+                  <p className="text-sm text-[#5B6577]">No recent trips to display</p>
                 </div>
               ) : (
                 recentTrips.map((trip) => (
                   <div
                     key={trip.bookingNumber}
-                    className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-[#F5F7FA]/50"
+                    className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-[#F4F6F9]/50"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-medium text-[#172F52]">
+                        <p className="truncate text-sm font-medium text-[#0F1B2D]">
                           {trip.pickup.formattedAddress.split(",")[0]}
                         </p>
-                        <ArrowRight className="h-3 w-3 shrink-0 text-[#6B7280]" />
-                        <p className="truncate text-sm text-[#6B7280]">
+                        <ArrowRight className="h-3 w-3 shrink-0 text-[#5B6577]" />
+                        <p className="truncate text-sm text-[#5B6577]">
                           {trip.destination.formattedAddress.split(",")[0]}
                         </p>
                       </div>
                       <div className="mt-1 flex items-center gap-3">
-                        <span className="text-xs text-[#6B7280]">
+                        <span className="text-xs text-[#5B6577]">
                           {trip.date} at {trip.pickupTime}
                         </span>
                       </div>
                     </div>
                     <div className="ml-4 flex items-center gap-3">
-                      <span className="text-sm font-bold text-[#172F52]">
+                      <span className="text-sm font-bold text-[#0F1B2D]">
                         £{trip.total.toFixed(2)}
                       </span>
                       <StatusBadge status={trip.bookingStatus} type="booking" />
@@ -305,26 +305,26 @@ export default function DriverDashboardPage() {
 
         {/* Weekly Earnings */}
         <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-          <h3 className="mb-4 text-base font-bold text-[#172F52]">
+          <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
             Weekly Earnings
           </h3>
           <div className="space-y-3">
             {weeklyChart.map((item) => (
               <div key={item.day} className="flex items-center gap-3">
-                <span className="w-8 text-xs font-medium text-[#6B7280]">
+                <span className="w-8 text-xs font-medium text-[#5B6577]">
                   {item.day}
                 </span>
                 <div className="flex-1">
-                  <div className="h-5 w-full overflow-hidden rounded-full bg-[#F5F7FA]">
+                  <div className="h-5 w-full overflow-hidden rounded-full bg-[#F4F6F9]">
                     <div
-                      className="h-full rounded-full bg-[#D4145A] transition-all duration-500"
+                      className="h-full rounded-full bg-[#1F4FD8] transition-all duration-500"
                       style={{
                         width: `${(item.amount / maxDay) * 100}%`,
                       }}
                     />
                   </div>
                 </div>
-                <span className="w-14 text-right text-xs font-semibold text-[#172F52]">
+                <span className="w-14 text-right text-xs font-semibold text-[#0F1B2D]">
                   {item.amount > 0 ? `£${item.amount.toFixed(0)}` : "-"}
                 </span>
               </div>
@@ -332,8 +332,8 @@ export default function DriverDashboardPage() {
           </div>
           <div className="mt-4 border-t border-[#E5E7EB] pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#6B7280]">This Week</span>
-              <span className="text-lg font-bold text-[#172F52]">£{thisWeekEarnings.toFixed(2)}</span>
+              <span className="text-sm text-[#5B6577]">This Week</span>
+              <span className="text-lg font-bold text-[#0F1B2D]">£{thisWeekEarnings.toFixed(2)}</span>
             </div>
           </div>
         </div>

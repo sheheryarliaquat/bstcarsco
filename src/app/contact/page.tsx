@@ -33,7 +33,7 @@ const CONTACT_INFO = [
 export default function ContactPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Contact Us
@@ -48,7 +48,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl font-bold text-[#172F52]">
+              <h2 className="text-3xl font-bold text-[#0F1B2D]">
                 Send Us a Message
               </h2>
               <p className="mt-4 text-gray-600">
@@ -58,39 +58,39 @@ export default function ContactPage() {
               <form className="mt-8 flex flex-col gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-[#172033]">
+                    <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
                       Full Name
                     </label>
                     <Input placeholder="John Smith" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-[#172033]">
+                    <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
                       Email Address
                     </label>
                     <Input placeholder="john@example.co.uk" type="email" />
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[#172033]">
+                  <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
                     Phone Number (optional)
                   </label>
                   <Input placeholder="07700 900000" type="tel" />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[#172033]">
+                  <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
                     Subject
                   </label>
                   <Input placeholder="How can we help?" />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[#172033]">
+                  <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
                     Message
                   </label>
                   <Textarea placeholder="Tell us more..." className="min-h-32" />
                 </div>
                 <Button
                   type="submit"
-                  className="self-start bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                  className="self-start bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
                 >
                   <Send className="mr-2 h-4 w-4" />
                   Send Message
@@ -102,11 +102,11 @@ export default function ContactPage() {
               {CONTACT_INFO.map((info) => (
                 <Card key={info.title}>
                   <CardContent className="flex gap-4 p-6">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#FCE7EF]">
-                      <info.icon className="h-6 w-6 text-[#D4145A]" />
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#E7EEFF]">
+                      <info.icon className="h-6 w-6 text-[#1F4FD8]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#172F52]">
+                      <h3 className="font-semibold text-[#0F1B2D]">
                         {info.title}
                       </h3>
                       <div className="mt-1 space-y-1">
@@ -125,14 +125,14 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">Find Us</h2>
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">Find Us</h2>
           </div>
-          <div className="mt-8 flex h-80 items-center justify-center rounded-xl bg-[#D9E0E8] text-gray-500">
+          <div className="mt-8 flex h-80 items-center justify-center rounded-xl bg-[#E2E6EC] text-gray-500">
             <div className="text-center">
-              <MapPin className="mx-auto h-12 w-12 text-[#D4145A]" />
+              <MapPin className="mx-auto h-12 w-12 text-[#1F4FD8]" />
               <p className="mt-4 text-sm">Map integration coming soon</p>
               <p className="text-xs text-gray-400">
                 10 Downing Street, London, SW1A 2AA

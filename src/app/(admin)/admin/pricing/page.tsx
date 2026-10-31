@@ -85,10 +85,10 @@ export default function AdminPricingPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Pricing</h1>
-          <p className="text-sm text-[#6B7280]">Configure platform pricing rules and surcharges</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Pricing</h1>
+          <p className="text-sm text-[#5B6577]">Configure platform pricing rules and surcharges</p>
         </div>
-        <Button onClick={handleSave} className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+        <Button onClick={handleSave} className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
           <Save className="mr-1.5 h-4 w-4" />
           {saved ? "Saved!" : "Save Settings"}
         </Button>
@@ -102,14 +102,14 @@ export default function AdminPricingPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Commission */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="mb-4 flex items-center gap-2">
-            <Settings className="h-5 w-5 text-[#172F52]" />
-            <h3 className="text-base font-bold text-[#172F52]">Platform Commission</h3>
+            <Settings className="h-5 w-5 text-[#0F1B2D]" />
+            <h3 className="text-base font-bold text-[#0F1B2D]">Platform Commission</h3>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Commission Percentage (%)</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Commission Percentage (%)</label>
               <Input
                 type="number"
                 value={commission.percent}
@@ -120,7 +120,7 @@ export default function AdminPricingPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Flat Fee Per Transaction (£)</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Flat Fee Per Transaction (£)</label>
               <Input
                 type="number"
                 value={commission.flatFee}
@@ -134,15 +134,15 @@ export default function AdminPricingPage() {
         </div>
 
         {/* Surcharges */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="mb-4 flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-[#D4145A]" />
-            <h3 className="text-base font-bold text-[#172F52]">Surcharge Settings</h3>
+            <AlertTriangle className="h-5 w-5 text-[#1F4FD8]" />
+            <h3 className="text-base font-bold text-[#0F1B2D]">Surcharge Settings</h3>
           </div>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#0F1B2D]">
                   <Moon className="h-3.5 w-3.5" /> Night Surcharge (%)
                 </label>
                 <Input
@@ -155,7 +155,7 @@ export default function AdminPricingPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#0F1B2D]">
                   <Sun className="h-3.5 w-3.5" /> Weekend Surcharge (%)
                 </label>
                 <Input
@@ -168,7 +168,7 @@ export default function AdminPricingPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#0F1B2D]">
                   <Clock className="h-3.5 w-3.5" /> Peak Time Surcharge (%)
                 </label>
                 <Input
@@ -181,7 +181,7 @@ export default function AdminPricingPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#0F1B2D]">
                   <Plane className="h-3.5 w-3.5" /> Airport Fee (£)
                 </label>
                 <Input
@@ -193,7 +193,7 @@ export default function AdminPricingPage() {
                 />
               </div>
               <div className="col-span-2">
-                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#0F1B2D]">
                   <MapPin className="h-3.5 w-3.5" /> Congestion Charge (£)
                 </label>
                 <Input
@@ -210,20 +210,20 @@ export default function AdminPricingPage() {
       </div>
 
       {/* Vehicle Base Pricing */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
         <div className="mb-4 flex items-center gap-2">
-          <Car className="h-5 w-5 text-[#172F52]" />
-          <h3 className="text-base font-bold text-[#172F52]">Vehicle Category Base Pricing</h3>
+          <Car className="h-5 w-5 text-[#0F1B2D]" />
+          <h3 className="text-base font-bold text-[#0F1B2D]">Vehicle Category Base Pricing</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Vehicle Type</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Base Fare (£)</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Per Mile (£)</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Per Minute (£)</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Min Fare (£)</th>
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Vehicle Type</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Base Fare (£)</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Per Mile (£)</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Per Minute (£)</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Min Fare (£)</th>
               </tr>
             </thead>
             <tbody>
@@ -231,8 +231,8 @@ export default function AdminPricingPage() {
                 const vp = vehiclePricing[vt.value]
                 if (!vp) return null
                 return (
-                  <tr key={vt.value} className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50">
-                    <td className="px-4 py-3 font-medium text-[#172F52]">
+                  <tr key={vt.value} className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50">
+                    <td className="px-4 py-3 font-medium text-[#0F1B2D]">
                       <span className="mr-2">{vt.icon}</span>
                       {vt.label}
                     </td>
@@ -259,8 +259,8 @@ export default function AdminPricingPage() {
             </tbody>
           </table>
         </div>
-        <div className="mt-4 flex items-center gap-2 border-t border-[#F5F7FA] pt-4">
-          <span className="text-sm font-medium text-[#172F52]">Global Minimum Fare: £</span>
+        <div className="mt-4 flex items-center gap-2 border-t border-[#F4F6F9] pt-4">
+          <span className="text-sm font-medium text-[#0F1B2D]">Global Minimum Fare: £</span>
           <Input
             type="number"
             value={minimumFare}
@@ -272,14 +272,14 @@ export default function AdminPricingPage() {
       </div>
 
       {/* Pricing Preview */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
         <div className="mb-4 flex items-center gap-2">
-          <Calculator className="h-5 w-5 text-[#D4145A]" />
-          <h3 className="text-base font-bold text-[#172F52]">Pricing Preview</h3>
+          <Calculator className="h-5 w-5 text-[#1F4FD8]" />
+          <h3 className="text-base font-bold text-[#0F1B2D]">Pricing Preview</h3>
         </div>
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex-1 min-w-[200px]">
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Distance (miles)</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Distance (miles)</label>
             <Input
               type="number"
               value={previewDistance}
@@ -290,11 +290,11 @@ export default function AdminPricingPage() {
             />
           </div>
           <div className="min-w-[180px]">
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Vehicle Type</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Vehicle Type</label>
             <select
               value={previewVehicle}
               onChange={(e) => setPreviewVehicle(e.target.value)}
-              className="h-9 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+              className="h-9 w-full rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
             >
               {VEHICLE_TYPES.map((v) => (
                 <option key={v.value} value={v.value}>{v.label}</option>
@@ -303,38 +303,38 @@ export default function AdminPricingPage() {
           </div>
         </div>
         {previewEstimate && (
-          <div className="mt-4 rounded-lg bg-[#F5F7FA] p-4">
-            <h4 className="mb-3 text-sm font-bold text-[#172F52]">Estimated Price Breakdown</h4>
+          <div className="mt-4 rounded-lg bg-[#F4F6F9] p-4">
+            <h4 className="mb-3 text-sm font-bold text-[#0F1B2D]">Estimated Price Breakdown</h4>
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Base Fare</span>
-                <span className="text-[#172F52]">£{previewEstimate.base.toFixed(2)}</span>
+                <span className="text-[#5B6577]">Base Fare</span>
+                <span className="text-[#0F1B2D]">£{previewEstimate.base.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Distance ({previewDistance} miles)</span>
-                <span className="text-[#172F52]">£{previewEstimate.distanceCharge.toFixed(2)}</span>
+                <span className="text-[#5B6577]">Distance ({previewDistance} miles)</span>
+                <span className="text-[#0F1B2D]">£{previewEstimate.distanceCharge.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Time Estimate</span>
-                <span className="text-[#172F52]">£{previewEstimate.timeCharge.toFixed(2)}</span>
+                <span className="text-[#5B6577]">Time Estimate</span>
+                <span className="text-[#0F1B2D]">£{previewEstimate.timeCharge.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between border-t border-[#D9E0E8] pt-2">
-                <span className="text-[#6B7280]">Subtotal</span>
-                <span className="font-semibold text-[#172F52]">£{previewEstimate.subtotal.toFixed(2)}</span>
+              <div className="flex justify-between border-t border-[#E2E6EC] pt-2">
+                <span className="text-[#5B6577]">Subtotal</span>
+                <span className="font-semibold text-[#0F1B2D]">£{previewEstimate.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B7280]">Platform Commission ({commission.percent}% + £{commission.flatFee.toFixed(2)})</span>
-                <span className="text-[#172F52]">£{previewEstimate.commissionAmount.toFixed(2)}</span>
+                <span className="text-[#5B6577]">Platform Commission ({commission.percent}% + £{commission.flatFee.toFixed(2)})</span>
+                <span className="text-[#0F1B2D]">£{previewEstimate.commissionAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between border-t border-[#D9E0E8] pt-2">
-                <span className="font-bold text-[#172F52]">Estimated Total</span>
-                <span className="text-lg font-bold text-[#D4145A]">£{previewEstimate.total.toFixed(2)}</span>
+              <div className="flex justify-between border-t border-[#E2E6EC] pt-2">
+                <span className="font-bold text-[#0F1B2D]">Estimated Total</span>
+                <span className="text-lg font-bold text-[#1F4FD8]">£{previewEstimate.total.toFixed(2)}</span>
               </div>
             </div>
           </div>
         )}
         {!previewEstimate && (
-          <p className="mt-3 text-sm text-[#6B7280]">Enter a distance to see an estimated price breakdown.</p>
+          <p className="mt-3 text-sm text-[#5B6577]">Enter a distance to see an estimated price breakdown.</p>
         )}
       </div>
     </div>

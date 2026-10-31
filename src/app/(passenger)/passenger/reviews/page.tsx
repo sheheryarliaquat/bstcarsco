@@ -89,26 +89,26 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Reviews</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Reviews</h1>
+        <p className="text-sm text-[#5B6577]">
           Your feedback helps us maintain the best service.
         </p>
       </div>
 
       {/* Summary */}
-      <div className="flex items-center gap-6 rounded-xl border border-[#D9E0E8] bg-white p-5">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#D4145A]/10">
-          <Star className="h-8 w-8 fill-[#D4145A] text-[#D4145A]" />
+      <div className="flex items-center gap-6 rounded-xl border border-[#E2E6EC] bg-white p-5">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1F4FD8]/10">
+          <Star className="h-8 w-8 fill-[#1F4FD8] text-[#1F4FD8]" />
         </div>
         <div>
-          <p className="text-3xl font-bold text-[#172F52]">
+          <p className="text-3xl font-bold text-[#0F1B2D]">
             {averageRating.toFixed(1)}
           </p>
           <RatingStars rating={averageRating} size="md" count={reviews.length} />
         </div>
         <div className="ml-auto text-right">
-          <p className="text-sm text-[#6B7280]">Total Reviews</p>
-          <p className="text-2xl font-bold text-[#172F52]">
+          <p className="text-sm text-[#5B6577]">Total Reviews</p>
+          <p className="text-2xl font-bold text-[#0F1B2D]">
             {reviews.length}
           </p>
         </div>
@@ -116,14 +116,14 @@ export default function ReviewsPage() {
 
       {/* Write review button for unreviewed trips */}
       {completedWithoutReview.length > 0 && (
-        <div className="rounded-xl border border-[#D4145A]/20 bg-[#D4145A]/5 p-4">
+        <div className="rounded-xl border border-[#1F4FD8]/20 bg-[#1F4FD8]/5 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#172F52]">
+              <p className="text-sm font-semibold text-[#0F1B2D]">
                 You have {completedWithoutReview.length} unreviewed trip
                 {completedWithoutReview.length > 1 ? "s" : ""}
               </p>
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[#5B6577]">
                 Share your experience to help other passengers.
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function ReviewsPage() {
                 setSelectedBooking(completedWithoutReview[0])
                 setWriteOpen(true)
               }}
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               <MessageSquarePlus className="h-4 w-4" /> Write Review
             </Button>
@@ -152,23 +152,23 @@ export default function ReviewsPage() {
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="rounded-xl border border-[#D9E0E8] bg-white p-5"
+              className="rounded-xl border border-[#E2E6EC] bg-white p-5"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div>
                   <div className="mb-1 flex items-center gap-3">
                     <RatingStars rating={review.rating} size="md" />
-                    <span className="text-xs text-[#6B7280]">
+                    <span className="text-xs text-[#5B6577]">
                       {review.bookingId}
                     </span>
                   </div>
                   {driverNames[review.driverId] && (
-                    <p className="text-sm text-[#6B7280]">
+                    <p className="text-sm text-[#5B6577]">
                       Driver: {driverNames[review.driverId]}
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+                <div className="flex items-center gap-1.5 text-xs text-[#5B6577]">
                   <Calendar className="h-3.5 w-3.5" />
                   {new Date(review.createdAt).toLocaleDateString("en-GB", {
                     day: "numeric",
@@ -178,7 +178,7 @@ export default function ReviewsPage() {
                 </div>
               </div>
               {review.comment && (
-                <p className="text-sm leading-relaxed text-[#172F52]">
+                <p className="text-sm leading-relaxed text-[#0F1B2D]">
                   {review.comment}
                 </p>
               )}
@@ -228,7 +228,7 @@ export default function ReviewsPage() {
             <Button
               onClick={handleSubmitReview}
               disabled={rating === 0 || submitting}
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               {submitting ? "Submitting..." : "Submit Review"}
             </Button>

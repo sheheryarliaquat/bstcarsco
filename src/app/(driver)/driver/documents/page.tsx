@@ -107,7 +107,7 @@ export default function DriverDocumentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1F4FD8]" />
       </div>
     )
   }
@@ -116,13 +116,13 @@ export default function DriverDocumentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Documents</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Documents</h1>
+          <p className="text-sm text-[#5B6577]">
             Manage your driving and vehicle documents
           </p>
         </div>
         <Button
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
           onClick={() => openUpload("New Document")}
         >
           <Upload className="mr-2 h-4 w-4" />
@@ -169,7 +169,7 @@ export default function DriverDocumentsPage() {
                 )}
               >
                 <div className="mb-4 flex items-start justify-between">
-                  <h3 className="text-sm font-bold text-[#172F52]">{doc.documentType}</h3>
+                  <h3 className="text-sm font-bold text-[#0F1B2D]">{doc.documentType}</h3>
                   <div className="flex items-center gap-1.5">
                     {expiringSoon && !expired && (
                       <Badge className="bg-amber-50 text-amber-700 border border-amber-200">
@@ -186,15 +186,15 @@ export default function DriverDocumentsPage() {
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-xs text-[#6B7280]">Number</span>
-                    <span className="text-xs font-medium text-[#172F52]">{doc.documentNumber}</span>
+                    <span className="text-xs text-[#5B6577]">Number</span>
+                    <span className="text-xs font-medium text-[#0F1B2D]">{doc.documentNumber}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-xs text-[#6B7280]">Expiry</span>
+                    <span className="text-xs text-[#5B6577]">Expiry</span>
                     <span
                       className={cn(
                         "text-xs font-medium",
-                        expired ? "text-red-600" : expiringSoon ? "text-amber-600" : "text-[#172F52]"
+                        expired ? "text-red-600" : expiringSoon ? "text-amber-600" : "text-[#0F1B2D]"
                       )}
                     >
                       {doc.expiryDate
@@ -207,8 +207,8 @@ export default function DriverDocumentsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-xs text-[#6B7280]">Uploaded</span>
-                    <span className="text-xs text-[#172F52]">
+                    <span className="text-xs text-[#5B6577]">Uploaded</span>
+                    <span className="text-xs text-[#0F1B2D]">
                       {new Date(doc.uploadedAt).toLocaleDateString("en-GB", {
                         day: "numeric",
                         month: "short",
@@ -223,7 +223,7 @@ export default function DriverDocumentsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full border-[#D9E0E8] text-[#D4145A] hover:bg-[#D4145A]/10"
+                  className="w-full border-[#E2E6EC] text-[#1F4FD8] hover:bg-[#1F4FD8]/10"
                   onClick={() => openUpload(doc.documentType)}
                 >
                   <Upload className="mr-2 h-3.5 w-3.5" />
@@ -245,7 +245,7 @@ export default function DriverDocumentsPage() {
       >
         <div className="space-y-4">
           <div>
-            <Label htmlFor="doc-type" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="doc-type" className="text-sm font-medium text-[#0F1B2D]">
               Document Type
             </Label>
             <Input
@@ -257,7 +257,7 @@ export default function DriverDocumentsPage() {
             />
           </div>
           <div>
-            <Label htmlFor="doc-number" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="doc-number" className="text-sm font-medium text-[#0F1B2D]">
               Document Number
             </Label>
             <Input
@@ -271,7 +271,7 @@ export default function DriverDocumentsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="issue-date" className="text-sm font-medium text-[#172033]">
+              <Label htmlFor="issue-date" className="text-sm font-medium text-[#0F1B2D]">
                 Issue Date
               </Label>
               <Input
@@ -283,7 +283,7 @@ export default function DriverDocumentsPage() {
               />
             </div>
             <div>
-              <Label htmlFor="expiry-date" className="text-sm font-medium text-[#172033]">
+              <Label htmlFor="expiry-date" className="text-sm font-medium text-[#0F1B2D]">
                 Expiry Date
               </Label>
               <Input
@@ -300,14 +300,14 @@ export default function DriverDocumentsPage() {
             <Button
               variant="outline"
               onClick={() => setUploadOpen(false)}
-              className="border-[#D9E0E8]"
+              className="border-[#E2E6EC]"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={saving || !docType || !docNumber || !expiryDate}
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               {saving ? "Saving..." : "Save Document"}
             </Button>

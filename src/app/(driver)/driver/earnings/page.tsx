@@ -80,7 +80,7 @@ export default function DriverEarningsPage() {
       header: "Date",
       sortable: true,
       render: (row) => (
-        <span className="font-medium text-[#172F52]">
+        <span className="font-medium text-[#0F1B2D]">
           {new Date((row as unknown as DaySummary).date).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "short",
@@ -93,7 +93,7 @@ export default function DriverEarningsPage() {
       key: "trips",
       header: "Trips",
       sortable: true,
-      render: (row) => <span className="text-[#172F52]">{(row as unknown as DaySummary).trips}</span>,
+      render: (row) => <span className="text-[#0F1B2D]">{(row as unknown as DaySummary).trips}</span>,
     },
     {
       key: "gross",
@@ -108,8 +108,8 @@ export default function DriverEarningsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Earnings</h1>
-        <p className="text-sm text-[#6B7280]">Track your completed trip earnings</p>
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Earnings</h1>
+        <p className="text-sm text-[#5B6577]">Track your completed trip earnings</p>
       </div>
 
       {/* Summary Cards */}
@@ -122,33 +122,33 @@ export default function DriverEarningsPage() {
 
       {/* Weekly Bar Chart */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-6 text-base font-bold text-[#172F52]">This Week</h3>
+        <h3 className="mb-6 text-base font-bold text-[#0F1B2D]">This Week</h3>
         <div className="flex items-end gap-4" style={{ height: 200 }}>
           {weeklyChart.map((item) => (
             <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
-              <span className="text-xs font-semibold text-[#172F52]">
+              <span className="text-xs font-semibold text-[#0F1B2D]">
                 {item.amount > 0 ? `£${item.amount.toFixed(0)}` : ""}
               </span>
               <div
-                className="w-full rounded-t-lg bg-[#D4145A] transition-all duration-500"
+                className="w-full rounded-t-lg bg-[#1F4FD8] transition-all duration-500"
                 style={{
                   height: `${(item.amount / maxAmount) * 150}px`,
                   minHeight: item.amount > 0 ? "4px" : "0px",
                 }}
               />
-              <span className="text-xs font-medium text-[#6B7280]">{item.day}</span>
+              <span className="text-xs font-medium text-[#5B6577]">{item.day}</span>
             </div>
           ))}
         </div>
         <div className="mt-6 flex items-center justify-between border-t border-[#E5E7EB] pt-4">
-          <span className="text-sm text-[#6B7280]">Week Total</span>
-          <span className="text-xl font-bold text-[#172F52]">£{weekTotal.toFixed(2)}</span>
+          <span className="text-sm text-[#5B6577]">Week Total</span>
+          <span className="text-xl font-bold text-[#0F1B2D]">£{weekTotal.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Earnings History Table */}
       <div>
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">Earnings History</h3>
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">Earnings History</h3>
         <DataTable
           columns={historyColumns}
           data={history as unknown as Record<string, unknown>[]}

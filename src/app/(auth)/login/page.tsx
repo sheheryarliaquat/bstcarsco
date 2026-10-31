@@ -110,8 +110,8 @@ export default function LoginPage() {
   return (
     <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold text-[#172F52]">Welcome back</h1>
-        <p className="mt-1 text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Welcome back</h1>
+        <p className="mt-1 text-sm text-[#5B6577]">
           Sign in to your account to continue
         </p>
       </div>
@@ -126,7 +126,7 @@ export default function LoginPage() {
       <Button
         type="button"
         variant="outline"
-        className="mb-4 h-11 w-full border-[#D9E0E8] text-[#172033] hover:bg-[#F5F7FA]"
+        className="mb-4 h-11 w-full border-[#E2E6EC] text-[#0F1B2D] hover:bg-[#F4F6F9]"
         onClick={handleGoogleSignIn}
         disabled={googleLoading}
       >
@@ -140,7 +140,7 @@ export default function LoginPage() {
 
       <div className="relative mb-4">
         <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-[#6B7280]">
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-[#5B6577]">
           or continue with email
         </span>
       </div>
@@ -149,12 +149,12 @@ export default function LoginPage() {
         <div>
           <Label
             htmlFor="email"
-            className="text-sm font-medium text-[#172033]"
+            className="text-sm font-medium text-[#0F1B2D]"
           >
             Email address
           </Label>
           <div className="relative mt-1.5">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               id="email"
               type="email"
@@ -174,19 +174,19 @@ export default function LoginPage() {
           <div className="flex items-center justify-between">
             <Label
               htmlFor="password"
-              className="text-sm font-medium text-[#172033]"
+              className="text-sm font-medium text-[#0F1B2D]"
             >
               Password
             </Label>
             <Link
               href="/forgot-password"
-              className="text-xs font-medium text-[#D4145A] hover:underline"
+              className="text-xs font-medium text-[#1F4FD8] hover:underline"
             >
               Forgot password?
             </Link>
           </div>
           <div className="relative mt-1.5">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -197,7 +197,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#172033]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6577] hover:text-[#0F1B2D]"
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -213,7 +213,7 @@ export default function LoginPage() {
           )}
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-[#172033]">
+        <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
           <Checkbox defaultChecked />
           Remember me
         </label>
@@ -221,7 +221,7 @@ export default function LoginPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="h-11 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90"
+          className="h-11 w-full bg-[#1F4FD8] text-base font-semibold text-white hover:bg-[#1F4FD8]/90"
         >
           {loading ? (
             <>
@@ -234,11 +234,11 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <div className="mt-4 text-center text-sm text-[#6B7280]">
+      <div className="mt-4 text-center text-sm text-[#5B6577]">
         Don&apos;t have an account?{" "}
         <Link
           href="/register"
-          className="font-semibold text-[#D4145A] hover:underline"
+          className="font-semibold text-[#1F4FD8] hover:underline"
         >
           Register
         </Link>
@@ -247,7 +247,7 @@ export default function LoginPage() {
       <div className="mt-4 text-center">
         <Link
           href="/"
-          className="text-sm font-medium text-[#6B7280] hover:text-[#172F52]"
+          className="text-sm font-medium text-[#5B6577] hover:text-[#0F1B2D]"
         >
           Continue as guest &rarr;
         </Link>

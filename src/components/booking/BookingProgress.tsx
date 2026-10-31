@@ -4,71 +4,51 @@ import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const STEPS = [
-  { id: "search", label: "Search" },
-  { id: "quotes", label: "Quotes" },
-  { id: "passenger", label: "Passenger" },
-  { id: "payment", label: "Payment" },
+  { id: "quotes", label: "Choose car" },
+  { id: "passenger", label: "Your details" },
   { id: "confirmed", label: "Confirmed" },
 ] as const
+
+/** Older step ids still used by some pages map onto the three steps above. */
+const ALIASES: Record<string, string> = { search: "quotes", payment: "passenger" }
 
 interface BookingProgressProps {
   currentStep: string
 }
 
 export function BookingProgress({ currentStep }: BookingProgressProps) {
-  const currentIndex = STEPS.findIndex((s) => s.id === currentStep)
+  const step = ALIASES[currentStep] ?? currentStep
+  const currentIndex = Math.max(
+    0,
+    STEPS.findIndex((s) => s.id === step)
+  )
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="flex min-w-max items-center justify-between px-2 py-4">
-        {STEPS.map((step, i) => {
-          const isCompleted = i < currentIndex
-          const isCurrent = step.id === currentStep
-          const isUpcoming = i > currentIndex
-
-          return (
-            <div key={step.id} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div
-                  className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
-                    isCompleted &&
-                      "border-[#168A55] bg-[#168A55] text-white",
-                    isCurrent &&
-                      "border-[#D4145A] bg-[#D4145A] text-white",
-                    isUpcoming &&
-                      "border-[#D9E0E8] bg-white text-[#6B7280]"
-                  )}
-                >
-                  {isCompleted ? (
-                    <Check className="h-5 w-5" />
-                  ) : (
-                    i + 1
-                  )}
-                </div>
-                <span
-                  className={cn(
-                    "mt-1.5 text-xs font-medium",
-                    (isCompleted || isCurrent) && "text-[#172033]",
-                    isUpcoming && "text-[#6B7280]"
-                  )}
-                >
-                  {step.label}
-                </span>
-              </div>
-
-              {i < STEPS.length - 1 && (
-                <div
-                  className={cn(
-                    "mx-2 mb-5 h-0.5 w-8 sm:w-12 lg:w-16",
-                    i < currentIndex ? "bg-[#168A55]" : "bg-[#D9E0E8]"
-                  )}
-                />
+    <ol aria-label="Booking steps" className="flex flex-wrap gap-2 sm:gap-3">
+      {STEPS.map((s, i) => {
+        const done = i < currentIndex
+        const active = i === currentIndex
+        return (
+          <li
+            key={s.id}
+            aria-current={active ? "step" : undefined}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full border py-1.5 pl-1.5 pr-3 text-[13px] font-semibold sm:gap-2 sm:py-2 sm:pl-2 sm:pr-4 sm:text-sm",
+              active ? "border-[#0F1B2D] bg-[#0F1B2D] text-white" : "border-[#E2E6EC] bg-white text-[#4A5568]"
+            )}
+          >
+            <span
+              className={cn(
+                "flex h-6 w-6 items-center justify-center rounded-full text-xs",
+                active ? "bg-[#F2B233] text-[#0F1B2D]" : done ? "bg-[#E6F4EC] text-[#1E6B44]" : "bg-[#EEF2F7] text-[#0F1B2D]"
               )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
+            >
+              {done ? <Check className="h-3.5 w-3.5" aria-label="done" /> : i + 1}
+            </span>
+            {s.label}
+          </li>
+        )
+      })}
+    </ol>
   )
 }

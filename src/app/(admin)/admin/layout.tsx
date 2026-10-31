@@ -81,15 +81,15 @@ function SidebarContent({
     : "A"
 
   return (
-    <div className="flex h-full flex-col bg-[#172F52]">
+    <div className="flex h-full flex-col bg-[#0F1B2D]">
       <div className="px-5 pt-6 pb-4">
         <Link href="/admin/dashboard" className="flex items-center gap-2.5" onClick={onNavClick}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D4145A]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1F4FD8]">
             <Car className="h-5 w-5 text-white" />
           </div>
           <div>
             <span className="text-lg font-bold text-white">Blue Star Airport Transfers LTD</span>
-            <span className="ml-2 inline-flex items-center rounded-full bg-[#D4145A] px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="ml-2 inline-flex items-center rounded-full bg-[#1F4FD8] px-2 py-0.5 text-[10px] font-bold text-white">
               ADMIN
             </span>
           </div>
@@ -113,7 +113,7 @@ function SidebarContent({
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-[#D4145A] text-white"
+                      ? "bg-[#1F4FD8] text-white"
                       : "text-white/70 hover:bg-white/10 hover:text-white"
                   )}
                 >
@@ -145,7 +145,7 @@ function SidebarContent({
 
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar className="h-10 w-10">
-          <AvatarFallback className="bg-[#D4145A] text-sm font-semibold text-white">
+          <AvatarFallback className="bg-[#1F4FD8] text-sm font-semibold text-white">
             {initials}
           </AvatarFallback>
         </Avatar>
@@ -164,8 +164,8 @@ function SidebarContent({
 
 function FullScreenLoader() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
-      <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+    <div className="flex min-h-screen items-center justify-center bg-[#F4F6F9]">
+      <Loader2 className="h-8 w-8 animate-spin text-[#1F4FD8]" />
     </div>
   )
 }
@@ -208,7 +208,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#F5F7FA]">
+    <div className="flex min-h-screen bg-[#F4F6F9]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
         <SidebarContent userData={userData} onLogout={handleLogout} />
@@ -220,7 +220,7 @@ export default function AdminLayout({
           <SheetTrigger
             render={
               <Button variant="ghost" size="icon" className="shrink-0">
-                <Menu className="h-5 w-5 text-[#172F52]" />
+                <Menu className="h-5 w-5 text-[#0F1B2D]" />
                 <span className="sr-only">Open menu</span>
               </Button>
             }
@@ -236,18 +236,18 @@ export default function AdminLayout({
         </Sheet>
 
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4145A]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1F4FD8]">
             <Car className="h-4 w-4 text-white" />
           </div>
-          <span className="font-bold text-[#172F52]">Blue Star Airport Transfers LTD</span>
-          <span className="inline-flex items-center rounded-full bg-[#172F52] px-1.5 py-0.5 text-[9px] font-bold text-white">
+          <span className="font-bold text-[#0F1B2D]">Blue Star Airport Transfers LTD</span>
+          <span className="inline-flex items-center rounded-full bg-[#0F1B2D] px-1.5 py-0.5 text-[9px] font-bold text-white">
             ADMIN
           </span>
         </Link>
 
         <div className="ml-auto">
           <Link href="/admin/notifications" className="relative">
-            <Bell className="h-5 w-5 text-[#6B7280]" />
+            <Bell className="h-5 w-5 text-[#5B6577]" />
           </Link>
         </div>
       </div>
@@ -258,19 +258,19 @@ export default function AdminLayout({
           <div />
           <div className="flex items-center gap-4">
             <Link href="/admin/notifications" className="relative">
-              <Bell className="h-5 w-5 text-[#6B7280]" />
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4145A] text-[9px] font-bold text-white">
+              <Bell className="h-5 w-5 text-[#5B6577]" />
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1F4FD8] text-[9px] font-bold text-white">
                 5
               </span>
             </Link>
             <div className="h-6 w-px bg-[#E5E7EB]" />
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-[#172F52] text-xs font-semibold text-white">
+                <AvatarFallback className="bg-[#0F1B2D] text-xs font-semibold text-white">
                   {`${userData?.firstName?.[0] ?? ""}${userData?.lastName?.[0] ?? ""}`.toUpperCase() || "A"}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium text-[#172F52]">
+              <span className="text-sm font-medium text-[#0F1B2D]">
                 {`${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`.trim() || "Admin"}
               </span>
             </div>

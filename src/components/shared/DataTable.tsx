@@ -85,15 +85,15 @@ export function DataTable<T extends Record<string, unknown>>({
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
         {searchable && (
-          <div className="border-b border-[#D9E0E8] p-4">
+          <div className="border-b border-[#E2E6EC] p-4">
             <Skeleton className="h-9 w-64" />
           </div>
         )}
         <div className="p-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex gap-4 border-b border-[#F5F7FA] py-3">
+            <div key={i} className="flex gap-4 border-b border-[#F4F6F9] py-3">
               {columns.map((col) => (
                 <div key={col.key} className="flex-1">
                   <Skeleton className="h-4 w-full" />
@@ -107,11 +107,11 @@ export function DataTable<T extends Record<string, unknown>>({
   }
 
   return (
-    <div className="rounded-xl border border-[#D9E0E8] bg-white">
+    <div className="rounded-xl border border-[#E2E6EC] bg-white">
       {searchable && (
-        <div className="border-b border-[#D9E0E8] p-4">
+        <div className="border-b border-[#E2E6EC] p-4">
           <div className="relative w-full max-w-xs">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -125,21 +125,21 @@ export function DataTable<T extends Record<string, unknown>>({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
+            <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
                   className={cn(
-                    "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]",
-                    col.sortable && "cursor-pointer select-none hover:text-[#172033]",
+                    "px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]",
+                    col.sortable && "cursor-pointer select-none hover:text-[#0F1B2D]",
                     col.className
                   )}
                 >
                   <span className="flex items-center gap-1">
                     {col.header}
                     {col.sortable && sortKey === col.key && (
-                      <span className="text-[#D4145A]">
+                      <span className="text-[#1F4FD8]">
                         {sortDir === "asc" ? "▲" : "▼"}
                       </span>
                     )}
@@ -153,7 +153,7 @@ export function DataTable<T extends Record<string, unknown>>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-12 text-center text-[#6B7280]"
+                  className="px-4 py-12 text-center text-[#5B6577]"
                 >
                   {emptyMessage}
                 </td>
@@ -162,12 +162,12 @@ export function DataTable<T extends Record<string, unknown>>({
               filteredData.map((row, i) => (
                 <tr
                   key={keyExtractor?.(row, i) ?? i}
-                  className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50"
+                  className="border-b border-[#F4F6F9] transition-colors last:border-0 hover:bg-[#F4F6F9]/50"
                 >
                   {columns.map((col) => (
                     <td
                       key={col.key}
-                      className={cn("px-4 py-3 text-[#172033]", col.className)}
+                      className={cn("px-4 py-3 text-[#0F1B2D]", col.className)}
                     >
                       {renderCell(row, col, i)}
                     </td>
@@ -180,8 +180,8 @@ export function DataTable<T extends Record<string, unknown>>({
       </div>
 
       {pagination && (
-        <div className="flex items-center justify-between border-t border-[#D9E0E8] px-4 py-3">
-          <p className="text-xs text-[#6B7280]">
+        <div className="flex items-center justify-between border-t border-[#E2E6EC] px-4 py-3">
+          <p className="text-xs text-[#5B6577]">
             Showing {(pagination.page - 1) * pagination.pageSize + 1} to{" "}
             {Math.min(pagination.page * pagination.pageSize, pagination.total)} of{" "}
             {pagination.total}
@@ -203,7 +203,7 @@ export function DataTable<T extends Record<string, unknown>>({
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
-            <span className="px-2 text-sm font-medium text-[#172033]">
+            <span className="px-2 text-sm font-medium text-[#0F1B2D]">
               {pagination.page} / {totalPages}
             </span>
             <Button

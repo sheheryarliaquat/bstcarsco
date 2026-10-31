@@ -80,7 +80,7 @@ export default function BookingDetail({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1F4FD8]" />
       </div>
     )
   }
@@ -90,12 +90,12 @@ export default function BookingDetail({
       <div className="space-y-4">
         <Link
           href="/passenger/bookings"
-          className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#172F52]"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5B6577] hover:text-[#0F1B2D]"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Bookings
         </Link>
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-12 text-center">
-          <p className="text-sm text-[#6B7280]">Booking not found.</p>
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-12 text-center">
+          <p className="text-sm text-[#5B6577]">Booking not found.</p>
         </div>
       </div>
     )
@@ -161,13 +161,13 @@ export default function BookingDetail({
     <div className="space-y-6">
       <Link
         href="/passenger/bookings"
-        className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#172F52]"
+        className="inline-flex items-center gap-1.5 text-sm text-[#5B6577] hover:text-[#0F1B2D]"
       >
         <ArrowLeft className="h-4 w-4" /> Back to Bookings
       </Link>
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold text-[#172F52]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">
           {booking.bookingNumber}
         </h1>
         <StatusBadge status={booking.bookingStatus} />
@@ -176,8 +176,8 @@ export default function BookingDetail({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Timeline */}
         <div className="lg:col-span-1">
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#5B6577]">
               Booking Timeline
             </h2>
             <div className="space-y-0">
@@ -189,14 +189,14 @@ export default function BookingDetail({
                     ) : step.status === "cancelled" ? (
                       <XCircle className="h-5 w-5 shrink-0 text-[#DC3545]" />
                     ) : (
-                      <CircleDot className="h-5 w-5 shrink-0 text-[#D9E0E8]" />
+                      <CircleDot className="h-5 w-5 shrink-0 text-[#E2E6EC]" />
                     )}
                     {i < timelineSteps.length - 1 && (
                       <div
                         className={`w-0.5 flex-1 ${
                           step.status === "completed"
                             ? "bg-[#28A745]"
-                            : "bg-[#D9E0E8]"
+                            : "bg-[#E2E6EC]"
                         }`}
                       />
                     )}
@@ -205,7 +205,7 @@ export default function BookingDetail({
                     <p
                       className={`text-sm font-medium ${
                         step.status === "completed"
-                          ? "text-[#172F52]"
+                          ? "text-[#0F1B2D]"
                           : step.status === "cancelled"
                             ? "text-[#DC3545]"
                             : "text-[#ADB5BD]"
@@ -214,7 +214,7 @@ export default function BookingDetail({
                       {step.label}
                     </p>
                     {step.time && (
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#5B6577]">
                         {new Date(step.time).toLocaleString("en-GB", {
                           day: "numeric",
                           month: "short",
@@ -234,48 +234,48 @@ export default function BookingDetail({
         {/* Details */}
         <div className="space-y-6 lg:col-span-2">
           {/* Route info */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#D4145A]" />
-              <h3 className="text-sm font-semibold text-[#172F52]">
+              <MapPin className="h-4 w-4 text-[#1F4FD8]" />
+              <h3 className="text-sm font-semibold text-[#0F1B2D]">
                 Route Information
               </h3>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs text-[#6B7280]">Pickup</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Pickup</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.pickup.formattedAddress}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[#6B7280]">Destination</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Destination</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.destination.formattedAddress}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[#6B7280]">Date & Time</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Date & Time</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.date} at {booking.pickupTime}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[#6B7280]">Distance</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Distance</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.distanceMiles} miles (~
                   {booking.estimatedDuration} min)
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[#6B7280]">Passengers</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Passengers</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.passengers}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[#6B7280]">Luggage</p>
-                <p className="text-sm font-medium text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Luggage</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.luggage} bags
                 </p>
               </div>
@@ -283,37 +283,37 @@ export default function BookingDetail({
           </div>
 
           {/* Vehicle info */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
-              <Car className="h-4 w-4 text-[#172F52]" />
-              <h3 className="text-sm font-semibold text-[#172F52]">
+              <Car className="h-4 w-4 text-[#0F1B2D]" />
+              <h3 className="text-sm font-semibold text-[#0F1B2D]">
                 Vehicle Information
               </h3>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs text-[#6B7280]">Vehicle Type</p>
-                <p className="text-sm font-medium capitalize text-[#172F52]">
+                <p className="text-xs text-[#5B6577]">Vehicle Type</p>
+                <p className="text-sm font-medium capitalize text-[#0F1B2D]">
                   {booking.vehicleType.replace(/_/g, " ")}
                 </p>
               </div>
               {vehicle && (
                 <>
                   <div>
-                    <p className="text-xs text-[#6B7280]">Vehicle</p>
-                    <p className="text-sm font-medium text-[#172F52]">
+                    <p className="text-xs text-[#5B6577]">Vehicle</p>
+                    <p className="text-sm font-medium text-[#0F1B2D]">
                       {vehicle.make} {vehicle.model} ({vehicle.year})
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#6B7280]">Registration</p>
-                    <p className="text-sm font-medium text-[#172F52]">
+                    <p className="text-xs text-[#5B6577]">Registration</p>
+                    <p className="text-sm font-medium text-[#0F1B2D]">
                       {vehicle.registration}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#6B7280]">Colour</p>
-                    <p className="text-sm font-medium text-[#172F52]">
+                    <p className="text-xs text-[#5B6577]">Colour</p>
+                    <p className="text-sm font-medium text-[#0F1B2D]">
                       {vehicle.colour}
                     </p>
                   </div>
@@ -321,8 +321,8 @@ export default function BookingDetail({
               )}
               {operator && (
                 <div>
-                  <p className="text-xs text-[#6B7280]">Operator</p>
-                  <p className="text-sm font-medium text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Operator</p>
+                  <p className="text-sm font-medium text-[#0F1B2D]">
                     {operator.companyName}
                   </p>
                 </div>
@@ -332,35 +332,35 @@ export default function BookingDetail({
 
           {/* Driver info */}
           {driver && (
-            <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+            <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
               <div className="mb-4 flex items-center gap-2">
-                <User className="h-4 w-4 text-[#172F52]" />
-                <h3 className="text-sm font-semibold text-[#172F52]">
+                <User className="h-4 w-4 text-[#0F1B2D]" />
+                <h3 className="text-sm font-semibold text-[#0F1B2D]">
                   Driver Information
                 </h3>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-[#6B7280]">Name</p>
-                  <p className="text-sm font-medium text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Name</p>
+                  <p className="text-sm font-medium text-[#0F1B2D]">
                     {driver.firstName} {driver.lastName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Rating</p>
-                  <p className="text-sm font-medium text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Rating</p>
+                  <p className="text-sm font-medium text-[#0F1B2D]">
                     ★ {driver.rating} ({driver.totalReviews} reviews)
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Phone</p>
-                  <p className="text-sm font-medium text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Phone</p>
+                  <p className="text-sm font-medium text-[#0F1B2D]">
                     {driver.phone}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Licence</p>
-                  <p className="text-sm font-medium text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Licence</p>
+                  <p className="text-sm font-medium text-[#0F1B2D]">
                     {driver.licenceNumber}
                   </p>
                 </div>
@@ -369,59 +369,59 @@ export default function BookingDetail({
           )}
 
           {/* Payment info */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-[#172F52]" />
-              <h3 className="text-sm font-semibold text-[#172F52]">
+              <CreditCard className="h-4 w-4 text-[#0F1B2D]" />
+              <h3 className="text-sm font-semibold text-[#0F1B2D]">
                 Payment Information
               </h3>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Base Fare</span>
-                <span className="text-[#172F52]">
+                <span className="text-[#5B6577]">Base Fare</span>
+                <span className="text-[#0F1B2D]">
                   £{booking.price.toFixed(2)}
                 </span>
               </div>
               {booking.discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#6B7280]">Discount</span>
+                  <span className="text-[#5B6577]">Discount</span>
                   <span className="text-[#28A745]">
                     -£{booking.discount.toFixed(2)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Tax (VAT)</span>
-                <span className="text-[#172F52]">
+                <span className="text-[#5B6577]">Tax (VAT)</span>
+                <span className="text-[#0F1B2D]">
                   £{booking.tax.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between border-t border-[#F5F7FA] pt-2 text-sm font-bold">
-                <span className="text-[#172F52]">Total</span>
-                <span className="text-[#172F52]">
+              <div className="flex justify-between border-t border-[#F4F6F9] pt-2 text-sm font-bold">
+                <span className="text-[#0F1B2D]">Total</span>
+                <span className="text-[#0F1B2D]">
                   £{booking.total.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">Payment Status</span>
+                <span className="text-[#5B6577]">Payment Status</span>
                 <StatusBadge status={booking.paymentStatus} type="payment" />
               </div>
             </div>
           </div>
 
           {/* Map placeholder */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
             <div className="mb-4 flex items-center gap-2">
-              <Navigation className="h-4 w-4 text-[#172F52]" />
-              <h3 className="text-sm font-semibold text-[#172F52]">
+              <Navigation className="h-4 w-4 text-[#0F1B2D]" />
+              <h3 className="text-sm font-semibold text-[#0F1B2D]">
                 Route Map
               </h3>
             </div>
-            <div className="flex h-48 items-center justify-center rounded-lg bg-[#F5F7FA]">
+            <div className="flex h-48 items-center justify-center rounded-lg bg-[#F4F6F9]">
               <div className="text-center">
-                <MapPin className="mx-auto mb-2 h-8 w-8 text-[#D9E0E8]" />
-                <p className="text-xs text-[#6B7280]">
+                <MapPin className="mx-auto mb-2 h-8 w-8 text-[#E2E6EC]" />
+                <p className="text-xs text-[#5B6577]">
                   Map view —{" "}
                   {booking.pickup.formattedAddress.split(",")[0]} →{" "}
                   {booking.destination.formattedAddress.split(",")[0]}
@@ -447,12 +447,12 @@ export default function BookingDetail({
                 </Button>
               )}
             {driver && (
-              <Button variant="outline" className="border-[#D9E0E8]">
+              <Button variant="outline" className="border-[#E2E6EC]">
                 <Phone className="h-4 w-4" /> Contact Driver
               </Button>
             )}
             <Link href="/passenger/support">
-              <Button variant="outline" className="border-[#D9E0E8]">
+              <Button variant="outline" className="border-[#E2E6EC]">
                 <Headphones className="h-4 w-4" /> Contact Support
               </Button>
             </Link>

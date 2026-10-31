@@ -56,7 +56,7 @@ const STATS = [
 export default function AboutPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             About Blue Star Airport Transfers LTD
@@ -70,7 +70,7 @@ export default function AboutPage() {
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-3xl font-bold text-[#172F52]">Our Story</h2>
+          <h2 className="text-3xl font-bold text-[#0F1B2D]">Our Story</h2>
           <div className="mt-6 space-y-4 text-gray-600">
             <p>
               Blue Star Airport Transfers LTD was born out of a simple frustration: booking a car
@@ -93,10 +93,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Mission & Values
             </h2>
           </div>
@@ -104,10 +104,10 @@ export default function AboutPage() {
             {VALUES.map((v) => (
               <Card key={v.title}>
                 <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FCE7EF]">
-                    <v.icon className="h-7 w-7 text-[#D4145A]" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E7EEFF]">
+                    <v.icon className="h-7 w-7 text-[#1F4FD8]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-[#172F52]">
+                  <h3 className="text-lg font-semibold text-[#0F1B2D]">
                     {v.title}
                   </h3>
                   <p className="text-sm text-gray-600">{v.description}</p>
@@ -121,7 +121,7 @@ export default function AboutPage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Meet the Team
             </h2>
             <p className="mt-2 text-gray-600">
@@ -131,34 +131,34 @@ export default function AboutPage() {
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {TEAM.map((member) => (
               <div key={member.name} className="text-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#172F52] text-2xl font-bold text-white">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#0F1B2D] text-2xl font-bold text-white">
                   {member.name
                     .split(" ")
                     .map((n) => n.charAt(0))
                     .join("")}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[#172F52]">
+                <h3 className="mt-4 text-lg font-semibold text-[#0F1B2D]">
                   {member.name}
                 </h3>
-                <p className="text-sm text-[#D4145A]">{member.role}</p>
+                <p className="text-sm text-[#1F4FD8]">{member.role}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">By the Numbers</h2>
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">By the Numbers</h2>
           </div>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#D4145A] text-white">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1F4FD8] text-white">
                   <stat.icon className="h-7 w-7" />
                 </div>
-                <p className="mt-4 text-3xl font-bold text-[#172F52]">
+                <p className="mt-4 text-3xl font-bold text-[#0F1B2D]">
                   {stat.value}
                 </p>
                 <p className="mt-1 text-sm text-gray-600">{stat.label}</p>

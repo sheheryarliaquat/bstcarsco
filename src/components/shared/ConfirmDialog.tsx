@@ -52,7 +52,7 @@ export function ConfirmDialog({
               variant === "destructive" &&
                 "bg-[#DC2626] text-white hover:bg-[#DC2626]/90",
               variant === "default" &&
-                "bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                "bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             )}
           >
             {confirmText}

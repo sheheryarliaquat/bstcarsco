@@ -50,11 +50,11 @@ export default function OperatorDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Dashboard</h1>
-          <p className="text-sm text-[#6B7280]">Welcome back. Here&apos;s your fleet overview.</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Dashboard</h1>
+          <p className="text-sm text-[#5B6577]">Welcome back. Here&apos;s your fleet overview.</p>
         </div>
         <Link href="/operator/bookings">
-          <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+          <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
             <ClipboardList className="mr-2 h-4 w-4" />
             View Bookings
           </Button>
@@ -98,12 +98,12 @@ export default function OperatorDashboardPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Bookings */}
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Recent Bookings</h3>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Recent Bookings</h3>
               <Link
                 href="/operator/bookings"
-                className="text-sm font-medium text-[#D4145A] hover:underline"
+                className="text-sm font-medium text-[#1F4FD8] hover:underline"
               >
                 View All
               </Link>
@@ -111,37 +111,37 @@ export default function OperatorDashboardPage() {
             <div className="overflow-x-auto">
               {bookings.length === 0 ? (
                 <div className="px-6 py-8 text-center">
-                  <p className="text-sm text-[#6B7280]">No recent bookings to display</p>
+                  <p className="text-sm text-[#5B6577]">No recent bookings to display</p>
                 </div>
               ) : (
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Booking ID</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Passenger</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Route</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Amount</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Status</th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Actions</th>
+                    <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Booking ID</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Passenger</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Route</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Amount</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Status</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {bookings.map((booking) => (
                       <tr
                         key={booking.id}
-                        className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
+                        className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50"
                       >
-                        <td className="px-4 py-3 font-medium text-[#172F52]">{booking.id}</td>
-                        <td className="px-4 py-3 text-[#172F52]">{booking.passenger}</td>
+                        <td className="px-4 py-3 font-medium text-[#0F1B2D]">{booking.id}</td>
+                        <td className="px-4 py-3 text-[#0F1B2D]">{booking.passenger}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1.5 max-w-[200px]">
-                            <MapPin className="h-3 w-3 shrink-0 text-[#D4145A]" />
-                            <span className="truncate text-[#6B7280]">
+                            <MapPin className="h-3 w-3 shrink-0 text-[#1F4FD8]" />
+                            <span className="truncate text-[#5B6577]">
                               {booking.from.split(",")[0]} → {booking.to.split(",")[0]}
                             </span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 font-semibold text-[#172F52]">{booking.amount}</td>
+                        <td className="px-4 py-3 font-semibold text-[#0F1B2D]">{booking.amount}</td>
                         <td className="px-4 py-3">
                           <StatusBadge status={booking.status} type="booking" />
                         </td>
@@ -178,25 +178,25 @@ export default function OperatorDashboardPage() {
         </div>
 
         {/* Driver Status Overview */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white">
-          <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-            <h3 className="text-base font-bold text-[#172F52]">Driver Status</h3>
+        <div className="rounded-xl border border-[#E2E6EC] bg-white">
+          <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+            <h3 className="text-base font-bold text-[#0F1B2D]">Driver Status</h3>
             <Link
               href="/operator/drivers"
-              className="text-sm font-medium text-[#D4145A] hover:underline"
+              className="text-sm font-medium text-[#1F4FD8] hover:underline"
             >
               View All
             </Link>
           </div>
-          <div className="divide-y divide-[#F5F7FA]">
+          <div className="divide-y divide-[#F4F6F9]">
             {driverStatusData.map((item) => (
               <div
                 key={item.driver.uid}
-                className="flex items-center justify-between px-6 py-3 transition-colors hover:bg-[#F5F7FA]/50"
+                className="flex items-center justify-between px-6 py-3 transition-colors hover:bg-[#F4F6F9]/50"
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#172F52]/10 text-xs font-bold text-[#172F52]">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F1B2D]/10 text-xs font-bold text-[#0F1B2D]">
                       {item.driver.firstName[0]}{item.driver.lastName[0]}
                     </div>
                     <span
@@ -211,10 +211,10 @@ export default function OperatorDashboardPage() {
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#172F52]">
+                    <p className="text-sm font-medium text-[#0F1B2D]">
                       {item.driver.firstName} {item.driver.lastName}
                     </p>
-                    <p className="text-[11px] text-[#6B7280]">
+                    <p className="text-[11px] text-[#5B6577]">
                       {item.tripsToday} trips today
                     </p>
                   </div>
@@ -243,44 +243,44 @@ export default function OperatorDashboardPage() {
 
       {/* Quick Stats */}
       <div className="grid gap-6 sm:grid-cols-3">
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#28A745]/10">
               <CheckCircle2 className="h-5 w-5 text-[#28A745]" />
             </div>
             <div>
-              <p className="text-sm text-[#6B7280]">Completion Rate</p>
-              <p className="text-2xl font-bold text-[#172F52]">0%</p>
+              <p className="text-sm text-[#5B6577]">Completion Rate</p>
+              <p className="text-2xl font-bold text-[#0F1B2D]">0%</p>
             </div>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[#F5F7FA]">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[#F4F6F9]">
             <div className="h-full rounded-full bg-[#28A745]" style={{ width: "0%" }} />
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#DC3545]/10">
               <XCircle className="h-5 w-5 text-[#DC3545]" />
             </div>
             <div>
-              <p className="text-sm text-[#6B7280]">Cancellation Rate</p>
-              <p className="text-2xl font-bold text-[#172F52]">0%</p>
+              <p className="text-sm text-[#5B6577]">Cancellation Rate</p>
+              <p className="text-2xl font-bold text-[#0F1B2D]">0%</p>
             </div>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-[#F5F7FA]">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[#F4F6F9]">
             <div className="h-full rounded-full bg-[#DC3545]" style={{ width: "0%" }} />
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4AF37]/10">
               <Star className="h-5 w-5 text-[#D4AF37]" />
             </div>
             <div>
-              <p className="text-sm text-[#6B7280]">Average Rating</p>
-              <p className="text-2xl font-bold text-[#172F52]">0.0</p>
+              <p className="text-sm text-[#5B6577]">Average Rating</p>
+              <p className="text-2xl font-bold text-[#0F1B2D]">0.0</p>
             </div>
           </div>
           <RatingStars rating={0} size="lg" count={0} />

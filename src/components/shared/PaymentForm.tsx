@@ -45,11 +45,11 @@ export function PaymentForm({
   return (
     <div className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-[#172033]">
+        <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
           Card Number
         </label>
         <div className="relative">
-          <CreditCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <CreditCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
           <Input
             value={cardNumber}
             onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
@@ -62,7 +62,7 @@ export function PaymentForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
+          <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
             Expiry Date
           </label>
           <Input
@@ -74,7 +74,7 @@ export function PaymentForm({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-[#172033]">
+          <label className="mb-1 block text-sm font-medium text-[#0F1B2D]">
             CVC
           </label>
           <Input
@@ -95,7 +95,7 @@ export function PaymentForm({
         </div>
       )}
 
-      <p className="text-center text-xs text-[#6B7280]">
+      <p className="text-center text-xs text-[#5B6577]">
         Your payment is secured with 256-bit SSL encryption
       </p>
     </div>

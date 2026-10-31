@@ -133,7 +133,7 @@ export default function BookingsPage() {
       key: "bookingNumber",
       header: "ID",
       render: (row) => (
-        <span className="text-xs font-medium text-[#6B7280]">
+        <span className="text-xs font-medium text-[#5B6577]">
           {(row as unknown as Booking).bookingNumber.split("-").pop()}
         </span>
       ),
@@ -146,8 +146,8 @@ export default function BookingsPage() {
         const b = row as unknown as Booking
         return (
           <div>
-            <p className="text-sm text-[#172F52]">{b.date}</p>
-            <p className="text-xs text-[#6B7280]">{b.pickupTime}</p>
+            <p className="text-sm text-[#0F1B2D]">{b.date}</p>
+            <p className="text-xs text-[#5B6577]">{b.pickupTime}</p>
           </div>
         )
       },
@@ -159,10 +159,10 @@ export default function BookingsPage() {
         const b = row as unknown as Booking
         return (
           <div className="max-w-[200px]">
-            <p className="truncate text-sm text-[#172F52]">
+            <p className="truncate text-sm text-[#0F1B2D]">
               {b.pickup.formattedAddress.split(",")[0]}
             </p>
-            <p className="truncate text-xs text-[#6B7280]">
+            <p className="truncate text-xs text-[#5B6577]">
               → {b.destination.formattedAddress.split(",")[0]}
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function BookingsPage() {
       render: (row) => {
         const b = row as unknown as Booking
         return (
-          <span className="text-sm text-[#172F52]">
+          <span className="text-sm text-[#0F1B2D]">
             {b.operatorId ? operatorNames[b.operatorId] ?? "Loading..." : "N/A"}
           </span>
         )
@@ -187,7 +187,7 @@ export default function BookingsPage() {
       render: (row) => {
         const b = row as unknown as Booking
         return (
-          <span className="text-sm capitalize text-[#172F52]">
+          <span className="text-sm capitalize text-[#0F1B2D]">
             {b.vehicleType.replace(/_/g, " ")}
           </span>
         )
@@ -200,7 +200,7 @@ export default function BookingsPage() {
       render: (row) => {
         const b = row as unknown as Booking
         return (
-          <span className="text-sm font-semibold text-[#172F52]">
+          <span className="text-sm font-semibold text-[#0F1B2D]">
             £{b.total.toFixed(2)}
           </span>
         )
@@ -223,7 +223,7 @@ export default function BookingsPage() {
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <button className="rounded-md p-1 text-[#6B7280] hover:bg-[#F5F7FA]" />
+                <button className="rounded-md p-1 text-[#5B6577] hover:bg-[#F4F6F9]" />
               }
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -266,8 +266,8 @@ export default function BookingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">My Bookings</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">My Bookings</h1>
+        <p className="text-sm text-[#5B6577]">
           View and manage all your car bookings.
         </p>
       </div>
@@ -288,7 +288,7 @@ export default function BookingsPage() {
             <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
           </TabsList>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => {

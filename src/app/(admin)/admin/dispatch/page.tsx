@@ -178,8 +178,8 @@ export default function AdminDispatchPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Dispatch</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Dispatch</h1>
+          <p className="text-sm text-[#5B6577]">
             Assign a driver and car to each booking and track it to completion
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function AdminDispatchPage() {
               onClick={() => setView(v)}
               className={cn(
                 "rounded-md px-3 py-1.5 text-sm font-semibold transition-colors",
-                view === v ? "bg-white text-[#172F52] shadow-sm" : "text-[#6B7280]"
+                view === v ? "bg-white text-[#0F1B2D] shadow-sm" : "text-[#5B6577]"
               )}
             >
               {v === "board" ? "Board" : "Map & queue"}
@@ -202,7 +202,7 @@ export default function AdminDispatchPage() {
         <Button
           variant="outline"
           size="sm"
-          className="border-[#D9E0E8]"
+          className="border-[#E2E6EC]"
           onClick={() => {
             setAssignModal(null)
             setSelectedDriverId(null)
@@ -227,62 +227,62 @@ export default function AdminDispatchPage() {
       {view === "map" && (
       <div className="grid h-[calc(100vh-220px)] gap-4 lg:grid-cols-[1fr_2fr_1fr]">
         {/* LEFT: Booking Queue */}
-        <div className="flex flex-col rounded-xl border border-[#D9E0E8] bg-white overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[#D9E0E8] px-4 py-3">
+        <div className="flex flex-col rounded-xl border border-[#E2E6EC] bg-white overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[#E2E6EC] px-4 py-3">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-[#D4145A]" />
-              <h3 className="text-sm font-bold text-[#172F52]">Booking Queue</h3>
+              <Clock className="h-4 w-4 text-[#1F4FD8]" />
+              <h3 className="text-sm font-bold text-[#0F1B2D]">Booking Queue</h3>
             </div>
-            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#D4145A] px-1.5 text-[10px] font-bold text-white">
+            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1F4FD8] px-1.5 text-[10px] font-bold text-white">
               {queue.length}
             </span>
           </div>
           <div className="flex-1 overflow-y-auto">
             {queue.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Car className="mb-2 h-8 w-8 text-[#D9E0E8]" />
-                <p className="text-sm font-medium text-[#6B7280]">No pending bookings</p>
-                <p className="text-xs text-[#6B7280]">All bookings are assigned</p>
+                <Car className="mb-2 h-8 w-8 text-[#E2E6EC]" />
+                <p className="text-sm font-medium text-[#5B6577]">No pending bookings</p>
+                <p className="text-xs text-[#5B6577]">All bookings are assigned</p>
               </div>
             ) : (
-              <div className="divide-y divide-[#F5F7FA]">
+              <div className="divide-y divide-[#F4F6F9]">
                 {queue.map((booking) => (
                   <div
                     key={booking.bookingNumber}
                     className={cn(
-                      "cursor-pointer px-4 py-3 transition-colors hover:bg-[#F5F7FA]/80",
-                      assignModal?.bookingNumber === booking.bookingNumber && "bg-[#D4145A]/5 border-l-2 border-[#D4145A]"
+                      "cursor-pointer px-4 py-3 transition-colors hover:bg-[#F4F6F9]/80",
+                      assignModal?.bookingNumber === booking.bookingNumber && "bg-[#1F4FD8]/5 border-l-2 border-[#1F4FD8]"
                     )}
                     onClick={() => { setAssignModal(booking); setSelectedDriverId(null) }}
                   >
                     <div className="mb-1.5 flex items-center justify-between">
-                      <span className="font-mono text-xs font-semibold text-[#172F52]">
+                      <span className="font-mono text-xs font-semibold text-[#0F1B2D]">
                         {booking.bookingNumber}
                       </span>
-                      <span className="rounded-full bg-[#172F52]/10 px-2 py-0.5 text-[10px] font-semibold text-[#172F52]">
+                      <span className="rounded-full bg-[#0F1B2D]/10 px-2 py-0.5 text-[10px] font-semibold text-[#0F1B2D]">
                         {booking.passengers} pax
                       </span>
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-start gap-1.5">
-                        <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[#D4145A]" />
-                        <p className="truncate text-xs text-[#6B7280]">
+                        <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[#1F4FD8]" />
+                        <p className="truncate text-xs text-[#5B6577]">
                           {booking.pickup.formattedAddress.split(",")[0]}
                         </p>
                       </div>
                       <div className="flex items-start gap-1.5">
                         <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-green-600" />
-                        <p className="truncate text-xs text-[#6B7280]">
+                        <p className="truncate text-xs text-[#5B6577]">
                           {booking.destination.formattedAddress.split(",")[0]}
                         </p>
                       </div>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
-                      <span className="text-[10px] text-[#6B7280]">{booking.date} {booking.pickupTime}</span>
-                      <span className="rounded bg-[#F5F7FA] px-1.5 py-0.5 text-[10px] font-medium text-[#172F52]">
+                      <span className="text-[10px] text-[#5B6577]">{booking.date} {booking.pickupTime}</span>
+                      <span className="rounded bg-[#F4F6F9] px-1.5 py-0.5 text-[10px] font-medium text-[#0F1B2D]">
                         {VEHICLE_LABELS[booking.vehicleType]}
                       </span>
-                      <span className="text-[10px] font-semibold text-[#172F52]">£{booking.total.toFixed(2)}</span>
+                      <span className="text-[10px] font-semibold text-[#0F1B2D]">£{booking.total.toFixed(2)}</span>
                     </div>
                   </div>
                 ))}
@@ -292,13 +292,13 @@ export default function AdminDispatchPage() {
         </div>
 
         {/* CENTER: Map Placeholder */}
-        <div className="relative flex flex-col rounded-xl border border-[#D9E0E8] bg-white overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[#D9E0E8] px-4 py-3">
+        <div className="relative flex flex-col rounded-xl border border-[#E2E6EC] bg-white overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[#E2E6EC] px-4 py-3">
             <div className="flex items-center gap-2">
-              <Navigation className="h-4 w-4 text-[#172F52]" />
-              <h3 className="text-sm font-bold text-[#172F52]">Live Map View</h3>
+              <Navigation className="h-4 w-4 text-[#0F1B2D]" />
+              <h3 className="text-sm font-bold text-[#0F1B2D]">Live Map View</h3>
             </div>
-            <span className="text-xs text-[#6B7280]">Real-time driver locations</span>
+            <span className="text-xs text-[#5B6577]">Real-time driver locations</span>
           </div>
           <div className="relative flex-1 bg-gradient-to-br from-[#E8F0FE] via-[#F0F4FF] to-[#E0E8F5]">
             {/* Simulated map with grid and markers */}
@@ -306,7 +306,7 @@ export default function AdminDispatchPage() {
               <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#172F52" strokeWidth="0.5" />
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#0F1B2D" strokeWidth="0.5" />
                   </pattern>
                 </defs>
                 <rect width="100%" height="100%" fill="url(#grid)" />
@@ -314,10 +314,10 @@ export default function AdminDispatchPage() {
             </div>
 
             {/* Simulated road lines */}
-            <div className="absolute left-0 right-0 top-1/3 h-px bg-[#172F52]/20" />
-            <div className="absolute left-0 right-0 top-2/3 h-px bg-[#172F52]/20" />
-            <div className="absolute top-0 bottom-0 left-1/3 w-px bg-[#172F52]/20" />
-            <div className="absolute top-0 bottom-0 left-2/3 w-px bg-[#172F52]/20" />
+            <div className="absolute left-0 right-0 top-1/3 h-px bg-[#0F1B2D]/20" />
+            <div className="absolute left-0 right-0 top-2/3 h-px bg-[#0F1B2D]/20" />
+            <div className="absolute top-0 bottom-0 left-1/3 w-px bg-[#0F1B2D]/20" />
+            <div className="absolute top-0 bottom-0 left-2/3 w-px bg-[#0F1B2D]/20" />
 
             {/* Driver markers */}
             {drivers.map((driver, i) => {
@@ -335,10 +335,10 @@ export default function AdminDispatchPage() {
                   className="absolute -translate-x-1/2 -translate-y-1/2"
                   style={{ top: pos.top, left: pos.left }}
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52] text-xs font-bold text-white shadow-lg ring-2 ring-white">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0F1B2D] text-xs font-bold text-white shadow-lg ring-2 ring-white">
                     {driver.firstName[0]}
                   </div>
-                  <div className="mt-0.5 rounded bg-[#172F52] px-1 py-0.5 text-center text-[8px] font-semibold text-white shadow">
+                  <div className="mt-0.5 rounded bg-[#0F1B2D] px-1 py-0.5 text-center text-[8px] font-semibold text-white shadow">
                     {driver.firstName}
                   </div>
                 </div>
@@ -359,7 +359,7 @@ export default function AdminDispatchPage() {
                   className="absolute -translate-x-1/2 -translate-y-1/2"
                   style={{ top: pos.top, left: pos.left }}
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#D4145A] shadow-lg ring-2 ring-white">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1F4FD8] shadow-lg ring-2 ring-white">
                     <MapPin className="h-3 w-3 text-white" />
                   </div>
                 </div>
@@ -368,15 +368,15 @@ export default function AdminDispatchPage() {
 
             {/* Legend */}
             <div className="absolute bottom-4 left-4 rounded-lg bg-white/90 p-3 shadow-sm backdrop-blur-sm">
-              <p className="mb-2 text-[10px] font-semibold uppercase text-[#6B7280]">Legend</p>
+              <p className="mb-2 text-[10px] font-semibold uppercase text-[#5B6577]">Legend</p>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-[#172F52]" />
-                  <span className="text-[10px] text-[#172F52]">Driver</span>
+                  <div className="h-3 w-3 rounded-full bg-[#0F1B2D]" />
+                  <span className="text-[10px] text-[#0F1B2D]">Driver</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-[#D4145A]" />
-                  <span className="text-[10px] text-[#172F52]">Pickup Point</span>
+                  <div className="h-3 w-3 rounded-full bg-[#1F4FD8]" />
+                  <span className="text-[10px] text-[#0F1B2D]">Pickup Point</span>
                 </div>
               </div>
             </div>
@@ -384,33 +384,33 @@ export default function AdminDispatchPage() {
         </div>
 
         {/* RIGHT: Available Drivers */}
-        <div className="flex flex-col rounded-xl border border-[#D9E0E8] bg-white overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[#D9E0E8] px-4 py-3">
+        <div className="flex flex-col rounded-xl border border-[#E2E6EC] bg-white overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[#E2E6EC] px-4 py-3">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-green-600" />
-              <h3 className="text-sm font-bold text-[#172F52]">Available Drivers</h3>
+              <h3 className="text-sm font-bold text-[#0F1B2D]">Available Drivers</h3>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setSortByDistance(!sortByDistance)}
                 className={cn(
                   "rounded px-2 py-0.5 text-[10px] font-semibold transition-colors",
-                  sortByDistance ? "bg-[#172F52] text-white" : "bg-[#F5F7FA] text-[#6B7280]"
+                  sortByDistance ? "bg-[#0F1B2D] text-white" : "bg-[#F4F6F9] text-[#5B6577]"
                 )}
               >
                 By Distance
               </button>
-              <span className="text-xs text-[#6B7280]">{drivers.length} online</span>
+              <span className="text-xs text-[#5B6577]">{drivers.length} online</span>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
             {drivers.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Users className="mb-2 h-8 w-8 text-[#D9E0E8]" />
-                <p className="text-sm font-medium text-[#6B7280]">No available drivers</p>
+                <Users className="mb-2 h-8 w-8 text-[#E2E6EC]" />
+                <p className="text-sm font-medium text-[#5B6577]">No available drivers</p>
               </div>
             ) : (
-              <div className="divide-y divide-[#F5F7FA]">
+              <div className="divide-y divide-[#F4F6F9]">
                 {sortedDrivers.map((driver) => {
                   const isSelected = selectedDriverId === driver.uid
                   return (
@@ -418,23 +418,23 @@ export default function AdminDispatchPage() {
                       key={driver.uid}
                       className={cn(
                         "px-4 py-3 transition-colors",
-                        isSelected && "bg-[#D4145A]/5"
+                        isSelected && "bg-[#1F4FD8]/5"
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <div className="relative">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#172F52] text-xs font-bold text-white">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F1B2D] text-xs font-bold text-white">
                             {driver.firstName[0]}{driver.lastName[0]}
                           </div>
                           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-green-500" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-[#172F52]">
+                          <p className="truncate text-sm font-medium text-[#0F1B2D]">
                             {driver.firstName} {driver.lastName}
                           </p>
                           <div className="flex items-center gap-2">
                             <RatingStars rating={driver.rating} size="sm" />
-                            <span className="text-[10px] text-[#6B7280]">({driver.totalReviews})</span>
+                            <span className="text-[10px] text-[#5B6577]">({driver.totalReviews})</span>
                           </div>
                         </div>
                         {assignModal && (
@@ -444,8 +444,8 @@ export default function AdminDispatchPage() {
                             className={cn(
                               "text-xs",
                               isSelected
-                                ? "bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-                                : "border-[#D9E0E8]"
+                                ? "bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
+                                : "border-[#E2E6EC]"
                             )}
                             onClick={() => setSelectedDriverId(isSelected ? null : driver.uid)}
                           >
@@ -455,10 +455,10 @@ export default function AdminDispatchPage() {
                       </div>
                       {assignModal && (
                         <div className="mt-2 flex items-center gap-3 pl-12">
-                          <span className="text-[10px] text-[#6B7280]">
+                          <span className="text-[10px] text-[#5B6577]">
                             {getDistanceEstimate(driver, assignModal)} from pickup
                           </span>
-                          <span className="text-[10px] text-[#6B7280]">
+                          <span className="text-[10px] text-[#5B6577]">
                             {driver.vehicleId ? vehicleInfoMap[driver.vehicleId] ?? "Loading..." : "No vehicle"}
                           </span>
                         </div>
@@ -472,9 +472,9 @@ export default function AdminDispatchPage() {
 
           {/* Assign Button */}
           {assignModal && selectedDriverId && (
-            <div className="border-t border-[#D9E0E8] px-4 py-3">
+            <div className="border-t border-[#E2E6EC] px-4 py-3">
               <Button
-                className="w-full bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                className="w-full bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
                 onClick={handleAssign}
               >
                 <Car className="mr-1.5 h-4 w-4" />
