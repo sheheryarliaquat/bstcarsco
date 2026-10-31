@@ -120,15 +120,33 @@ export default function HomePage() {
     <PublicLayout>
       <section className="relative overflow-hidden bg-gradient-to-br from-[#172F52] to-[#102544] px-4 pb-24 pt-16 sm:px-6 sm:pb-32 sm:pt-24 lg:px-8">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Book Your Car Online
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-300 sm:text-xl">
-            Compare trusted UK private hire providers and book your journey at the best
-            available price.
-          </p>
-          <div className="mx-auto mt-8 max-w-3xl">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_1.25fr]">
+          <div className="text-center lg:text-left">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white">
+              <Plane className="h-4 w-4" /> Heathrow · Gatwick · Stansted · Luton · Manchester
+            </p>
+            <h1 className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Airport transfers across the UK
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-gray-300 sm:text-xl lg:mx-0">
+              Fixed prices you see before you book. Licensed drivers, meet &amp; greet and child seats
+              available.
+            </p>
+            <ul className="mx-auto mt-6 grid max-w-md gap-3 text-left text-sm text-white sm:grid-cols-2 lg:mx-0">
+              {[
+                "Fixed fare, no surprises",
+                "Licensed, vetted drivers",
+                "Free cancellation up to 2 hours",
+                "Book online in two minutes",
+              ].map((point) => (
+                <li key={point} className="flex items-center gap-2">
+                  <BadgeCheck className="h-5 w-5 shrink-0 text-[#F2B233]" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="text-left">
             <BookingSearch />
           </div>
         </div>
