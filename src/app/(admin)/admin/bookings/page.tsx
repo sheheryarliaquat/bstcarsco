@@ -32,6 +32,7 @@ import type { Booking, Operator, User as AppUser } from "@/types"
 import { BookingStatus } from "@/types"
 import { listenToAllBookings, updateBookingStatus } from "@/lib/services/booking-service"
 import { getVehicle } from "@/lib/services/vehicle-service"
+import { listenToDrivers } from "@/lib/services/driver-service"
 import { getDocument } from "@/lib/firebase/firestore"
 
 type BookingRow = Booking & { id: string }
@@ -55,6 +56,16 @@ export default function AdminBookingsPage() {
   const [passengerNames, setPassengerNames] = useState<Record<string, string>>({})
   const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
   const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
+  const [driverNames, setDriverNames] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const unsubscribe = listenToDrivers(
+      (drivers) =>
+        setDriverNames(Object.fromEntries(drivers.map((d) => [d.uid, `${d.firstName} ${d.lastName}`]))),
+      () => setDriverNames({})
+    )
+    return () => unsubscribe()
+  }, [])
 
   useEffect(() => {
     const unsubscribe = listenToAllBookings(
@@ -138,7 +149,38 @@ export default function AdminBookingsPage() {
 
   const getDriverName = (driverId: string) => {
     if (!driverId) return "Unassigned"
-    return "Unknown"
+    return driverNames[driverId] ?? "Unknown"
+  }
+
+  // Download the bookings currently shown by the filters as a CSV for record keeping.
+  function exportCsv() {
+    const header = [
+      "Booking ref", "Booked at", "Pick-up date", "Pick-up time", "Passenger", "Pick-up", "Drop-off",
+      "Car type", "Passengers", "Luggage", "Flight", "Driver", "Vehicle", "Fare (GBP)", "Payment method",
+      "Payment status", "Booking status", "Cancellation reason",
+    ]
+    const statusLabel = (v: string) => BOOKING_STATUSES.find((s) => s.value === v)?.label ?? v
+    const rows = filtered.map((b) => [
+      b.bookingNumber, b.createdAt, b.date, b.pickupTime, getPassengerName(b.passengerId),
+      b.pickup?.formattedAddress, b.destination?.formattedAddress, b.vehicleType, b.passengers, b.luggage,
+      b.specialRequirements?.flightNumber ?? "", getDriverName(b.driverId), b.vehicleId ? getVehicleInfo(b.vehicleId) : "",
+      (b.total ?? 0).toFixed(2), b.paymentMethod ?? "", b.paymentStatus, statusLabel(b.bookingStatus),
+      b.cancellationReason ?? "",
+    ])
+    const escape = (v: unknown) => {
+      const t = String(v ?? "")
+      // Prefix formula-like cells so spreadsheets don't execute them.
+      const safe = /^[=+\-@]/.test(t) ? `'${t}` : t
+      return /[",\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe
+    }
+    const csv = [header, ...rows].map((r) => r.map(escape).join(",")).join("\r\n")
+    const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `bookings-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const getVehicleInfo = (vehicleId: string) => {
@@ -277,9 +319,15 @@ export default function AdminBookingsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-[#D9E0E8]">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-[#D9E0E8]"
+            onClick={exportCsv}
+            disabled={filtered.length === 0}
+          >
             <Download className="mr-1.5 h-3.5 w-3.5" />
-            Export
+            Export CSV
           </Button>
         </div>
       </div>

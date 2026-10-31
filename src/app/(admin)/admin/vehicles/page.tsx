@@ -26,6 +26,15 @@ import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { VEHICLE_TYPES } from "@/constants"
 import {
+  VEHICLE_COMPLIANCE_FIELDS,
+  expiryState,
+  formatUKDate,
+  vehicleCompliance,
+  daysUntil,
+  type ExpiryState,
+  type VehicleComplianceKey,
+} from "@/lib/utils/compliance"
+import {
   createVehicle,
   deleteVehicle,
   listenToVehicles,
@@ -72,6 +81,16 @@ interface NewVehicle {
   isHybrid: boolean
   wheelchairAccessible: boolean
   operatorId: string
+  motExpiry: string
+  insuranceExpiry: string
+  phvLicenceExpiry: string
+}
+
+const EXPIRY_BADGE: Record<ExpiryState, string> = {
+  ok: "bg-green-50 text-green-700",
+  due: "bg-amber-50 text-amber-800",
+  expired: "bg-red-50 text-red-700",
+  missing: "bg-[#F5F7FA] text-[#6B7280]",
 }
 
 const EMPTY_VEHICLE: NewVehicle = {
@@ -87,6 +106,9 @@ const EMPTY_VEHICLE: NewVehicle = {
   isHybrid: false,
   wheelchairAccessible: false,
   operatorId: "",
+  motExpiry: "",
+  insuranceExpiry: "",
+  phvLicenceExpiry: "",
 }
 
 export default function AdminVehiclesPage() {
@@ -128,6 +150,21 @@ export default function AdminVehiclesPage() {
 
   const getDriverName = (driverId: string) => {
     return driverId ? "Unknown" : "Unassigned"
+  }
+
+  // Vehicles whose MOT, insurance or PHV licence has expired or expires within 30 days.
+  const complianceAlerts = useMemo(
+    () =>
+      vehicles
+        .map((v) => ({ v, c: vehicleCompliance(v) }))
+        .filter(({ c }) => c.state === "expired" || c.state === "due"),
+    [vehicles]
+  )
+
+  async function handleSetExpiry(vehicle: Vehicle, key: VehicleComplianceKey, value: string) {
+    const patch = { [key]: value } as Partial<Vehicle>
+    await updateVehicle(vehicle.id, patch)
+    setSelectedVehicle((cur) => (cur && cur.id === vehicle.id ? { ...cur, ...patch } : cur))
   }
 
   const filtered = useMemo(() => {
@@ -178,6 +215,9 @@ export default function AdminVehiclesPage() {
       isHybrid: newVehicle.isHybrid,
       isApproved: false,
       availabilityStatus: "available",
+      ...(newVehicle.motExpiry && { motExpiry: newVehicle.motExpiry }),
+      ...(newVehicle.insuranceExpiry && { insuranceExpiry: newVehicle.insuranceExpiry }),
+      ...(newVehicle.phvLicenceExpiry && { phvLicenceExpiry: newVehicle.phvLicenceExpiry }),
     }
     await createVehicle(vehicle)
     setNewVehicle(EMPTY_VEHICLE)
@@ -307,6 +347,27 @@ export default function AdminVehiclesPage() {
       },
     },
     {
+      key: "compliance",
+      header: "Compliance",
+      render: (row) => {
+        const v = row as unknown as Vehicle
+        const c = vehicleCompliance(v)
+        const text =
+          c.state === "ok"
+            ? "All valid"
+            : c.state === "missing"
+              ? `${c.label} date missing`
+              : c.state === "expired"
+                ? `${c.label} expired`
+                : `${c.label} due ${formatUKDate(c.date!)}`
+        return (
+          <span className={cn("inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold", EXPIRY_BADGE[c.state])}>
+            {text}
+          </span>
+        )
+      },
+    },
+    {
       key: "availability",
       header: "Availability",
       render: (row) => {
@@ -372,6 +433,24 @@ export default function AdminVehiclesPage() {
           Add Vehicle
         </Button>
       </div>
+
+      {complianceAlerts.length > 0 && (
+        <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-bold text-amber-900">
+            {complianceAlerts.length} vehicle{complianceAlerts.length > 1 ? "s need" : " needs"} attention
+          </p>
+          <ul className="mt-1 space-y-0.5 text-sm text-amber-900">
+            {complianceAlerts.map(({ v, c }) => (
+              <li key={v.id}>
+                <span className="font-mono font-semibold">{v.registration}</span> · {c.label}{" "}
+                {c.state === "expired"
+                  ? `expired on ${formatUKDate(c.date!)}`
+                  : `expires ${formatUKDate(c.date!)} (${daysUntil(c.date!)} days)`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Pricing / Rates Section */}
       <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
@@ -587,6 +666,17 @@ export default function AdminVehiclesPage() {
                 ))}
               </select>
             </div>
+            {VEHICLE_COMPLIANCE_FIELDS.map((f) => (
+              <div key={f.key}>
+                <Label className="text-sm font-medium text-[#172033]">{f.label} expiry</Label>
+                <Input
+                  type="date"
+                  value={newVehicle[f.key]}
+                  onChange={(e) => setNewVehicle((p) => ({ ...p, [f.key]: e.target.value }))}
+                  className="mt-1 h-10"
+                />
+              </div>
+            ))}
             <div>
               <Label className="text-sm font-medium text-[#172033]">Passenger Capacity</Label>
               <Input
@@ -734,6 +824,31 @@ export default function AdminVehiclesPage() {
                   {selectedVehicle.isApproved ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                   {selectedVehicle.isApproved ? "Approved" : "Pending Approval"}
                 </span>
+              </div>
+              <div className="rounded-lg bg-[#F5F7FA] p-3 sm:col-span-2">
+                <p className="mb-1.5 text-xs font-semibold uppercase text-[#6B7280]">Compliance documents</p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {VEHICLE_COMPLIANCE_FIELDS.map((f) => {
+                    const date = selectedVehicle[f.key]
+                    const state = expiryState(date)
+                    return (
+                      <label key={f.key} className="text-xs font-medium text-[#172F52]">
+                        <span className="flex items-center justify-between gap-2">
+                          {f.label}
+                          <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", EXPIRY_BADGE[state])}>
+                            {state === "ok" ? "Valid" : state === "due" ? "Due soon" : state === "expired" ? "Expired" : "Not set"}
+                          </span>
+                        </span>
+                        <Input
+                          type="date"
+                          value={date ?? ""}
+                          onChange={(e) => handleSetExpiry(selectedVehicle, f.key, e.target.value)}
+                          className="mt-1 h-9 bg-white"
+                        />
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
               <div className="rounded-lg bg-[#F5F7FA] p-3 sm:col-span-2">
                 <p className="mb-1.5 text-xs font-semibold uppercase text-[#6B7280]">Fleet Availability</p>

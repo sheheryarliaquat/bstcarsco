@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { RatingStars } from "@/components/shared/RatingStars"
+import { DispatchBoard, type BoardBooking } from "@/components/admin/DispatchBoard"
 import { listenToAllBookings, updateBooking } from "@/lib/services/booking-service"
 import { listenToDrivers, updateDriver } from "@/lib/services/driver-service"
 import { getVehicle } from "@/lib/services/vehicle-service"
@@ -46,6 +47,7 @@ export default function AdminDispatchPage() {
   const [sortByDistance, setSortByDistance] = useState(true)
   const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
   const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
+  const [view, setView] = useState<"board" | "map">("board")
 
   useEffect(() => {
     const unsubscribe = listenToAllBookings(
@@ -94,15 +96,17 @@ export default function AdminDispatchPage() {
   }, [queue])
 
   useEffect(() => {
-    const vehicleIds = [...new Set(drivers.map((d) => d.vehicleId).filter(Boolean))]
+    const vehicleIds = [
+      ...new Set([...allDrivers.map((d) => d.vehicleId), ...allBookings.map((b) => b.vehicleId)].filter(Boolean)),
+    ]
     Promise.all(vehicleIds.map((id) => getVehicle(id).catch(() => null))).then((results) => {
       const map: Record<string, string> = {}
       results.forEach((v, i) => {
-        map[vehicleIds[i]] = v ? `${v.make} ${v.model}` : "Unknown"
+        map[vehicleIds[i]] = v ? `${v.registration} ${v.make} ${v.model}` : "Unknown"
       })
       setVehicleInfoMap(map)
     })
-  }, [drivers])
+  }, [allDrivers, allBookings])
 
   const sortedDrivers = sortByDistance
     ? [...drivers].sort((a, b) => {
@@ -134,6 +138,31 @@ export default function AdminDispatchPage() {
     setSelectedDriverId(null)
   }
 
+  async function boardAssign(booking: BoardBooking, driver: Driver) {
+    await Promise.all([
+      updateBooking(booking.id, {
+        driverId: driver.uid,
+        vehicleId: driver.vehicleId || booking.vehicleId || "",
+        bookingStatus: BookingStatus.DriverAssigned,
+      }),
+      updateDriver(driver.uid, { status: "busy" }),
+    ])
+  }
+
+  async function boardSetStatus(booking: BoardBooking, status: BookingStatus) {
+    await updateBooking(booking.id, { bookingStatus: status })
+    // A finished trip frees the driver for the next job.
+    if (status === BookingStatus.TripCompleted && booking.driverId) {
+      await updateDriver(booking.driverId, { status: "online" })
+    }
+  }
+
+  async function boardUnassign(booking: BoardBooking) {
+    const previous = booking.driverId
+    await updateBooking(booking.id, { driverId: "", bookingStatus: BookingStatus.Confirmed })
+    if (previous) await updateDriver(previous, { status: "online" })
+  }
+
   function getOperatorName(operatorId: string) {
     if (!operatorId) return "Unassigned"
     return operatorNames[operatorId] ?? "Loading..."
@@ -151,8 +180,24 @@ export default function AdminDispatchPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#172F52]">Dispatch</h1>
           <p className="text-sm text-[#6B7280]">
-            Assign drivers to unassigned bookings
+            Assign a driver and car to each booking and track it to completion
           </p>
+        </div>
+        <div className="ml-auto mr-2 flex gap-1 rounded-lg bg-[#EEF1F5] p-1" role="tablist" aria-label="Dispatch view">
+          {(["board", "map"] as const).map((v) => (
+            <button
+              key={v}
+              role="tab"
+              aria-selected={view === v}
+              onClick={() => setView(v)}
+              className={cn(
+                "rounded-md px-3 py-1.5 text-sm font-semibold transition-colors",
+                view === v ? "bg-white text-[#172F52] shadow-sm" : "text-[#6B7280]"
+              )}
+            >
+              {v === "board" ? "Board" : "Map & queue"}
+            </button>
+          ))}
         </div>
         <Button
           variant="outline"
@@ -168,6 +213,18 @@ export default function AdminDispatchPage() {
         </Button>
       </div>
 
+      {view === "board" && (
+        <DispatchBoard
+          bookings={allBookings}
+          drivers={allDrivers}
+          vehicleInfo={vehicleInfoMap}
+          onAssign={boardAssign}
+          onSetStatus={boardSetStatus}
+          onUnassign={boardUnassign}
+        />
+      )}
+
+      {view === "map" && (
       <div className="grid h-[calc(100vh-220px)] gap-4 lg:grid-cols-[1fr_2fr_1fr]">
         {/* LEFT: Booking Queue */}
         <div className="flex flex-col rounded-xl border border-[#D9E0E8] bg-white overflow-hidden">
@@ -427,6 +484,8 @@ export default function AdminDispatchPage() {
           )}
         </div>
       </div>
+
+      )}
 
       {/* Assignment Confirmation Modal */}
       <ConfirmDialog

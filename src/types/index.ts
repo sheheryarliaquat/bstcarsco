@@ -195,6 +195,10 @@ export interface Vehicle {
   availabilityStatus?: VehicleAvailabilityStatus;
   availabilityNote?: string;
   availabilityUpdatedAt?: string;
+  /** Compliance expiry dates (YYYY-MM-DD). */
+  motExpiry?: string;
+  insuranceExpiry?: string;
+  phvLicenceExpiry?: string;
 }
 
 export interface Booking {
@@ -350,6 +354,24 @@ export interface PricingRule {
   weekendSurchargePercent: number;
   peakTimeSurchargePercent: number;
   congestionCharge: number;
+}
+
+/**
+ * A fixed point-to-point fare set by an admin, e.g. "Central London → Heathrow".
+ * Each side is a list of area tokens: UK postcode prefixes ("SW1", "W1", "RG"),
+ * airport codes ("LHR", "LGW") or town names ("Oxford").
+ */
+export interface RouteFare {
+  id: string;
+  fromLabel: string;
+  fromAreas: string[];
+  toLabel: string;
+  toAreas: string[];
+  /** Fixed one-way price per car type, in GBP. A missing type falls back to mileage pricing. */
+  prices: Partial<Record<VehicleType, number>>;
+  /** Apply the same fare for the reverse journey. */
+  bothWays: boolean;
+  active: boolean;
 }
 
 export interface Payout {

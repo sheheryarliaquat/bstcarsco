@@ -3,6 +3,7 @@
 import { getDocument } from '@/lib/firebase/firestore';
 import { getAllVehicles, getVehicleRates, type VehicleRate } from './vehicle-service';
 import { calculateDistance, estimateDuration } from './pricing';
+import { getRouteFares, findRouteFare } from './route-fare-service';
 import type { Location, Operator, Quote, Vehicle } from '@/types';
 
 const DEFAULT_RATE: Omit<VehicleRate, 'vehicleType' | 'label'> = {
@@ -26,7 +27,12 @@ function roundTo2(n: number): number {
 }
 
 export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> {
-  const [vehicles, rates] = await Promise.all([getAllVehicles(), getVehicleRates()]);
+  const [vehicles, rates, routeFares] = await Promise.all([
+    getAllVehicles(),
+    getVehicleRates(),
+    // A failure to read route fares must not block quotes — mileage pricing still applies.
+    getRouteFares().catch(() => []),
+  ]);
 
   const eligible = vehicles.filter(
     (v) =>
@@ -53,8 +59,10 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
     const minimumFare = rate?.minimumFare ?? DEFAULT_RATE.minimumFare;
     const bookingFee = rate?.bookingFee ?? DEFAULT_RATE.bookingFee;
 
+    // An admin-set fixed fare for this route and car type wins over mileage pricing.
+    const fixed = findRouteFare(routeFares, search.pickup, search.destination, vehicle.vehicleType);
     const subtotal = baseFare + distanceMiles * perMile + durationMinutes * perMinute + bookingFee;
-    const price = roundTo2(Math.max(subtotal, minimumFare));
+    const price = fixed ? roundTo2(fixed.price) : roundTo2(Math.max(subtotal, minimumFare));
 
     let operator = operatorCache.get(vehicle.operatorId);
     if (operator === undefined) {
@@ -86,7 +94,7 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
       isHybrid: vehicle.isHybrid,
       price,
       paymentTypes: ['card', 'cash'],
-      features: [],
+      features: fixed ? ['Fixed fare'] : [],
       isLowestPrice: false,
     });
   }
