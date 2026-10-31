@@ -2,12 +2,15 @@
 
 import type { BookingSearchParams } from '@/components/booking/BookingSearch';
 import type { Quote } from '@/types';
+import type { JourneyPriceLine } from '@/lib/services/extras-service';
 
 const KEY = 'bst_checkout_selection';
 
 export interface CheckoutSelection {
   quote: Quote;
   search: BookingSearchParams;
+  /** Price lines chosen on the car selection page (fare, return leg, extras), before VAT. */
+  pricing?: { lines: JourneyPriceLine[]; subtotal: number };
 }
 
 export function saveCheckoutSelection(selection: CheckoutSelection): void {

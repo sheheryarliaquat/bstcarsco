@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { VEHICLE_TYPES, PRICING_DEFAULTS } from "@/constants"
 import { RouteFaresEditor } from "@/components/admin/RouteFaresEditor"
+import { ExtrasPricingEditor } from "@/components/admin/ExtrasPricingEditor"
 import type { PricingRule } from "@/types"
 
 interface Surcharges {
@@ -95,6 +96,9 @@ export default function AdminPricingPage() {
 
       {/* Fixed point-to-point fares per car type */}
       <RouteFaresEditor />
+
+      {/* Optional extras (meet & greet, child seat, return discount) */}
+      <ExtrasPricingEditor />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Commission */}

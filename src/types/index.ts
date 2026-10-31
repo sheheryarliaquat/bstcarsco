@@ -374,6 +374,14 @@ export interface RouteFare {
   active: boolean;
 }
 
+/** Prices for optional extras, set by an admin. 0 means the extra is free. */
+export interface BookingExtrasPricing {
+  meetAndGreet: number;
+  childSeat: number;
+  /** Percentage taken off the doubled fare when a return journey is booked. */
+  returnDiscountPercent: number;
+}
+
 export interface Payout {
   id: string;
   operatorId: string;

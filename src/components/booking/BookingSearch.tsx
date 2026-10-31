@@ -132,6 +132,10 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
     params.set("time", time)
     params.set("passengers", String(passengers))
     params.set("luggage", String(luggage))
+    if (childSeat) params.set("childSeat", "1")
+    if (wheelchair) params.set("wheelchair", "1")
+    if (meetGreet) params.set("meetGreet", "1")
+    if (isAirport && flightNumber.trim()) params.set("flight", flightNumber.trim().toUpperCase())
 
     router.push(`/quotes?${params.toString()}`)
   }
@@ -346,7 +350,7 @@ export function BookingSearch({ onSearch, compact }: BookingSearchProps) {
         className="h-12 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <MapPin className="mr-2 h-5 w-5" />
-        Get Quotes
+        Get prices
       </Button>
       {(!pickup || !destination) && (pickupText || destinationText) && (
         <p className="text-center text-xs text-[#6B7280]">

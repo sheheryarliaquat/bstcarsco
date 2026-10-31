@@ -80,6 +80,8 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState("");
   const [specialOpen, setSpecialOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+  const [returnDate, setReturnDate] = useState("");
+  const [returnTime, setReturnTime] = useState("");
 
   useEffect(() => {
     const stored = getCheckoutSelection();
@@ -98,7 +100,12 @@ export default function CheckoutPage() {
   const distanceMiles =
     pickup && destination ? calculateDistance(pickup, destination) : 0;
 
-  const basePrice = quote?.price ?? 0;
+  // Fare + return leg + extras as chosen on the car selection page; falls back
+  // to the single-trip quote price for selections saved before extras existed.
+  const priceLines = selection?.pricing?.lines ?? (quote ? [{ label: "Journey Fare", amount: quote.price }] : []);
+  const basePrice = selection?.pricing?.subtotal ?? quote?.price ?? 0;
+  const isReturn = search?.tripType === "return";
+  const returnMissing = isReturn && (!returnDate || !returnTime);
   const discount = promoDiscount;
   const tax = (basePrice - discount) * 0.2;
   const total = basePrice - discount + tax;
@@ -124,6 +131,7 @@ export default function CheckoutPage() {
 
   const createAccount = watch("createAccount");
   const continueAsGuest = watch("continueAsGuest");
+  const notes = watch("specialRequirements") ?? "";
 
   function handlePromoApply() {
     if (promoInput.toUpperCase() === "FIRST10") {
@@ -137,6 +145,10 @@ export default function CheckoutPage() {
 
   async function handlePayment() {
     if (!quote || !pickup || !destination || !search) return;
+    if (returnMissing) {
+      setPaymentError("Please enter the date and time for your return journey.");
+      return;
+    }
     setPaymentLoading(true);
     setPaymentError("");
 
@@ -160,6 +172,7 @@ export default function CheckoutPage() {
         driverId: "",
         vehicleId: quote.id,
         tripType: search.tripType,
+        ...(isReturn && { returnDate, returnTime }),
         pickup,
         destination,
         viaStops: [],
@@ -167,6 +180,14 @@ export default function CheckoutPage() {
         pickupTime: search.time,
         passengers: search.passengers,
         luggage: search.luggage,
+        // Firestore rejects undefined values, so only include fields that are set.
+        specialRequirements: {
+          childSeat: Boolean(search.specialRequirements?.childSeat),
+          wheelchairAccessible: Boolean(search.specialRequirements?.wheelchairAccessible),
+          meetAndGreet: Boolean(search.specialRequirements?.meetAndGreet),
+          ...(search.specialRequirements?.flightNumber && { flightNumber: search.specialRequirements.flightNumber }),
+          ...(notes.trim() && { notes: notes.trim() }),
+        },
         vehicleType: quote.vehicleType,
         distanceMiles,
         estimatedDuration: quote.estimatedJourneyTime,
@@ -382,6 +403,43 @@ export default function CheckoutPage() {
                   </label>
                 </div>
               </div>
+
+              {isReturn && (
+                <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
+                  <h2 className="mb-1 text-lg font-bold text-[#172F52]">Return journey</h2>
+                  <p className="mb-4 text-sm text-[#6B7280]">
+                    From {destination.formattedAddress.split(",")[0]} back to {pickup.formattedAddress.split(",")[0]}.
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="returnDate" className="text-sm font-medium text-[#172033]">
+                        Return date *
+                      </Label>
+                      <Input
+                        id="returnDate"
+                        type="date"
+                        value={returnDate}
+                        min={format(search.date ?? new Date(), "yyyy-MM-dd")}
+                        onChange={(e) => setReturnDate(e.target.value)}
+                        className="mt-1.5 h-11"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="returnTime" className="text-sm font-medium text-[#172033]">
+                        Pick-up time *
+                      </Label>
+                      <Input
+                        id="returnTime"
+                        type="time"
+                        step={900}
+                        value={returnTime}
+                        onChange={(e) => setReturnTime(e.target.value)}
+                        className="mt-1.5 h-11"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
                 <button
@@ -637,10 +695,17 @@ export default function CheckoutPage() {
                 <Separator className="my-3" />
 
                 <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between text-[#172033]">
-                    <span>Journey Fare</span>
-                    <span>£{basePrice.toFixed(2)}</span>
-                  </div>
+                  {priceLines.map((line) => (
+                    <div
+                      key={line.label}
+                      className={line.amount < 0 ? "flex justify-between text-[#168A55]" : "flex justify-between text-[#172033]"}
+                    >
+                      <span>{line.label}</span>
+                      <span>
+                        {line.amount < 0 ? "-" : ""}£{Math.abs(line.amount).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                   {promoApplied && (
                     <div className="flex justify-between text-[#168A55]">
                       <span>Discount</span>

@@ -47,6 +47,18 @@ function todayISO(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
 }
 
+/**
+ * Bookings store the pick-up date either as "YYYY-MM-DD" or as a full ISO
+ * timestamp (checkout saves `date.toISOString()`), so compare on the local day.
+ */
+export function bookingDayKey(value: string | undefined): string {
+  if (!value) return ""
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value.slice(0, 10)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
 function vehicleLabel(type: string): string {
   return VEHICLE_TYPES.find((v) => v.value === type)?.label ?? type
 }
@@ -82,7 +94,7 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
     const q = search.trim().toLowerCase()
     const grouped: Record<ColumnKey, BoardBooking[]> = { unassigned: [], assigned: [], onroute: [], completed: [] }
     for (const b of bookings) {
-      if (!allDates && b.date !== date) continue
+      if (!allDates && bookingDayKey(b.date) !== date) continue
       if (
         q &&
         ![b.bookingNumber, b.pickup?.formattedAddress, b.destination?.formattedAddress, b.pickup?.postcode]
@@ -94,7 +106,9 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
       if (col) grouped[col].push(b)
     }
     for (const list of Object.values(grouped)) {
-      list.sort((a, b) => `${a.date} ${a.pickupTime}`.localeCompare(`${b.date} ${b.pickupTime}`))
+      list.sort((a, b) =>
+        `${bookingDayKey(a.date)} ${a.pickupTime}`.localeCompare(`${bookingDayKey(b.date)} ${b.pickupTime}`)
+      )
     }
     return grouped
   }, [bookings, date, allDates, search])
@@ -190,7 +204,7 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
                     </span>
                     <span className="font-mono text-[11px] font-semibold text-[#6B7280]">{b.bookingNumber}</span>
                   </div>
-                  {allDates && <p className="text-xs text-[#6B7280]">{b.date}</p>}
+                  {allDates && <p className="text-xs text-[#6B7280]">{bookingDayKey(b.date)}</p>}
                   <div className="space-y-1 text-xs text-[#172F52]">
                     <p className="flex gap-1.5">
                       <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[#D4145A]" />
