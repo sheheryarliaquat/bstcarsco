@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { VEHICLE_TYPES, PRICING_DEFAULTS } from "@/constants"
+import { RouteFaresEditor } from "@/components/admin/RouteFaresEditor"
 import type { PricingRule } from "@/types"
 
 interface Surcharges {
@@ -91,6 +92,9 @@ export default function AdminPricingPage() {
           {saved ? "Saved!" : "Save Settings"}
         </Button>
       </div>
+
+      {/* Fixed point-to-point fares per car type */}
+      <RouteFaresEditor />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Commission */}
