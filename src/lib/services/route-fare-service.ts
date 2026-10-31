@@ -62,6 +62,8 @@ export function parseAreas(input: string): string[] {
     .filter(Boolean);
 }
 
+const AIRPORT_ONLY_DISTRICTS = new Set(['TW6']);
+
 function outwardCode(postcode: string): string {
   const compact = (postcode || '').toUpperCase().replace(/\s+/g, '');
   if (compact.length < 5) return compact;
@@ -84,10 +86,13 @@ export function locationMatchesArea(loc: Location, token: string): boolean {
 
   const airport = UK_AIRPORTS.find((a) => a.code === t);
   if (airport) {
-    if (outward && outward === airport.postcode.toUpperCase()) return true;
+    // Only districts that contain nothing but the airport can match on postcode alone
+    // (E16, RH6, LU2 and CM24 also cover homes and towns near the airport).
+    if (outward && AIRPORT_ONLY_DISTRICTS.has(outward) && outward === airport.postcode.toUpperCase()) return true;
     if (new RegExp(`\\b${airport.code.toLowerCase()}\\b`).test(address)) return true;
+    // Name match needs "airport" too, so "City of London" isn't taken for London City Airport.
     const words = airportKeywords(airport.name);
-    return words.length > 0 && words.every((w) => address.includes(w));
+    return words.length > 0 && address.includes('airport') && words.every((w) => address.includes(w));
   }
 
   if (/^[A-Z]{1,2}\d/.test(t)) {

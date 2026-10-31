@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { ArrowLeftRight, Plus, Route, Save, Search, Trash2, CheckCircle } from "lucide-react"
+import { ArrowLeftRight, CheckCircle, FileSpreadsheet, Plus, Route, Save, Search, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,7 @@ import {
   parseAreas,
   saveRouteFares,
 } from "@/lib/services/route-fare-service"
+import { mergeRouteFares, parseRouteFareWorkbook } from "@/lib/services/route-fare-import"
 import type { Location, RouteFare, VehicleType } from "@/types"
 
 const UK_POSTCODE_IN_TEXT = /\b([A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})\b/i
@@ -60,6 +61,42 @@ export function RouteFaresEditor() {
   const [draft, setDraft] = useState(emptyDraft)
   const [testFrom, setTestFrom] = useState("")
   const [testTo, setTestTo] = useState("")
+  const [importType, setImportType] = useState<VehicleType>("saloon")
+  const [importing, setImporting] = useState(false)
+  const [importNote, setImportNote] = useState<{ ok: boolean; text: string } | null>(null)
+
+  async function importWorkbook(file: File) {
+    setImporting(true)
+    setImportNote(null)
+    try {
+      // Loaded on demand so the spreadsheet reader isn't in every admin page.
+      const { default: readExcelFile } = await import("read-excel-file/browser")
+      const sheets = await readExcelFile(file)
+      const result = parseRouteFareWorkbook(
+        sheets.map((s) => ({ sheet: s.sheet, data: s.data as unknown[][] })),
+        importType,
+        newRouteFareId
+      )
+      const label = VEHICLE_TYPES.find((v) => v.value === importType)?.label ?? importType
+      setRoutes((rs) => mergeRouteFares(rs, result.routes, importType))
+      setDirty(true)
+      setImportNote({
+        ok: true,
+        text:
+          `Imported ${result.prices} prices across ${result.zones} zones as ${result.routes.length} routes for ${label}. ` +
+          `Click "Save route fares" to upload them.` +
+          (result.warnings.length ? ` Note: ${result.warnings.join(" ")}` : ""),
+      })
+    } catch (err) {
+      console.error(err)
+      setImportNote({
+        ok: false,
+        text: err instanceof Error ? `Could not import: ${err.message}` : "Could not read that file. Use an .xlsx workbook.",
+      })
+    } finally {
+      setImporting(false)
+    }
+  }
 
   useEffect(() => {
     getRouteFares()
@@ -184,6 +221,63 @@ export function RouteFaresEditor() {
         </div>
       </div>
 
+      <div className="flex flex-wrap items-end gap-3 border-b border-[#E2E6EC] bg-[#F4F6F9] px-5 py-4">
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-2 text-sm font-semibold text-[#0F1B2D]">
+            <FileSpreadsheet className="h-4 w-4 text-[#1E6B44]" /> Import from a spreadsheet
+          </p>
+          <p className="text-xs text-[#5B6577]">
+            Excel workbook with a &ldquo;Postcodes&rdquo; sheet (postcode → zone) and a &ldquo;Rate List&rdquo; or
+            &ldquo;Rate Matrix&rdquo; sheet. Routes already here get the new price for the chosen car type.
+          </p>
+        </div>
+        <label className="text-xs font-medium text-[#0F1B2D]">
+          Prices are for
+          <select
+            value={importType}
+            onChange={(e) => setImportType(e.target.value as VehicleType)}
+            className="mt-1 block h-9 rounded-md border border-[#E2E6EC] bg-white px-2 text-sm"
+          >
+            {VEHICLE_TYPES.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label
+          className={cn(
+            "inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md bg-[#1E6B44] px-3 text-sm font-semibold text-white hover:bg-[#1E6B44]/90",
+            (importing || loading) && "pointer-events-none opacity-60"
+          )}
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          {importing ? "Reading..." : "Choose .xlsx file"}
+          <input
+            type="file"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              e.target.value = ""
+              if (file) importWorkbook(file)
+            }}
+          />
+        </label>
+      </div>
+
+      {importNote && (
+        <p
+          role="status"
+          className={cn(
+            "mx-5 mt-4 rounded-lg px-3 py-2 text-sm",
+            importNote.ok ? "bg-[#E7EEFF] text-[#0F1B2D]" : "bg-red-50 text-red-700"
+          )}
+        >
+          {importNote.text}
+        </p>
+      )}
+
       {status && (
         <p
           role="status"
@@ -268,6 +362,7 @@ export function RouteFaresEditor() {
                       type="number"
                       min={0}
                       step={1}
+                      key={`${vt.value}-${r.prices[vt.value] ?? ""}`}
                       defaultValue={r.prices[vt.value] ?? ""}
                       onBlur={(e) => setRoutePrice(r, vt.value, e.target.value)}
                       placeholder="—"
