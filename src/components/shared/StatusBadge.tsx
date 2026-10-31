@@ -22,7 +22,7 @@ export function StatusBadge({ status, type = "booking", className }: StatusBadge
       )}
       style={{
         backgroundColor: match ? `${match.color}18` : "#F3F4F6",
-        color: match?.color ?? "#6B7280",
+        color: match?.color ?? "#5B6577",
       }}
     >
       {match?.label ?? status}

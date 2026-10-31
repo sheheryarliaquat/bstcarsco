@@ -92,7 +92,7 @@ export default function DriverAvailabilityPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1F4FD8]" />
       </div>
     )
   }
@@ -101,8 +101,8 @@ export default function DriverAvailabilityPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Availability</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Availability</h1>
+          <p className="text-sm text-[#5B6577]">
             Manage your working hours and online status
           </p>
         </div>
@@ -111,7 +111,7 @@ export default function DriverAvailabilityPage() {
           disabled={saving}
           className={cn(
             "text-white",
-            saved ? "bg-green-600 hover:bg-green-700" : "bg-[#D4145A] hover:bg-[#D4145A]/90"
+            saved ? "bg-green-600 hover:bg-green-700" : "bg-[#1F4FD8] hover:bg-[#1F4FD8]/90"
           )}
         >
           {saved ? (
@@ -139,10 +139,10 @@ export default function DriverAvailabilityPage() {
               )}
             />
             <div>
-              <p className="text-sm font-bold text-[#172F52]">
+              <p className="text-sm font-bold text-[#0F1B2D]">
                 {isOnline ? "Currently Online" : "Currently Offline"}
               </p>
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[#5B6577]">
                 Toggle your availability status
               </p>
             </div>
@@ -158,8 +158,8 @@ export default function DriverAvailabilityPage() {
       {/* Working Hours */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
         <div className="mb-5 flex items-center gap-2">
-          <Clock className="h-5 w-5 text-[#172F52]" />
-          <h2 className="text-base font-bold text-[#172F52]">Working Hours</h2>
+          <Clock className="h-5 w-5 text-[#0F1B2D]" />
+          <h2 className="text-base font-bold text-[#0F1B2D]">Working Hours</h2>
         </div>
 
         <div className="space-y-4">
@@ -176,7 +176,7 @@ export default function DriverAvailabilityPage() {
               >
                 <div className="flex items-center gap-3">
                   <Switch checked={enabled} onCheckedChange={() => toggleDay(day)} />
-                  <span className="w-24 text-sm font-semibold text-[#172F52]">
+                  <span className="w-24 text-sm font-semibold text-[#0F1B2D]">
                     {DAY_LABELS[day]}
                   </span>
                 </div>
@@ -189,7 +189,7 @@ export default function DriverAvailabilityPage() {
                       onChange={(e) => updateTime(day, "start", e.target.value)}
                       className="h-9 w-32 text-sm"
                     />
-                    <span className="text-sm text-[#6B7280]">to</span>
+                    <span className="text-sm text-[#5B6577]">to</span>
                     <Input
                       type="time"
                       value={slot.end}

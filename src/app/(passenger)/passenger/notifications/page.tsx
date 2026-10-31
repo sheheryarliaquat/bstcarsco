@@ -126,7 +126,7 @@ const typeIconMap: Record<string, React.ReactNode> = {
 }
 
 const typeColorMap: Record<string, string> = {
-  driver_assigned: "bg-[#172F52]/10 text-[#172F52]",
+  driver_assigned: "bg-[#0F1B2D]/10 text-[#0F1B2D]",
   booking_confirmed: "bg-[#28A745]/10 text-[#28A745]",
   booking_cancelled: "bg-[#DC3545]/10 text-[#DC3545]",
   trip_completed: "bg-[#28A745]/10 text-[#28A745]",
@@ -134,7 +134,7 @@ const typeColorMap: Record<string, string> = {
   payment_failed: "bg-[#DC3545]/10 text-[#DC3545]",
   review_received: "bg-[#D4AF37]/10 text-[#D4AF37]",
   support_update: "bg-[#6C757D]/10 text-[#6C757D]",
-  promo_code_applied: "bg-[#D4145A]/10 text-[#D4145A]",
+  promo_code_applied: "bg-[#1F4FD8]/10 text-[#1F4FD8]",
   system_alert: "bg-[#FFC107]/10 text-[#B8941E]",
 }
 
@@ -180,8 +180,8 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Notifications</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Notifications</h1>
+          <p className="text-sm text-[#5B6577]">
             Stay updated on your bookings and account.
           </p>
         </div>
@@ -189,7 +189,7 @@ export default function NotificationsPage() {
           <Button
             variant="outline"
             onClick={markAllRead}
-            className="border-[#D9E0E8] text-[#172F52]"
+            className="border-[#E2E6EC] text-[#0F1B2D]"
           >
             <CheckCheck className="h-4 w-4" /> Mark All Read
           </Button>
@@ -203,8 +203,8 @@ export default function NotificationsPage() {
           className={cn(
             "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
             filter === "all"
-              ? "bg-[#172F52] text-white"
-              : "bg-white text-[#6B7280] hover:bg-[#F5F7FA]"
+              ? "bg-[#0F1B2D] text-white"
+              : "bg-white text-[#5B6577] hover:bg-[#F4F6F9]"
           )}
         >
           All
@@ -214,8 +214,8 @@ export default function NotificationsPage() {
           className={cn(
             "flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
             filter === "unread"
-              ? "bg-[#172F52] text-white"
-              : "bg-white text-[#6B7280] hover:bg-[#F5F7FA]"
+              ? "bg-[#0F1B2D] text-white"
+              : "bg-white text-[#5B6577] hover:bg-[#F4F6F9]"
           )}
         >
           Unread
@@ -225,7 +225,7 @@ export default function NotificationsPage() {
                 "flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold",
                 filter === "unread"
                   ? "bg-white/20 text-white"
-                  : "bg-[#D4145A] text-white"
+                  : "bg-[#1F4FD8] text-white"
               )}
             >
               {unreadCount}
@@ -256,16 +256,16 @@ export default function NotificationsPage() {
               key={notif.id}
               onClick={() => markAsRead(notif.id)}
               className={cn(
-                "flex w-full items-start gap-4 rounded-xl border bg-white p-4 text-left transition-colors hover:bg-[#F5F7FA]/50",
+                "flex w-full items-start gap-4 rounded-xl border bg-white p-4 text-left transition-colors hover:bg-[#F4F6F9]/50",
                 notif.read
-                  ? "border-[#D9E0E8]"
-                  : "border-[#D4145A]/20 bg-[#D4145A]/[0.02]"
+                  ? "border-[#E2E6EC]"
+                  : "border-[#1F4FD8]/20 bg-[#1F4FD8]/[0.02]"
               )}
             >
               <div
                 className={cn(
                   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-                  typeColorMap[notif.type] ?? "bg-[#6B7280]/10 text-[#6B7280]"
+                  typeColorMap[notif.type] ?? "bg-[#5B6577]/10 text-[#5B6577]"
                 )}
               >
                 {typeIconMap[notif.type] ?? <Bell className="h-4 w-4" />}
@@ -276,22 +276,22 @@ export default function NotificationsPage() {
                     className={cn(
                       "text-sm",
                       notif.read
-                        ? "font-medium text-[#6B7280]"
-                        : "font-semibold text-[#172F52]"
+                        ? "font-medium text-[#5B6577]"
+                        : "font-semibold text-[#0F1B2D]"
                     )}
                   >
                     {notif.title}
                   </p>
                   <div className="flex items-center gap-2">
                     {!notif.read && (
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-[#D4145A]" />
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[#1F4FD8]" />
                     )}
                     <span className="shrink-0 text-[11px] text-[#ADB5BD]">
                       {timeAgo(notif.createdAt)}
                     </span>
                   </div>
                 </div>
-                <p className="mt-0.5 text-xs text-[#6B7280]">
+                <p className="mt-0.5 text-xs text-[#5B6577]">
                   {notif.message}
                 </p>
               </div>

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Terms of Service
@@ -23,7 +23,7 @@ export default function TermsPage() {
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl prose prose-slate">
-          <h2 className="text-2xl font-bold text-[#172F52]">1. Introduction</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">1. Introduction</h2>
           <p className="text-gray-600">
             Welcome to Blue Star Airport Transfers LTD (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;). These Terms of
             Service (&quot;Terms&quot;) govern your use of our website, mobile
@@ -36,7 +36,7 @@ export default function TermsPage() {
             10 Downing Street, London, SW1A 2AA.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">2. Definitions</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">2. Definitions</h2>
           <p className="text-gray-600">
             &quot;User&quot;, &quot;you&quot;, &quot;your&quot; — any person who accesses or uses the
             Platform. &quot;Provider&quot; — a licensed private hire operator or driver registered
@@ -45,14 +45,14 @@ export default function TermsPage() {
             the Platform.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">3. Eligibility</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">3. Eligibility</h2>
           <p className="text-gray-600">
             You must be at least 18 years of age to use the Platform. By using the
             Platform, you represent that you meet this requirement and have the
             legal capacity to enter into a binding agreement.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">4. Booking &amp; Payment</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">4. Booking &amp; Payment</h2>
           <p className="text-gray-600">
             When you make a booking through the Platform, you enter into a
             contract directly with the private hire provider. Blue Star Airport Transfers LTD acts as an
@@ -67,7 +67,7 @@ export default function TermsPage() {
             payment partners.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">5. Cancellation Policy</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">5. Cancellation Policy</h2>
           <p className="text-gray-600">
             You may cancel a booking free of charge up to 24 hours before your
             scheduled pickup time. Cancellations made within 24 hours of the
@@ -80,7 +80,7 @@ export default function TermsPage() {
             refund of any prepaid amount.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">6. User Conduct</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">6. User Conduct</h2>
           <p className="text-gray-600">
             You agree to use the Platform in a respectful and lawful manner. You
             must not harass drivers, provide false information, attempt to defraud
@@ -89,7 +89,7 @@ export default function TermsPage() {
             that violate these Terms.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">7. Limitation of Liability</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">7. Limitation of Liability</h2>
           <p className="text-gray-600">
             Blue Star Airport Transfers LTD acts as an intermediary between passengers and providers.
             We are not a party to the contract between you and your driver. While
@@ -98,7 +98,7 @@ export default function TermsPage() {
             booking in question.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">8. Intellectual Property</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">8. Intellectual Property</h2>
           <p className="text-gray-600">
             All content on the Platform, including text, graphics, logos, and
             software, is the property of Blue Star Airport Transfers LTD Ltd and is protected by UK
@@ -106,7 +106,7 @@ export default function TermsPage() {
             derivative works without our express written permission.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">9. Changes to Terms</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">9. Changes to Terms</h2>
           <p className="text-gray-600">
             We reserve the right to modify these Terms at any time. Changes will
             be posted on this page with an updated &quot;Last updated&quot; date. Your
@@ -114,7 +114,7 @@ export default function TermsPage() {
             acceptance of the updated Terms.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">10. Governing Law</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">10. Governing Law</h2>
           <p className="text-gray-600">
             These Terms are governed by and construed in accordance with the laws
             of England and Wales. Any disputes arising from these Terms shall be
@@ -122,7 +122,7 @@ export default function TermsPage() {
             Wales.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">11. Contact</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">11. Contact</h2>
           <p className="text-gray-600">
             If you have any questions about these Terms, please contact us at
             legal@bstcars.co or write to us at Blue Star Airport Transfers LTD Ltd, 10

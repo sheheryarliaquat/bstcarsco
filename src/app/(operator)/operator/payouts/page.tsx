@@ -85,129 +85,129 @@ export default function OperatorPayoutsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Payouts</h1>
-        <p className="text-sm text-[#6B7280]">Track your earnings and payout history.</p>
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Payouts</h1>
+        <p className="text-sm text-[#5B6577]">Track your earnings and payout history.</p>
       </div>
 
       {/* Next Payout + Earnings Summary */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border-2 border-[#D4145A]/20 bg-white p-6">
+        <div className="rounded-xl border-2 border-[#1F4FD8]/20 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4145A]/10">
-              <Clock className="h-5 w-5 text-[#D4145A]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1F4FD8]/10">
+              <Clock className="h-5 w-5 text-[#1F4FD8]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-[#6B7280]">Next Payout</p>
-              <p className="text-lg font-bold text-[#172F52]">26 Aug 2026</p>
+              <p className="text-sm font-medium text-[#5B6577]">Next Payout</p>
+              <p className="text-lg font-bold text-[#0F1B2D]">26 Aug 2026</p>
             </div>
           </div>
-          <div className="rounded-lg bg-[#F5F7FA] p-4">
+          <div className="rounded-lg bg-[#F4F6F9] p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#6B7280]">Net Amount</span>
-              <span className="text-xl font-bold text-[#172F52]">£1,845.00</span>
+              <span className="text-sm text-[#5B6577]">Net Amount</span>
+              <span className="text-xl font-bold text-[#0F1B2D]">£1,845.00</span>
             </div>
-            <div className="mt-2 flex items-center justify-between text-xs text-[#6B7280]">
+            <div className="mt-2 flex items-center justify-between text-xs text-[#5B6577]">
               <span>Gross: £2,170.00</span>
               <span>Commission: £325.00</span>
             </div>
           </div>
-          <Button className="mt-4 w-full bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+          <Button className="mt-4 w-full bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
             <Wallet className="mr-2 h-4 w-4" />
             View Details
           </Button>
         </div>
 
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold text-[#172F52]">Earnings Summary</h3>
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+          <h3 className="mb-4 text-sm font-semibold text-[#0F1B2D]">Earnings Summary</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#6B7280]">This Week</span>
+                <Calendar className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#5B6577]">This Week</span>
               </div>
-              <span className="text-sm font-bold text-[#172F52]">£2,170.00</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">£2,170.00</span>
             </div>
-            <div className="h-px bg-[#F5F7FA]" />
+            <div className="h-px bg-[#F4F6F9]" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#6B7280]">This Month</span>
+                <TrendingUp className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#5B6577]">This Month</span>
               </div>
-              <span className="text-sm font-bold text-[#172F52]">£8,450.00</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">£8,450.00</span>
             </div>
-            <div className="h-px bg-[#F5F7FA]" />
+            <div className="h-px bg-[#F4F6F9]" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#6B7280]">This Quarter</span>
+                <TrendingUp className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#5B6577]">This Quarter</span>
               </div>
-              <span className="text-sm font-bold text-[#172F52]">£24,850.00</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">£24,850.00</span>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold text-[#172F52]">Quick Stats</h3>
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+          <h3 className="mb-4 text-sm font-semibold text-[#0F1B2D]">Quick Stats</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#6B7280]">Total Paid Out</span>
-              <span className="text-sm font-bold text-[#172F52]">£52,400.00</span>
+              <span className="text-sm text-[#5B6577]">Total Paid Out</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">£52,400.00</span>
             </div>
-            <div className="h-px bg-[#F5F7FA]" />
+            <div className="h-px bg-[#F4F6F9]" />
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#6B7280]">Commission Rate</span>
-              <span className="text-sm font-bold text-[#172F52]">15%</span>
+              <span className="text-sm text-[#5B6577]">Commission Rate</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">15%</span>
             </div>
-            <div className="h-px bg-[#F5F7FA]" />
+            <div className="h-px bg-[#F4F6F9]" />
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#6B7280]">Payout Frequency</span>
-              <span className="text-sm font-bold text-[#172F52]">Weekly</span>
+              <span className="text-sm text-[#5B6577]">Payout Frequency</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">Weekly</span>
             </div>
-            <div className="h-px bg-[#F5F7FA]" />
+            <div className="h-px bg-[#F4F6F9]" />
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#6B7280]">Avg. per Payout</span>
-              <span className="text-sm font-bold text-[#172F52]">£2,650.00</span>
+              <span className="text-sm text-[#5B6577]">Avg. per Payout</span>
+              <span className="text-sm font-bold text-[#0F1B2D]">£2,650.00</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Payout History */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
-        <div className="border-b border-[#D9E0E8] px-6 py-4">
-          <h3 className="text-base font-bold text-[#172F52]">Payout History</h3>
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
+        <div className="border-b border-[#E2E6EC] px-6 py-4">
+          <h3 className="text-base font-bold text-[#0F1B2D]">Payout History</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Period</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Gross Amount</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Commission</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Net Amount</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Status</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#6B7280]">Paid Date</th>
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Period</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Gross Amount</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Commission</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Net Amount</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Status</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase text-[#5B6577]">Paid Date</th>
               </tr>
             </thead>
             <tbody>
               {payoutHistory.map((payout) => (
                 <tr
                   key={payout.id}
-                  className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
+                  className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50"
                 >
                   <td className="px-4 py-3">
                     <div>
-                      <p className="font-medium text-[#172F52]">{payout.period}</p>
-                      <p className="text-xs text-[#6B7280]">{payout.id}</p>
+                      <p className="font-medium text-[#0F1B2D]">{payout.period}</p>
+                      <p className="text-xs text-[#5B6577]">{payout.id}</p>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-medium text-[#172F52]">
+                  <td className="px-4 py-3 font-medium text-[#0F1B2D]">
                     £{payout.gross.toFixed(2)}
                   </td>
                   <td className="px-4 py-3 text-[#DC3545]">
                     -£{payout.commission.toFixed(2)}
                   </td>
-                  <td className="px-4 py-3 font-bold text-[#172F52]">
+                  <td className="px-4 py-3 font-bold text-[#0F1B2D]">
                     £{payout.net.toFixed(2)}
                   </td>
                   <td className="px-4 py-3">
@@ -216,7 +216,7 @@ export default function OperatorPayoutsPage() {
                       Completed
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-[#6B7280]">{payout.date}</td>
+                  <td className="px-4 py-3 text-[#5B6577]">{payout.date}</td>
                 </tr>
               ))}
             </tbody>
@@ -225,9 +225,9 @@ export default function OperatorPayoutsPage() {
       </div>
 
       {/* Payout Settings */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-        <h3 className="mb-1 text-base font-bold text-[#172F52]">Payout Settings</h3>
-        <p className="mb-4 text-xs text-[#6B7280]">Bank details for receiving payouts.</p>
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+        <h3 className="mb-1 text-base font-bold text-[#0F1B2D]">Payout Settings</h3>
+        <p className="mb-4 text-xs text-[#5B6577]">Bank details for receiving payouts.</p>
 
         {saved && (
           <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
@@ -238,7 +238,7 @@ export default function OperatorPayoutsPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
               Account Holder Name
             </label>
             <Input
@@ -249,7 +249,7 @@ export default function OperatorPayoutsPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
               Bank Name
             </label>
             <Input
@@ -260,7 +260,7 @@ export default function OperatorPayoutsPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
               Sort Code
             </label>
             <Input
@@ -272,7 +272,7 @@ export default function OperatorPayoutsPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
               Account Number
             </label>
             <Input
@@ -286,7 +286,7 @@ export default function OperatorPayoutsPage() {
         </div>
 
         <div className="mt-4 flex justify-end">
-          <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90" onClick={handleSave}>
+          <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90" onClick={handleSave}>
             <Save className="mr-2 h-4 w-4" />
             Save Bank Details
           </Button>

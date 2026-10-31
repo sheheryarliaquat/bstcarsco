@@ -68,7 +68,7 @@ const EARNINGS = [
 export default function DriversPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Drive With Us
@@ -82,7 +82,7 @@ export default function DriversPage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Why Drive With Blue Star Airport Transfers LTD?
             </h2>
           </div>
@@ -90,10 +90,10 @@ export default function DriversPage() {
             {BENEFITS.map((b) => (
               <Card key={b.title}>
                 <CardContent className="flex flex-col gap-3 p-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FCE7EF]">
-                    <b.icon className="h-6 w-6 text-[#D4145A]" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E7EEFF]">
+                    <b.icon className="h-6 w-6 text-[#1F4FD8]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-[#172F52]">
+                  <h3 className="text-lg font-semibold text-[#0F1B2D]">
                     {b.title}
                   </h3>
                   <p className="text-sm text-gray-600">{b.description}</p>
@@ -104,11 +104,11 @@ export default function DriversPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl font-bold text-[#172F52]">
+              <h2 className="text-3xl font-bold text-[#0F1B2D]">
                 Potential Earnings
               </h2>
               <p className="mt-4 text-gray-600">
@@ -122,7 +122,7 @@ export default function DriversPage() {
                     className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5"
                   >
                     <p className="text-sm text-gray-500">{e.label}</p>
-                    <p className="mt-1 text-xl font-bold text-[#D4145A]">
+                    <p className="mt-1 text-xl font-bold text-[#1F4FD8]">
                       {e.value}
                     </p>
                   </div>
@@ -134,7 +134,7 @@ export default function DriversPage() {
               </p>
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-[#172F52]">
+              <h2 className="text-3xl font-bold text-[#0F1B2D]">
                 Requirements
               </h2>
               <p className="mt-4 text-gray-600">
@@ -143,7 +143,7 @@ export default function DriversPage() {
               <ul className="mt-6 space-y-3">
                 {REQUIREMENTS.map((r) => (
                   <li key={r} className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#D4145A]" />
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#1F4FD8]" />
                     <span className="text-sm text-gray-700">{r}</span>
                   </li>
                 ))}
@@ -153,7 +153,7 @@ export default function DriversPage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-r from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             Ready to Start Earning?
@@ -163,7 +163,7 @@ export default function DriversPage() {
           </p>
           <Button
             size="lg"
-            className="mt-8 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+            className="mt-8 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             render={<Link href="/register" />}
             nativeButton={false}
           >

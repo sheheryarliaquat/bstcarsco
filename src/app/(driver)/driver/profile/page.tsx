@@ -103,7 +103,7 @@ export default function DriverProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-[#D4145A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1F4FD8]" />
       </div>
     )
   }
@@ -115,15 +115,15 @@ export default function DriverProfilePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Profile</h1>
-          <p className="text-sm text-[#6B7280]">Manage your account settings</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Profile</h1>
+          <p className="text-sm text-[#5B6577]">Manage your account settings</p>
         </div>
         <Button
           onClick={handleSave}
           disabled={saving}
           className={cn(
             "text-white",
-            saved ? "bg-green-600 hover:bg-green-700" : "bg-[#D4145A] hover:bg-[#D4145A]/90"
+            saved ? "bg-green-600 hover:bg-green-700" : "bg-[#1F4FD8] hover:bg-[#1F4FD8]/90"
           )}
         >
           {saved ? (
@@ -145,19 +145,19 @@ export default function DriverProfilePage() {
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <div className="relative">
             <Avatar className="h-24 w-24">
-              <AvatarFallback className="bg-[#172F52] text-2xl font-bold text-white">
+              <AvatarFallback className="bg-[#0F1B2D] text-2xl font-bold text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <button className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#D4145A] text-white shadow-lg transition-colors hover:bg-[#D4145A]/90">
+            <button className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#1F4FD8] text-white shadow-lg transition-colors hover:bg-[#1F4FD8]/90">
               <Camera className="h-4 w-4" />
             </button>
           </div>
           <div className="text-center sm:text-left">
-            <h2 className="text-xl font-bold text-[#172F52]">
+            <h2 className="text-xl font-bold text-[#0F1B2D]">
               {firstName} {lastName}
             </h2>
-            <p className="text-sm text-[#6B7280]">{profile?.email}</p>
+            <p className="text-sm text-[#5B6577]">{profile?.email}</p>
             <div className="mt-2 flex items-center justify-center gap-2 sm:justify-start">
               <RatingStars rating={profile?.rating ?? 0} size="md" count={profile?.totalReviews ?? 0} />
             </div>
@@ -173,17 +173,17 @@ export default function DriverProfilePage() {
 
       {/* Personal Info */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
           Personal Information
         </h3>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="firstName" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="firstName" className="text-sm font-medium text-[#0F1B2D]">
               First Name
             </Label>
             <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="firstName"
                 value={firstName}
@@ -193,11 +193,11 @@ export default function DriverProfilePage() {
             </div>
           </div>
           <div>
-            <Label htmlFor="lastName" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="lastName" className="text-sm font-medium text-[#0F1B2D]">
               Last Name
             </Label>
             <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="lastName"
                 value={lastName}
@@ -207,11 +207,11 @@ export default function DriverProfilePage() {
             </div>
           </div>
           <div>
-            <Label htmlFor="email" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="email" className="text-sm font-medium text-[#0F1B2D]">
               Email Address
             </Label>
             <div className="relative mt-1.5">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="email"
                 type="email"
@@ -222,11 +222,11 @@ export default function DriverProfilePage() {
             </div>
           </div>
           <div>
-            <Label htmlFor="phone" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="phone" className="text-sm font-medium text-[#0F1B2D]">
               Phone Number
             </Label>
             <div className="relative mt-1.5">
-              <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="phone"
                 type="tel"
@@ -241,18 +241,18 @@ export default function DriverProfilePage() {
 
       {/* Vehicle Section */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">My Vehicle</h3>
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">My Vehicle</h3>
 
         {vehicle ? (
-          <div className="flex items-center gap-4 rounded-xl bg-[#F5F7FA] p-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#172F52]/10">
-              <Car className="h-7 w-7 text-[#172F52]" />
+          <div className="flex items-center gap-4 rounded-xl bg-[#F4F6F9] p-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0F1B2D]/10">
+              <Car className="h-7 w-7 text-[#0F1B2D]" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-[#172F52]">
+              <p className="text-sm font-bold text-[#0F1B2D]">
                 {vehicle.make} {vehicle.model} {vehicle.year}
               </p>
-              <div className="flex items-center gap-4 text-xs text-[#6B7280]">
+              <div className="flex items-center gap-4 text-xs text-[#5B6577]">
                 <span>{vehicle.registration}</span>
                 <span>{vehicle.colour}</span>
                 {vehicle.isElectric && <span>Electric</span>}
@@ -264,21 +264,21 @@ export default function DriverProfilePage() {
             </Badge>
           </div>
         ) : (
-          <p className="text-sm text-[#6B7280]">No vehicle assigned yet. Contact your operator or admin.</p>
+          <p className="text-sm text-[#5B6577]">No vehicle assigned yet. Contact your operator or admin.</p>
         )}
       </div>
 
       {/* Rating */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
           Driver Rating
         </h3>
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#D4145A]/10">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1F4FD8]/10">
             <Star className="h-8 w-8 fill-amber-400 text-amber-400" />
           </div>
           <div>
-            <p className="text-3xl font-bold text-[#172F52]">{(profile?.rating ?? 0).toFixed(1)}</p>
+            <p className="text-3xl font-bold text-[#0F1B2D]">{(profile?.rating ?? 0).toFixed(1)}</p>
             <RatingStars rating={profile?.rating ?? 0} size="md" count={profile?.totalReviews ?? 0} />
           </div>
         </div>
@@ -286,16 +286,16 @@ export default function DriverProfilePage() {
 
       {/* Change Password */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
           Change Password
         </h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="currentPassword" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="currentPassword" className="text-sm font-medium text-[#0F1B2D]">
               Current Password
             </Label>
             <div className="relative mt-1.5">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="currentPassword"
                 type="password"
@@ -307,11 +307,11 @@ export default function DriverProfilePage() {
             </div>
           </div>
           <div>
-            <Label htmlFor="newPassword" className="text-sm font-medium text-[#172033]">
+            <Label htmlFor="newPassword" className="text-sm font-medium text-[#0F1B2D]">
               New Password
             </Label>
             <div className="relative mt-1.5">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="newPassword"
                 type="password"
@@ -336,7 +336,7 @@ export default function DriverProfilePage() {
         <Button
           onClick={handleChangePassword}
           disabled={passwordSaving || !currentPassword || !newPassword}
-          className="mt-4 bg-[#172F52] text-white hover:bg-[#172F52]/90"
+          className="mt-4 bg-[#0F1B2D] text-white hover:bg-[#0F1B2D]/90"
         >
           {passwordSaving ? "Updating..." : "Update Password"}
         </Button>
@@ -344,7 +344,7 @@ export default function DriverProfilePage() {
 
       {/* Availability Status */}
       <div className="rounded-2xl bg-white p-6 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
           Availability Status
         </h3>
         <div className={cn("flex items-center gap-3 rounded-xl p-4", isOnline ? "bg-green-50" : "bg-gray-100")}>

@@ -47,10 +47,10 @@ export default function OperatorProfilePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Company Profile</h1>
-          <p className="text-sm text-[#6B7280]">Manage your company details and settings.</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Company Profile</h1>
+          <p className="text-sm text-[#5B6577]">Manage your company details and settings.</p>
         </div>
-        <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90" onClick={handleSave}>
+        <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90" onClick={handleSave}>
           <Save className="mr-2 h-4 w-4" />
           Save Changes
         </Button>
@@ -65,48 +65,48 @@ export default function OperatorProfilePage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Company Logo & Summary */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="mb-4 flex flex-col items-center text-center">
             <div className="relative mb-4">
-              <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-[#172F52] text-2xl font-bold text-white">
+              <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-[#0F1B2D] text-2xl font-bold text-white">
                 {(operator?.companyName ?? "").split(" ").map((w) => w[0]).join("").slice(0, 2)}
               </div>
-              <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#D4145A] text-white shadow-md hover:bg-[#D4145A]/90">
+              <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#1F4FD8] text-white shadow-md hover:bg-[#1F4FD8]/90">
                 <Camera className="h-4 w-4" />
               </button>
             </div>
-            <h2 className="text-lg font-bold text-[#172F52]">
+            <h2 className="text-lg font-bold text-[#0F1B2D]">
               {operator?.companyName || "Your Company"}
             </h2>
             <RatingStars rating={operator?.rating ?? 0} size="md" count={operator?.totalReviews ?? 0} />
           </div>
 
-          <div className="space-y-3 border-t border-[#F5F7FA] pt-4">
-            <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+          <div className="space-y-3 border-t border-[#F4F6F9] pt-4">
+            <div className="flex items-center gap-3 text-sm text-[#5B6577]">
               <Building2 className="h-4 w-4 shrink-0" />
               <span>Verified Operator</span>
               <Badge className="ml-auto bg-green-500/10 text-green-600 text-[10px]">
                 Active
               </Badge>
             </div>
-            <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+            <div className="flex items-center gap-3 text-sm text-[#5B6577]">
               <Car className="h-4 w-4 shrink-0" />
               <span>Fleet Size</span>
-              <span className="ml-auto font-medium text-[#172F52]">
+              <span className="ml-auto font-medium text-[#0F1B2D]">
                 {operator?.fleetSize ?? 0} vehicles
               </span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+            <div className="flex items-center gap-3 text-sm text-[#5B6577]">
               <Star className="h-4 w-4 shrink-0" />
               <span>Rating</span>
-              <span className="ml-auto font-medium text-[#172F52]">
+              <span className="ml-auto font-medium text-[#0F1B2D]">
                 {operator?.rating ?? 0}/5.0
               </span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-[#6B7280]">
+            <div className="flex items-center gap-3 text-sm text-[#5B6577]">
               <Users className="h-4 w-4 shrink-0" />
               <span>Total Reviews</span>
-              <span className="ml-auto font-medium text-[#172F52]">
+              <span className="ml-auto font-medium text-[#0F1B2D]">
                 {(operator?.totalReviews ?? 0).toLocaleString()}
               </span>
             </div>
@@ -115,13 +115,13 @@ export default function OperatorProfilePage() {
 
         {/* Company Details Form */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-            <h3 className="mb-4 text-base font-bold text-[#172F52]">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+            <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
               Company Information
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
                   Company Name
                 </label>
                 <Input
@@ -132,7 +132,7 @@ export default function OperatorProfilePage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
                   Description
                 </label>
                 <Textarea
@@ -145,11 +145,11 @@ export default function OperatorProfilePage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+                  <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
                     Email
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                     <Input
                       type="email"
                       value={profile.email}
@@ -161,11 +161,11 @@ export default function OperatorProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+                  <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
                     Phone
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                     <Input
                       type="tel"
                       value={profile.phone}
@@ -178,11 +178,11 @@ export default function OperatorProfilePage() {
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+                <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
                   Address
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-[#6B7280]" />
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-[#5B6577]" />
                   <Input
                     value={profile.address}
                     onChange={(e) =>
@@ -196,20 +196,20 @@ export default function OperatorProfilePage() {
           </div>
 
           {/* Operating Areas */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-            <h3 className="mb-4 text-base font-bold text-[#172F52]">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+            <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
               Operating Areas
             </h3>
             <div className="flex flex-wrap gap-2">
               {profile.operatingAreas.map((area) => (
                 <Badge
                   key={area}
-                  className="bg-[#172F52]/10 text-[#172F52] hover:bg-[#172F52]/20 cursor-pointer px-3 py-1.5"
+                  className="bg-[#0F1B2D]/10 text-[#0F1B2D] hover:bg-[#0F1B2D]/20 cursor-pointer px-3 py-1.5"
                 >
                   <MapPin className="mr-1 h-3 w-3" />
                   {area}
                   <button
-                    className="ml-2 text-[#6B7280] hover:text-[#DC3545]"
+                    className="ml-2 text-[#5B6577] hover:text-[#DC3545]"
                     onClick={() =>
                       setProfile((p) => ({
                         ...p,
@@ -221,25 +221,25 @@ export default function OperatorProfilePage() {
                   </button>
                 </Badge>
               ))}
-              <button className="flex items-center gap-1 rounded-full border border-dashed border-[#D9E0E8] px-3 py-1.5 text-xs font-medium text-[#6B7280] hover:border-[#D4145A] hover:text-[#D4145A]">
+              <button className="flex items-center gap-1 rounded-full border border-dashed border-[#E2E6EC] px-3 py-1.5 text-xs font-medium text-[#5B6577] hover:border-[#1F4FD8] hover:text-[#1F4FD8]">
                 + Add Area
               </button>
             </div>
           </div>
 
           {/* Service Hours */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-            <h3 className="mb-4 text-base font-bold text-[#172F52]">
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+            <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">
               Service Hours
             </h3>
             <div className="grid gap-6 sm:grid-cols-2">
               <div>
-                <p className="mb-3 text-sm font-medium text-[#172F52]">
+                <p className="mb-3 text-sm font-medium text-[#0F1B2D]">
                   Weekday Hours
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="mb-1 block text-xs text-[#6B7280]">From</label>
+                    <label className="mb-1 block text-xs text-[#5B6577]">From</label>
                     <Input
                       type="time"
                       value={profile.serviceHoursStart}
@@ -251,9 +251,9 @@ export default function OperatorProfilePage() {
                       }
                     />
                   </div>
-                  <span className="mt-5 text-[#6B7280]">to</span>
+                  <span className="mt-5 text-[#5B6577]">to</span>
                   <div className="flex-1">
-                    <label className="mb-1 block text-xs text-[#6B7280]">Until</label>
+                    <label className="mb-1 block text-xs text-[#5B6577]">Until</label>
                     <Input
                       type="time"
                       value={profile.serviceHoursEnd}
@@ -268,12 +268,12 @@ export default function OperatorProfilePage() {
                 </div>
               </div>
               <div>
-                <p className="mb-3 text-sm font-medium text-[#172F52]">
+                <p className="mb-3 text-sm font-medium text-[#0F1B2D]">
                   Weekend Hours
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="mb-1 block text-xs text-[#6B7280]">From</label>
+                    <label className="mb-1 block text-xs text-[#5B6577]">From</label>
                     <Input
                       type="time"
                       value={profile.weekendHoursStart}
@@ -285,9 +285,9 @@ export default function OperatorProfilePage() {
                       }
                     />
                   </div>
-                  <span className="mt-5 text-[#6B7280]">to</span>
+                  <span className="mt-5 text-[#5B6577]">to</span>
                   <div className="flex-1">
-                    <label className="mb-1 block text-xs text-[#6B7280]">Until</label>
+                    <label className="mb-1 block text-xs text-[#5B6577]">Until</label>
                     <Input
                       type="time"
                       value={profile.weekendHoursEnd}

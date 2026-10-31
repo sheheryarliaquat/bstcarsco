@@ -70,7 +70,7 @@ export default function PaymentsPage() {
       render: (row) => {
         const p = row as unknown as Booking
         return (
-          <span className="text-sm text-[#172F52]">
+          <span className="text-sm text-[#0F1B2D]">
             {new Date(p.createdAt).toLocaleDateString("en-GB", {
               day: "numeric",
               month: "short",
@@ -86,7 +86,7 @@ export default function PaymentsPage() {
       render: (row) => {
         const p = row as unknown as Booking
         return (
-          <span className="text-xs font-medium text-[#6B7280]">
+          <span className="text-xs font-medium text-[#5B6577]">
             {p.bookingNumber}
           </span>
         )
@@ -99,7 +99,7 @@ export default function PaymentsPage() {
       render: (row) => {
         const p = row as unknown as Booking
         return (
-          <span className="text-sm font-semibold text-[#172F52]">
+          <span className="text-sm font-semibold text-[#0F1B2D]">
             £{p.total.toFixed(2)}
           </span>
         )
@@ -112,8 +112,8 @@ export default function PaymentsPage() {
         const p = row as unknown as Booking
         return (
           <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-[#6B7280]" />
-            <span className="text-sm capitalize text-[#172F52]">
+            <CreditCard className="h-4 w-4 text-[#5B6577]" />
+            <span className="text-sm capitalize text-[#0F1B2D]">
               {p.paymentMethod ?? "-"}
             </span>
           </div>
@@ -132,7 +132,7 @@ export default function PaymentsPage() {
       key: "receipt",
       header: "Receipt",
       render: () => (
-        <Button variant="ghost" size="sm" className="gap-1.5 text-[#D4145A]" disabled>
+        <Button variant="ghost" size="sm" className="gap-1.5 text-[#1F4FD8]" disabled>
           <Download className="h-3.5 w-3.5" /> Download
         </Button>
       ),
@@ -142,8 +142,8 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Payments</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Payments</h1>
+        <p className="text-sm text-[#5B6577]">
           View your payment history from your bookings.
         </p>
       </div>

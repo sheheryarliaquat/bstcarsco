@@ -128,8 +128,8 @@ export default function ActiveTripPage() {
 
   const statusConfig = STATUS_CONFIG[trip.bookingStatus] ?? {
     label: trip.bookingStatus,
-    color: "text-[#172F52]",
-    bg: "bg-[#F5F7FA] border-[#D9E0E8]",
+    color: "text-[#0F1B2D]",
+    bg: "bg-[#F4F6F9] border-[#E2E6EC]",
   }
   const nextActions = getNextActions(trip.bookingStatus)
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${trip.pickup.latitude},${trip.pickup.longitude}&destination=${trip.destination.latitude},${trip.destination.longitude}&travelmode=driving`
@@ -159,10 +159,10 @@ export default function ActiveTripPage() {
           </div>
           <div>
             <p className={cn("text-sm font-bold", statusConfig.color)}>{statusConfig.label}</p>
-            <p className="text-xs text-[#6B7280]">{trip.bookingNumber}</p>
+            <p className="text-xs text-[#5B6577]">{trip.bookingNumber}</p>
           </div>
         </div>
-        <Badge variant="outline" className="border-[#D9E0E8] text-xs font-medium text-[#6B7280]">
+        <Badge variant="outline" className="border-[#E2E6EC] text-xs font-medium text-[#5B6577]">
           <Clock className="mr-1 h-3 w-3" />
           Est. {trip.estimatedDuration} min
         </Badge>
@@ -181,12 +181,12 @@ export default function ActiveTripPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
           <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D4145A]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1F4FD8]">
               <MapPin className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Pickup</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Pickup</span>
           </div>
-          <p className="text-base font-bold text-[#172F52]">{trip.pickup.formattedAddress}</p>
+          <p className="text-base font-bold text-[#0F1B2D]">{trip.pickup.formattedAddress}</p>
         </div>
 
         <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
@@ -194,76 +194,76 @@ export default function ActiveTripPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500">
               <MapPin className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Destination</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Destination</span>
           </div>
-          <p className="text-base font-bold text-[#172F52]">{trip.destination.formattedAddress}</p>
+          <p className="text-base font-bold text-[#0F1B2D]">{trip.destination.formattedAddress}</p>
         </div>
       </div>
 
       {/* Trip Details */}
       <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">Trip Details</h3>
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">Trip Details</h3>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Users className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Users className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Passenger</p>
-              <p className="text-sm font-semibold text-[#172F52]">{passengerName}</p>
+              <p className="text-xs text-[#5B6577]">Passenger</p>
+              <p className="text-sm font-semibold text-[#0F1B2D]">{passengerName}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Phone className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Phone className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Phone</p>
-              <p className="text-sm font-semibold text-[#172F52]">{passengerPhone}</p>
+              <p className="text-xs text-[#5B6577]">Phone</p>
+              <p className="text-sm font-semibold text-[#0F1B2D]">{passengerPhone}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Users className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Users className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Passengers</p>
-              <p className="text-sm font-semibold text-[#172F52]">{trip.passengers}</p>
+              <p className="text-xs text-[#5B6577]">Passengers</p>
+              <p className="text-sm font-semibold text-[#0F1B2D]">{trip.passengers}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Luggage className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Luggage className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Luggage</p>
-              <p className="text-sm font-semibold text-[#172F52]">
+              <p className="text-xs text-[#5B6577]">Luggage</p>
+              <p className="text-sm font-semibold text-[#0F1B2D]">
                 {trip.luggage} bag{trip.luggage !== 1 && "s"}
               </p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Ruler className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Ruler className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Distance</p>
-              <p className="text-sm font-semibold text-[#172F52]">{trip.distanceMiles} miles</p>
+              <p className="text-xs text-[#5B6577]">Distance</p>
+              <p className="text-sm font-semibold text-[#0F1B2D]">{trip.distanceMiles} miles</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Clock className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Clock className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Est. Time</p>
-              <p className="text-sm font-semibold text-[#172F52]">{trip.estimatedDuration} min</p>
+              <p className="text-xs text-[#5B6577]">Est. Time</p>
+              <p className="text-sm font-semibold text-[#0F1B2D]">{trip.estimatedDuration} min</p>
             </div>
           </div>
         </div>
@@ -271,10 +271,10 @@ export default function ActiveTripPage() {
         <Separator className="my-4" />
 
         <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#6B7280]" />
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#5B6577]" />
           <div>
-            <p className="text-xs text-[#6B7280]">Special Requirements</p>
-            <p className="text-sm font-medium text-[#172F52]">
+            <p className="text-xs text-[#5B6577]">Special Requirements</p>
+            <p className="text-sm font-medium text-[#0F1B2D]">
               {trip.specialRequirements?.notes || "None"}
             </p>
           </div>
@@ -284,18 +284,18 @@ export default function ActiveTripPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-[#6B7280]">Fare</p>
-            <p className="text-xl font-bold text-[#172F52]">£{trip.total.toFixed(2)}</p>
+            <p className="text-xs text-[#5B6577]">Fare</p>
+            <p className="text-xl font-bold text-[#0F1B2D]">£{trip.total.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="rounded-xl bg-white p-5 ring-1 ring-[#E5E7EB]">
-        <h3 className="mb-4 text-base font-bold text-[#172F52]">Actions</h3>
+        <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">Actions</h3>
 
         <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="mb-4 block">
-          <Button variant="outline" className="w-full border-2 border-[#172F52] text-[#172F52] hover:bg-[#172F52] hover:text-white">
+          <Button variant="outline" className="w-full border-2 border-[#0F1B2D] text-[#0F1B2D] hover:bg-[#0F1B2D] hover:text-white">
             <Navigation className="mr-2 h-4 w-4" />
             Open Navigation
             <ExternalLink className="ml-2 h-3.5 w-3.5" />
@@ -304,7 +304,7 @@ export default function ActiveTripPage() {
 
         {passengerPhone !== "N/A" && (
           <a href={`tel:${passengerPhone}`} className="mb-4 block">
-            <Button variant="outline" className="w-full border-[#D9E0E8]">
+            <Button variant="outline" className="w-full border-[#E2E6EC]">
               <Phone className="mr-2 h-4 w-4" />
               Call Passenger
             </Button>

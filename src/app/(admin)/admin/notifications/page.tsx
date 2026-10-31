@@ -70,8 +70,8 @@ export default function AdminNotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Notifications</h1>
-          <p className="text-sm text-[#6B7280]">Send and manage platform notifications</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Notifications</h1>
+          <p className="text-sm text-[#5B6577]">Send and manage platform notifications</p>
         </div>
       </div>
 
@@ -83,14 +83,14 @@ export default function AdminNotificationsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Send Form */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
+        <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
           <div className="mb-4 flex items-center gap-2">
-            <Send className="h-5 w-5 text-[#D4145A]" />
-            <h3 className="text-base font-bold text-[#172F52]">Send New Notification</h3>
+            <Send className="h-5 w-5 text-[#1F4FD8]" />
+            <h3 className="text-base font-bold text-[#0F1B2D]">Send New Notification</h3>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Target Audience</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Target Audience</label>
               <div className="grid grid-cols-2 gap-2">
                 {TARGET_OPTIONS.map((opt) => {
                   const Icon = opt.icon
@@ -101,8 +101,8 @@ export default function AdminNotificationsPage() {
                       className={cn(
                         "flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
                         target === opt.value
-                          ? "border-[#D4145A] bg-[#D4145A]/5 text-[#D4145A]"
-                          : "border-[#D9E0E8] text-[#6B7280] hover:border-[#172F52] hover:text-[#172F52]"
+                          ? "border-[#1F4FD8] bg-[#1F4FD8]/5 text-[#1F4FD8]"
+                          : "border-[#E2E6EC] text-[#5B6577] hover:border-[#0F1B2D] hover:text-[#0F1B2D]"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -113,11 +113,11 @@ export default function AdminNotificationsPage() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Notification Type</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Notification Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="h-9 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+                className="h-9 w-full rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
               >
                 <option value="system">System</option>
                 <option value="promotion">Promotion</option>
@@ -126,7 +126,7 @@ export default function AdminNotificationsPage() {
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Title</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Title</label>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -135,19 +135,19 @@ export default function AdminNotificationsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Message</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Message</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Notification message..."
-                className="w-full rounded-lg border border-[#D9E0E8] px-3 py-2 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+                className="w-full rounded-lg border border-[#E2E6EC] px-3 py-2 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
                 rows={4}
               />
             </div>
             <Button
               onClick={handleSend}
               disabled={!title.trim() || !message.trim()}
-              className="w-full bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="w-full bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               <Send className="mr-1.5 h-4 w-4" />
               {sent ? "Sent!" : "Send Notification"}
@@ -156,11 +156,11 @@ export default function AdminNotificationsPage() {
         </div>
 
         {/* History */}
-        <div className="rounded-xl border border-[#D9E0E8] bg-white">
-          <div className="border-b border-[#D9E0E8] px-6 py-4">
-            <h3 className="text-base font-bold text-[#172F52]">Notification History</h3>
+        <div className="rounded-xl border border-[#E2E6EC] bg-white">
+          <div className="border-b border-[#E2E6EC] px-6 py-4">
+            <h3 className="text-base font-bold text-[#0F1B2D]">Notification History</h3>
           </div>
-          <div className="divide-y divide-[#F5F7FA]">
+          <div className="divide-y divide-[#F4F6F9]">
             {DEMO_NOTIFICATIONS.map((notif) => {
               const readPct = notif.totalRecipients > 0 ? Math.round((notif.readCount / notif.totalRecipients) * 100) : 0
               return (
@@ -170,22 +170,22 @@ export default function AdminNotificationsPage() {
                       <div className="flex items-center gap-2">
                         <span className={cn(
                           "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
-                          notif.type === "system" ? "bg-[#172F52]/10 text-[#172F52]" : "bg-[#D4145A]/10 text-[#D4145A]"
+                          notif.type === "system" ? "bg-[#0F1B2D]/10 text-[#0F1B2D]" : "bg-[#1F4FD8]/10 text-[#1F4FD8]"
                         )}>
                           {notif.type}
                         </span>
-                        <span className="text-xs text-[#6B7280] capitalize">{notif.target === "all" ? "All Users" : notif.target}s</span>
+                        <span className="text-xs text-[#5B6577] capitalize">{notif.target === "all" ? "All Users" : notif.target}s</span>
                       </div>
-                      <p className="mt-1 text-sm font-medium text-[#172F52]">{notif.title}</p>
-                      <p className="mt-0.5 text-xs text-[#6B7280] line-clamp-2">{notif.message}</p>
+                      <p className="mt-1 text-sm font-medium text-[#0F1B2D]">{notif.title}</p>
+                      <p className="mt-0.5 text-xs text-[#5B6577] line-clamp-2">{notif.message}</p>
                     </div>
                   </div>
-                  <div className="mt-2 flex items-center gap-4 text-xs text-[#6B7280]">
+                  <div className="mt-2 flex items-center gap-4 text-xs text-[#5B6577]">
                     <span>{new Date(notif.sentAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
                     <span>{notif.totalRecipients.toLocaleString()} recipients</span>
                     <span>{readPct}% read rate</span>
                   </div>
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#F5F7FA]">
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#F4F6F9]">
                     <div
                       className="h-full rounded-full bg-[#168A55]"
                       style={{ width: `${readPct}%` }}

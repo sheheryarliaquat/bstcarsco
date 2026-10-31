@@ -161,7 +161,7 @@ export default function OperatorBookingsPage() {
       header: "ID",
       sortable: true,
       render: (row) => (
-        <span className="font-medium text-[#172F52]">{row.bookingNumber}</span>
+        <span className="font-medium text-[#0F1B2D]">{row.bookingNumber}</span>
       ),
     },
     {
@@ -184,8 +184,8 @@ export default function OperatorBookingsPage() {
       header: "Route",
       render: (row) => (
         <div className="max-w-[180px]">
-          <p className="truncate text-sm text-[#172F52]">{row.from}</p>
-          <p className="truncate text-xs text-[#6B7280]">→ {row.to}</p>
+          <p className="truncate text-sm text-[#0F1B2D]">{row.from}</p>
+          <p className="truncate text-xs text-[#5B6577]">→ {row.to}</p>
         </div>
       ),
     },
@@ -203,7 +203,7 @@ export default function OperatorBookingsPage() {
       header: "Price",
       sortable: true,
       render: (row) => (
-        <span className="font-semibold text-[#172F52]">{row.price}</span>
+        <span className="font-semibold text-[#0F1B2D]">{row.price}</span>
       ),
     },
     {
@@ -235,7 +235,7 @@ export default function OperatorBookingsPage() {
             <Button
               size="sm"
               variant="outline"
-              className="h-7 border-[#D9E0E8]"
+              className="h-7 border-[#E2E6EC]"
               onClick={() => handleAssignDriver(row.bookingNumber)}
             >
               <UserPlus className="h-3 w-3" />
@@ -250,8 +250,8 @@ export default function OperatorBookingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Bookings</h1>
-          <p className="text-sm text-[#6B7280]">Manage all your car bookings.</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Bookings</h1>
+          <p className="text-sm text-[#5B6577]">Manage all your car bookings.</p>
         </div>
       </div>
 
@@ -267,8 +267,8 @@ export default function OperatorBookingsPage() {
             className={cn(
               "flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
               activeTab === tab
-                ? "bg-[#D4145A] text-white"
-                : "bg-white text-[#6B7280] hover:bg-[#F5F7FA] border border-[#D9E0E8]"
+                ? "bg-[#1F4FD8] text-white"
+                : "bg-white text-[#5B6577] hover:bg-[#F4F6F9] border border-[#E2E6EC]"
             )}
           >
             {tab}
@@ -277,7 +277,7 @@ export default function OperatorBookingsPage() {
                 "flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold",
                 activeTab === tab
                   ? "bg-white/20 text-white"
-                  : "bg-[#F5F7FA] text-[#6B7280]"
+                  : "bg-[#F4F6F9] text-[#5B6577]"
               )}
             >
               {tabCounts[tab]}
@@ -289,7 +289,7 @@ export default function OperatorBookingsPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
           <Input
             value={search}
             onChange={(e) => {
@@ -300,12 +300,12 @@ export default function OperatorBookingsPage() {
             className="h-9 pl-9"
           />
         </div>
-        <Button variant="outline" className="border-[#D9E0E8]">
+        <Button variant="outline" className="border-[#E2E6EC]">
           <Calendar className="mr-2 h-4 w-4" />
           Date Range
           <ChevronDown className="ml-2 h-3 w-3" />
         </Button>
-        <Button variant="outline" className="border-[#D9E0E8]">
+        <Button variant="outline" className="border-[#E2E6EC]">
           <Filter className="mr-2 h-4 w-4" />
           Filters
         </Button>
@@ -346,13 +346,13 @@ export default function OperatorBookingsPage() {
       >
         <div className="space-y-4 pt-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
               Select Driver
             </label>
             <select
               value={selectedDriver}
               onChange={(e) => setSelectedDriver(e.target.value)}
-              className="flex h-9 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A] focus:ring-2 focus:ring-[#D4145A]/20"
+              className="flex h-9 w-full rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8] focus:ring-2 focus:ring-[#1F4FD8]/20"
             >
               <option value="">Choose a driver...</option>
               {DEMO_DATA.drivers
@@ -367,13 +367,13 @@ export default function OperatorBookingsPage() {
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
-              className="border-[#D9E0E8]"
+              className="border-[#E2E6EC]"
               onClick={() => setAssignModalOpen(false)}
             >
               Cancel
             </Button>
             <Button
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
               onClick={confirmAssign}
               disabled={!selectedDriver}
             >

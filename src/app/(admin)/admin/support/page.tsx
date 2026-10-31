@@ -183,8 +183,8 @@ export default function AdminSupportPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Support</h1>
-          <p className="text-sm text-[#6B7280]">Manage user support tickets</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Support</h1>
+          <p className="text-sm text-[#5B6577]">Manage user support tickets</p>
         </div>
       </div>
 
@@ -194,10 +194,10 @@ export default function AdminSupportPage() {
         <DashboardCard title="Awaiting Reply" value={waitingCount} icon={<AlertTriangle className="h-5 w-5" />} />
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -208,7 +208,7 @@ export default function AdminSupportPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Statuses</option>
             {STATUS_FLOW.map((s) => (
@@ -218,7 +218,7 @@ export default function AdminSupportPage() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Priorities</option>
             <option value="high">High</option>
@@ -228,7 +228,7 @@ export default function AdminSupportPage() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Categories</option>
             {SUPPORT_CATEGORIES.map((c) => (
@@ -238,26 +238,26 @@ export default function AdminSupportPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Ticket ID</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">User</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Category</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Subject</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Priority</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Assigned</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Created</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Actions</th>
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Ticket ID</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">User</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Category</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Subject</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Priority</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Status</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Assigned</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Created</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-[#6B7280]">
+                  <td colSpan={9} className="px-4 py-12 text-center text-[#5B6577]">
                     No tickets found
                   </td>
                 </tr>
@@ -265,18 +265,18 @@ export default function AdminSupportPage() {
                 filtered.map((ticket) => (
                   <tr
                     key={ticket.id}
-                    className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50 cursor-pointer"
+                    className="border-b border-[#F4F6F9] transition-colors last:border-0 hover:bg-[#F4F6F9]/50 cursor-pointer"
                     onClick={() => { setDetailTarget(ticket); setDetailOpen(true) }}
                   >
-                    <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{ticket.id}</td>
+                    <td className="px-4 py-3 font-mono text-xs font-medium text-[#0F1B2D]">{ticket.id}</td>
                     <td className="px-4 py-3">
                       <div>
-                        <p className="text-[#172F52] font-medium">{ticket.userName}</p>
-                        <p className="text-xs text-[#6B7280] capitalize">{ticket.userRole}</p>
+                        <p className="text-[#0F1B2D] font-medium">{ticket.userName}</p>
+                        <p className="text-xs text-[#5B6577] capitalize">{ticket.userRole}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-[#6B7280] capitalize">{ticket.category.replace("_", " ")}</td>
-                    <td className="max-w-[200px] truncate px-4 py-3 text-[#172F52]">{ticket.subject}</td>
+                    <td className="px-4 py-3 text-[#5B6577] capitalize">{ticket.category.replace("_", " ")}</td>
+                    <td className="max-w-[200px] truncate px-4 py-3 text-[#0F1B2D]">{ticket.subject}</td>
                     <td className="px-4 py-3">
                       <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize", priorityColors[ticket.priority] ?? "")}>
                         {ticket.priority}
@@ -287,17 +287,17 @@ export default function AdminSupportPage() {
                         {ticket.status.replace("_", " ")}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[#6B7280]">
+                    <td className="px-4 py-3 text-[#5B6577]">
                       {ticket.assignedAdmin ?? <span className="italic text-[#ADB5BD]">Unassigned</span>}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#6B7280]">
+                    <td className="px-4 py-3 text-xs text-[#5B6577]">
                       {new Date(ticket.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
                     </td>
                     <td className="px-4 py-3">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-[#D9E0E8]"
+                        className="border-[#E2E6EC]"
                         onClick={(e) => { e.stopPropagation(); setDetailTarget(ticket); setDetailOpen(true) }}
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -322,33 +322,33 @@ export default function AdminSupportPage() {
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">User</p>
-                <p className="text-sm font-medium text-[#172F52]">{detailTarget.userName} ({detailTarget.userRole})</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">User</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">{detailTarget.userName} ({detailTarget.userRole})</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Category</p>
-                <p className="text-sm text-[#172F52] capitalize">{detailTarget.category.replace("_", " ")}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Category</p>
+                <p className="text-sm text-[#0F1B2D] capitalize">{detailTarget.category.replace("_", " ")}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Priority</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Priority</p>
                 <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize", priorityColors[detailTarget.priority])}>
                   {detailTarget.priority}
                 </span>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Assigned To</p>
-                <p className="text-sm text-[#172F52]">{detailTarget.assignedAdmin ?? "Unassigned"}</p>
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Assigned To</p>
+                <p className="text-sm text-[#0F1B2D]">{detailTarget.assignedAdmin ?? "Unassigned"}</p>
               </div>
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase text-[#6B7280]">Subject</p>
-              <p className="text-sm font-medium text-[#172F52]">{detailTarget.subject}</p>
+              <p className="text-xs font-semibold uppercase text-[#5B6577]">Subject</p>
+              <p className="text-sm font-medium text-[#0F1B2D]">{detailTarget.subject}</p>
             </div>
 
             {/* Status advance buttons */}
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-semibold uppercase text-[#6B7280] mr-1">Status:</p>
+              <p className="text-xs font-semibold uppercase text-[#5B6577] mr-1">Status:</p>
               {STATUS_FLOW.map((s, i) => {
                 const isCurrent = detailTarget.status === s
                 const next = advanceStatus(detailTarget.status)
@@ -359,9 +359,9 @@ export default function AdminSupportPage() {
                     disabled={!isNext}
                     className={cn(
                       "rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors",
-                      isCurrent && "bg-[#172F52] text-white",
-                      isNext && "bg-[#D4145A] text-white hover:bg-[#D4145A]/90 cursor-pointer",
-                      !isCurrent && !isNext && "bg-[#F5F7FA] text-[#6B7280]"
+                      isCurrent && "bg-[#0F1B2D] text-white",
+                      isNext && "bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90 cursor-pointer",
+                      !isCurrent && !isNext && "bg-[#F4F6F9] text-[#5B6577]"
                     )}
                   >
                     {s.replace("_", " ")}
@@ -372,28 +372,28 @@ export default function AdminSupportPage() {
 
             {/* Message thread */}
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase text-[#6B7280]">Message Thread</p>
-              <div className="max-h-64 space-y-3 overflow-y-auto rounded-lg bg-[#F5F7FA] p-3">
+              <p className="text-xs font-semibold uppercase text-[#5B6577]">Message Thread</p>
+              <div className="max-h-64 space-y-3 overflow-y-auto rounded-lg bg-[#F4F6F9] p-3">
                 {detailTarget.messages.map((msg, i) => (
                   <div
                     key={i}
                     className={cn(
                       "rounded-lg p-3",
-                      msg.senderRole === "admin" ? "bg-[#172F52]/5 ml-8" : "bg-white mr-8"
+                      msg.senderRole === "admin" ? "bg-[#0F1B2D]/5 ml-8" : "bg-white mr-8"
                     )}
                   >
                     <div className="mb-1 flex items-center gap-2">
                       <span className={cn(
                         "text-xs font-semibold",
-                        msg.senderRole === "admin" ? "text-[#D4145A]" : "text-[#172F52]"
+                        msg.senderRole === "admin" ? "text-[#1F4FD8]" : "text-[#0F1B2D]"
                       )}>
                         {msg.sender}
                       </span>
-                      <span className="text-[10px] text-[#6B7280]">
+                      <span className="text-[10px] text-[#5B6577]">
                         {new Date(msg.timestamp).toLocaleString("en-GB", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" })}
                       </span>
                     </div>
-                    <p className="text-sm text-[#172F52]">{msg.message}</p>
+                    <p className="text-sm text-[#0F1B2D]">{msg.message}</p>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
@@ -410,7 +410,7 @@ export default function AdminSupportPage() {
                   className="h-9 flex-1"
                 />
                 <Button
-                  className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                  className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
                   onClick={() => setReplyMessage("")}
                   disabled={!replyMessage.trim()}
                 >

@@ -62,7 +62,7 @@ export function MapView({
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 8,
-            fillColor: "#D4145A",
+            fillColor: "#1F4FD8",
             fillOpacity: 1,
             strokeColor: "#ffffff",
             strokeWeight: 2,
@@ -94,7 +94,7 @@ export function MapView({
           icon: {
             path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
             scale: 6,
-            fillColor: "#172F52",
+            fillColor: "#0F1B2D",
             fillOpacity: 1,
             strokeColor: "#ffffff",
             strokeWeight: 2,
@@ -108,7 +108,7 @@ export function MapView({
         const routePath = new google.maps.Polyline({
           path: [pickup, destination],
           geodesic: true,
-          strokeColor: "#D4145A",
+          strokeColor: "#1F4FD8",
           strokeOpacity: 0.8,
           strokeWeight: 3,
           map,
@@ -133,7 +133,7 @@ export function MapView({
       ref={mapRef}
       style={{ height }}
       className={cn(
-        "overflow-hidden rounded-xl bg-[#F5F7FA] ring-1 ring-[#D9E0E8]",
+        "overflow-hidden rounded-xl bg-[#F4F6F9] ring-1 ring-[#E2E6EC]",
         className
       )}
     />

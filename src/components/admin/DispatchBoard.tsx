@@ -36,8 +36,8 @@ function columnFor(b: BoardBooking): ColumnKey | null {
 }
 
 const COLUMNS: { key: ColumnKey; title: string; dot: string }[] = [
-  { key: "unassigned", title: "Unassigned", dot: "bg-[#D4145A]" },
-  { key: "assigned", title: "Assigned", dot: "bg-[#172F52]" },
+  { key: "unassigned", title: "Unassigned", dot: "bg-[#1F4FD8]" },
+  { key: "assigned", title: "Assigned", dot: "bg-[#0F1B2D]" },
   { key: "onroute", title: "On the way", dot: "bg-amber-500" },
   { key: "completed", title: "Completed", dot: "bg-green-600" },
 ]
@@ -140,7 +140,7 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
-        <label className="text-xs font-medium text-[#172F52]">
+        <label className="text-xs font-medium text-[#0F1B2D]">
           Date
           <Input
             type="date"
@@ -150,12 +150,12 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
             className="mt-1 h-9 w-44"
           />
         </label>
-        <label className="flex h-9 items-center gap-2 text-sm text-[#172F52]">
+        <label className="flex h-9 items-center gap-2 text-sm text-[#0F1B2D]">
           <input
             type="checkbox"
             checked={allDates}
             onChange={(e) => setAllDates(e.target.checked)}
-            className="h-4 w-4 accent-[#D4145A]"
+            className="h-4 w-4 accent-[#1F4FD8]"
           />
           All dates
         </label>
@@ -170,9 +170,9 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-xl border border-[#D9E0E8] bg-white px-4 py-3">
-            <p className="text-xs font-medium text-[#6B7280]">{s.label}</p>
-            <p className="text-2xl font-bold text-[#172F52]">{s.value}</p>
+          <div key={s.label} className="rounded-xl border border-[#E2E6EC] bg-white px-4 py-3">
+            <p className="text-xs font-medium text-[#5B6577]">{s.label}</p>
+            <p className="text-2xl font-bold text-[#0F1B2D]">{s.value}</p>
           </div>
         ))}
       </div>
@@ -180,16 +180,16 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {COLUMNS.map((col) => (
           <section key={col.key} className="flex min-h-[360px] flex-col gap-3 rounded-xl bg-[#EEF1F5] p-3">
-            <h3 className="flex items-center justify-between px-1 text-sm font-bold text-[#172F52]">
+            <h3 className="flex items-center justify-between px-1 text-sm font-bold text-[#0F1B2D]">
               <span className="flex items-center gap-2">
                 <span className={cn("h-2.5 w-2.5 rounded-full", col.dot)} />
                 {col.title}
               </span>
-              <span className="rounded-full bg-white px-2 py-0.5 text-xs text-[#6B7280]">{columns[col.key].length}</span>
+              <span className="rounded-full bg-white px-2 py-0.5 text-xs text-[#5B6577]">{columns[col.key].length}</span>
             </h3>
 
             {columns[col.key].length === 0 && (
-              <p className="px-1 py-6 text-center text-xs text-[#6B7280]">Nothing here</p>
+              <p className="px-1 py-6 text-center text-xs text-[#5B6577]">Nothing here</p>
             )}
 
             {columns[col.key].map((b) => {
@@ -198,16 +198,16 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
               return (
                 <article key={b.id} className="space-y-2.5 rounded-lg bg-white p-3 shadow-sm">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="flex items-center gap-1 text-lg font-bold text-[#172F52]">
-                      <Clock className="h-4 w-4 text-[#6B7280]" />
+                    <span className="flex items-center gap-1 text-lg font-bold text-[#0F1B2D]">
+                      <Clock className="h-4 w-4 text-[#5B6577]" />
                       {b.pickupTime}
                     </span>
-                    <span className="font-mono text-[11px] font-semibold text-[#6B7280]">{b.bookingNumber}</span>
+                    <span className="font-mono text-[11px] font-semibold text-[#5B6577]">{b.bookingNumber}</span>
                   </div>
-                  {allDates && <p className="text-xs text-[#6B7280]">{bookingDayKey(b.date)}</p>}
-                  <div className="space-y-1 text-xs text-[#172F52]">
+                  {allDates && <p className="text-xs text-[#5B6577]">{bookingDayKey(b.date)}</p>}
+                  <div className="space-y-1 text-xs text-[#0F1B2D]">
                     <p className="flex gap-1.5">
-                      <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[#D4145A]" />
+                      <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-[#1F4FD8]" />
                       <span className="line-clamp-2">{b.pickup?.formattedAddress}</span>
                     </p>
                     <p className="flex gap-1.5">
@@ -216,15 +216,15 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5 text-[11px]">
-                    <span className="rounded-full bg-[#F5F7FA] px-2 py-0.5 font-semibold text-[#172F52]">
+                    <span className="rounded-full bg-[#F4F6F9] px-2 py-0.5 font-semibold text-[#0F1B2D]">
                       <Car className="mr-1 inline h-3 w-3" />
                       {vehicleLabel(b.vehicleType)}
                     </span>
-                    <span className="rounded-full bg-[#F5F7FA] px-2 py-0.5 text-[#172F52]">
+                    <span className="rounded-full bg-[#F4F6F9] px-2 py-0.5 text-[#0F1B2D]">
                       <Users className="mr-1 inline h-3 w-3" />
                       {b.passengers}
                     </span>
-                    <span className="rounded-full bg-[#F5F7FA] px-2 py-0.5 font-semibold text-[#172F52]">
+                    <span className="rounded-full bg-[#F4F6F9] px-2 py-0.5 font-semibold text-[#0F1B2D]">
                       £{(b.total ?? 0).toFixed(2)}
                     </span>
                     {b.specialRequirements?.flightNumber && (
@@ -234,24 +234,24 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
                       </span>
                     )}
                     {b.specialRequirements?.meetAndGreet && (
-                      <span className="rounded-full bg-[#F5F7FA] px-2 py-0.5 text-[#172F52]">Meet &amp; greet</span>
+                      <span className="rounded-full bg-[#F4F6F9] px-2 py-0.5 text-[#0F1B2D]">Meet &amp; greet</span>
                     )}
                     {b.specialRequirements?.childSeat && (
-                      <span className="rounded-full bg-[#F5F7FA] px-2 py-0.5 text-[#172F52]">Child seat</span>
+                      <span className="rounded-full bg-[#F4F6F9] px-2 py-0.5 text-[#0F1B2D]">Child seat</span>
                     )}
                   </div>
 
                   {col.key === "unassigned" &&
                     (driverOptions.length === 0 ? (
-                      <p className="text-xs text-[#6B7280]">No drivers added yet.</p>
+                      <p className="text-xs text-[#5B6577]">No drivers added yet.</p>
                     ) : (
                       <>
-                        <label className="block text-[11px] font-semibold text-[#6B7280]">
+                        <label className="block text-[11px] font-semibold text-[#5B6577]">
                           Driver and car
                           <select
                             value={pick}
                             onChange={(e) => setPicks((p) => ({ ...p, [b.id]: e.target.value }))}
-                            className="mt-1 h-9 w-full rounded-md border border-[#D9E0E8] bg-white px-2 text-xs text-[#172F52] outline-none focus:border-[#D4145A]"
+                            className="mt-1 h-9 w-full rounded-md border border-[#E2E6EC] bg-white px-2 text-xs text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
                           >
                             {driverOptions.map((d) => (
                               <option key={d.uid} value={d.uid}>
@@ -269,7 +269,7 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
                             const driver = driverById.get(pick)
                             if (driver) run(b.id, () => onAssign(b, driver))
                           }}
-                          className="w-full bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                          className="w-full bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
                         >
                           {busy ? "Dispatching..." : "Dispatch job"}
                         </Button>
@@ -277,15 +277,15 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
                     ))}
 
                   {col.key !== "unassigned" && b.driverId && (
-                    <div className="flex items-center gap-2 rounded-md bg-[#F5F7FA] px-2 py-1.5">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#172F52] text-[11px] font-bold text-white">
+                    <div className="flex items-center gap-2 rounded-md bg-[#F4F6F9] px-2 py-1.5">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#0F1B2D] text-[11px] font-bold text-white">
                         {driverName(b.driverId)
                           .split(" ")
                           .map((w) => w[0])
                           .join("")
                           .slice(0, 2)}
                       </span>
-                      <span className="text-xs text-[#172F52]">
+                      <span className="text-xs text-[#0F1B2D]">
                         {driverName(b.driverId)}
                         {b.vehicleId && vehicleInfo[b.vehicleId] ? ` · ${vehicleInfo[b.vehicleId]}` : ""}
                       </span>
@@ -298,7 +298,7 @@ export function DispatchBoard({ bookings, drivers, vehicleInfo, onAssign, onSetS
                         size="sm"
                         disabled={busy}
                         onClick={() => run(b.id, () => onSetStatus(b, BookingStatus.DriverEnRoute))}
-                        className="flex-1 bg-[#172F52] text-white hover:bg-[#172F52]/90"
+                        className="flex-1 bg-[#0F1B2D] text-white hover:bg-[#0F1B2D]/90"
                       >
                         Driver on the way
                       </Button>

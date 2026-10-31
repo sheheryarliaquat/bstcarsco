@@ -27,18 +27,18 @@ export function EmptyState({
       )}
     >
       {icon && (
-        <div className="mb-4 text-[#D9E0E8] [&>svg]:h-16 [&>svg]:w-16">
+        <div className="mb-4 text-[#E2E6EC] [&>svg]:h-16 [&>svg]:w-16">
           {icon}
         </div>
       )}
-      <h3 className="mb-1 text-lg font-semibold text-[#172033]">{title}</h3>
+      <h3 className="mb-1 text-lg font-semibold text-[#0F1B2D]">{title}</h3>
       {description && (
-        <p className="mb-4 max-w-sm text-sm text-[#6B7280]">{description}</p>
+        <p className="mb-4 max-w-sm text-sm text-[#5B6577]">{description}</p>
       )}
       {action && (
         <Button
           onClick={action.onClick}
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
         >
           {action.label}
         </Button>

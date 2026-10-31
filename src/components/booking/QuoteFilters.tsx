@@ -59,15 +59,15 @@ export function QuoteFilters({
   }
 
   return (
-    <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+    <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-[#172F52]">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-[#0F1B2D]">
           <SlidersHorizontal className="h-4 w-4" />
           Filters
         </h3>
         <button
           onClick={onReset}
-          className="flex items-center gap-1 text-xs text-[#6B7280] hover:text-[#D4145A]"
+          className="flex items-center gap-1 text-xs text-[#5B6577] hover:text-[#1F4FD8]"
         >
           <RotateCcw className="h-3 w-3" />
           Reset
@@ -75,7 +75,7 @@ export function QuoteFilters({
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Sort By
         </label>
         <Select
@@ -96,7 +96,7 @@ export function QuoteFilters({
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Max Price: £{priceMax}
         </label>
         <input
@@ -110,16 +110,16 @@ export function QuoteFilters({
             setPriceMax(v)
             update("priceRange", [0, v])
           }}
-          className="w-full accent-[#D4145A]"
+          className="w-full accent-[#1F4FD8]"
         />
-        <div className="flex justify-between text-xs text-[#6B7280]">
+        <div className="flex justify-between text-xs text-[#5B6577]">
           <span>£0</span>
           <span>£1000</span>
         </div>
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Minimum Rating
         </label>
         <div className="flex gap-1">
@@ -130,8 +130,8 @@ export function QuoteFilters({
               className={cn(
                 "flex items-center gap-0.5 rounded-lg border px-2 py-1 text-xs transition-colors",
                 filters.minRating === r
-                  ? "border-[#D4145A] bg-[#D4145A]/10 text-[#D4145A]"
-                  : "border-[#D9E0E8] text-[#6B7280] hover:border-[#172F52]/30"
+                  ? "border-[#1F4FD8] bg-[#1F4FD8]/10 text-[#1F4FD8]"
+                  : "border-[#E2E6EC] text-[#5B6577] hover:border-[#0F1B2D]/30"
               )}
             >
               {r > 0 ? (
@@ -148,14 +148,14 @@ export function QuoteFilters({
       </div>
 
       <div className="mb-4">
-        <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Vehicle Type
         </label>
         <div className="flex flex-col gap-2">
           {VEHICLE_TYPES.map((vt) => (
             <label
               key={vt.value}
-              className="flex items-center gap-2 text-sm text-[#172033]"
+              className="flex items-center gap-2 text-sm text-[#0F1B2D]"
             >
               <Checkbox
                 checked={filters.vehicleTypes.includes(vt.value)}
@@ -170,7 +170,7 @@ export function QuoteFilters({
 
       <div className="mb-4 flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-[#172033]">
+          <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
             <Zap className="h-4 w-4 text-[#168A55]" />
             Electric Only
           </label>
@@ -180,7 +180,7 @@ export function QuoteFilters({
           />
         </div>
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-[#172033]">
+          <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
             <Leaf className="h-4 w-4 text-[#0EA5E9]" />
             Hybrid Only
           </label>
@@ -190,8 +190,8 @@ export function QuoteFilters({
           />
         </div>
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-[#172033]">
-            <Accessibility className="h-4 w-4 text-[#6B7280]" />
+          <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
+            <Accessibility className="h-4 w-4 text-[#5B6577]" />
             Wheelchair
           </label>
           <Switch
@@ -202,7 +202,7 @@ export function QuoteFilters({
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Min Passengers
         </label>
         <Select
@@ -223,7 +223,7 @@ export function QuoteFilters({
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Min Luggage
         </label>
         <Select
@@ -244,7 +244,7 @@ export function QuoteFilters({
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-[#5B6577]">
           Payment Method
         </label>
         <Select
@@ -263,7 +263,7 @@ export function QuoteFilters({
         </Select>
       </div>
 
-      <Button className="w-full bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+      <Button className="w-full bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
         Apply Filters
       </Button>
     </div>

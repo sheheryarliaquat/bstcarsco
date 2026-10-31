@@ -5,7 +5,7 @@ export function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-[#D9E0E8] bg-white p-5",
+        "rounded-xl border border-[#E2E6EC] bg-white p-5",
         className
       )}
     >
@@ -29,18 +29,18 @@ export function SkeletonTable({ rows = 5, cols = 4, className }: { rows?: number
   return (
     <div
       className={cn(
-        "rounded-xl border border-[#D9E0E8] bg-white",
+        "rounded-xl border border-[#E2E6EC] bg-white",
         className
       )}
     >
-      <div className="border-b border-[#D9E0E8] p-4">
+      <div className="border-b border-[#E2E6EC] p-4">
         <Skeleton className="h-9 w-64" />
       </div>
       <div className="p-4">
         {Array.from({ length: rows }).map((_, r) => (
           <div
             key={r}
-            className="flex gap-4 border-b border-[#F5F7FA] py-3 last:border-0"
+            className="flex gap-4 border-b border-[#F4F6F9] py-3 last:border-0"
           >
             {Array.from({ length: cols }).map((_, c) => (
               <div key={c} className="flex-1">

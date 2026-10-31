@@ -108,7 +108,7 @@ const FAQS = [
 export default function HowItWorksPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             How It Works
@@ -127,14 +127,14 @@ export default function HowItWorksPage() {
                 key={step.number}
                 className="flex flex-col items-start gap-6 sm:flex-row"
               >
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#D4145A] text-white">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#1F4FD8] text-white">
                   <step.icon className="h-8 w-8" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold uppercase tracking-wider text-[#D4145A]">
+                  <span className="text-sm font-semibold uppercase tracking-wider text-[#1F4FD8]">
                     Step {step.number}
                   </span>
-                  <h2 className="mt-1 text-2xl font-bold text-[#172F52]">
+                  <h2 className="mt-1 text-2xl font-bold text-[#0F1B2D]">
                     {step.title}
                   </h2>
                   <p className="mt-2 text-gray-600">{step.description}</p>
@@ -145,10 +145,10 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">
               Frequently Asked Questions
             </h2>
             <p className="mt-2 text-gray-600">
@@ -168,7 +168,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-r from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold text-white">
             Ready to Get Started?
@@ -178,8 +178,8 @@ export default function HowItWorksPage() {
           </p>
           <Button
             size="lg"
-            className="mt-8 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-            render={<Link href="/book" />}
+            className="mt-8 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
+            render={<Link href="/" />}
             nativeButton={false}
           >
             <Car className="mr-2 h-5 w-5" />

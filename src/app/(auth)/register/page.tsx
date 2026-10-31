@@ -129,23 +129,23 @@ export default function RegisterPage() {
   return (
     <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold text-[#172F52]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">
           Create your account
         </h1>
-        <p className="mt-1 text-sm text-[#6B7280]">
+        <p className="mt-1 text-sm text-[#5B6577]">
           Join thousands of passengers and drivers across the UK
         </p>
       </div>
 
-      <div className="mb-6 flex rounded-lg bg-[#F5F7FA] p-1">
+      <div className="mb-6 flex rounded-lg bg-[#F4F6F9] p-1">
         <button
           type="button"
           onClick={() => handleRoleSwitch("passenger")}
           className={cn(
             "flex-1 rounded-md py-2.5 text-sm font-medium transition-colors",
             role === "passenger"
-              ? "bg-white text-[#172F52] shadow-sm"
-              : "text-[#6B7280] hover:text-[#172033]"
+              ? "bg-white text-[#0F1B2D] shadow-sm"
+              : "text-[#5B6577] hover:text-[#0F1B2D]"
           )}
         >
           Passenger
@@ -156,8 +156,8 @@ export default function RegisterPage() {
           className={cn(
             "flex-1 rounded-md py-2.5 text-sm font-medium transition-colors",
             role === "driver"
-              ? "bg-white text-[#172F52] shadow-sm"
-              : "text-[#6B7280] hover:text-[#172033]"
+              ? "bg-white text-[#0F1B2D] shadow-sm"
+              : "text-[#5B6577] hover:text-[#0F1B2D]"
           )}
         >
           Driver
@@ -178,12 +178,12 @@ export default function RegisterPage() {
           <div>
             <Label
               htmlFor="firstName"
-              className="text-sm font-medium text-[#172033]"
+              className="text-sm font-medium text-[#0F1B2D]"
             >
               First name
             </Label>
             <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="firstName"
                 placeholder="James"
@@ -200,12 +200,12 @@ export default function RegisterPage() {
           <div>
             <Label
               htmlFor="lastName"
-              className="text-sm font-medium text-[#172033]"
+              className="text-sm font-medium text-[#0F1B2D]"
             >
               Last name
             </Label>
             <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 id="lastName"
                 placeholder="Wilson"
@@ -224,12 +224,12 @@ export default function RegisterPage() {
         <div>
           <Label
             htmlFor="email"
-            className="text-sm font-medium text-[#172033]"
+            className="text-sm font-medium text-[#0F1B2D]"
           >
             Email address
           </Label>
           <div className="relative mt-1.5">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               id="email"
               type="email"
@@ -248,12 +248,12 @@ export default function RegisterPage() {
         <div>
           <Label
             htmlFor="phone"
-            className="text-sm font-medium text-[#172033]"
+            className="text-sm font-medium text-[#0F1B2D]"
           >
             Phone number
           </Label>
           <div className="relative mt-1.5">
-            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               id="phone"
               type="tel"
@@ -272,12 +272,12 @@ export default function RegisterPage() {
         <div>
           <Label
             htmlFor="password"
-            className="text-sm font-medium text-[#172033]"
+            className="text-sm font-medium text-[#0F1B2D]"
           >
             Password
           </Label>
           <div className="relative mt-1.5">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -288,7 +288,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#172033]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6577] hover:text-[#0F1B2D]"
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -307,12 +307,12 @@ export default function RegisterPage() {
         <div>
           <Label
             htmlFor="confirmPassword"
-            className="text-sm font-medium text-[#172033]"
+            className="text-sm font-medium text-[#0F1B2D]"
           >
             Confirm password
           </Label>
           <div className="relative mt-1.5">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               id="confirmPassword"
               type={showConfirm ? "text" : "password"}
@@ -323,7 +323,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#172033]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6577] hover:text-[#0F1B2D]"
             >
               {showConfirm ? (
                 <EyeOff className="h-4 w-4" />
@@ -339,7 +339,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <label className="flex items-start gap-2 text-sm text-[#172033]">
+        <label className="flex items-start gap-2 text-sm text-[#0F1B2D]">
           <Checkbox
             className="mt-0.5"
             onCheckedChange={(checked) =>
@@ -350,11 +350,11 @@ export default function RegisterPage() {
           />
           <span>
             I agree to the{" "}
-            <Link href="/terms" className="text-[#D4145A] hover:underline">
+            <Link href="/terms" className="text-[#1F4FD8] hover:underline">
               Terms and Conditions
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="text-[#D4145A] hover:underline">
+            <Link href="/privacy" className="text-[#1F4FD8] hover:underline">
               Privacy Policy
             </Link>
           </span>
@@ -368,7 +368,7 @@ export default function RegisterPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="h-11 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90"
+          className="h-11 w-full bg-[#1F4FD8] text-base font-semibold text-white hover:bg-[#1F4FD8]/90"
         >
           {loading ? (
             <>
@@ -381,11 +381,11 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[#6B7280]">
+      <p className="mt-6 text-center text-sm text-[#5B6577]">
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-semibold text-[#D4145A] hover:underline"
+          className="font-semibold text-[#1F4FD8] hover:underline"
         >
           Sign in
         </Link>

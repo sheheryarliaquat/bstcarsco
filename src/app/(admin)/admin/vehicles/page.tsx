@@ -90,7 +90,7 @@ const EXPIRY_BADGE: Record<ExpiryState, string> = {
   ok: "bg-green-50 text-green-700",
   due: "bg-amber-50 text-amber-800",
   expired: "bg-red-50 text-red-700",
-  missing: "bg-[#F5F7FA] text-[#6B7280]",
+  missing: "bg-[#F4F6F9] text-[#5B6577]",
 }
 
 const EMPTY_VEHICLE: NewVehicle = {
@@ -274,12 +274,12 @@ export default function AdminVehiclesPage() {
         const v = row as unknown as Vehicle
         return (
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#172F52]/10">
-              <Car className="h-4 w-4 text-[#172F52]" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0F1B2D]/10">
+              <Car className="h-4 w-4 text-[#0F1B2D]" />
             </div>
             <div>
-              <span className="font-medium text-[#172F52]">{v.make} {v.model}</span>
-              <p className="text-xs text-[#6B7280]">{v.year} · {v.colour}</p>
+              <span className="font-medium text-[#0F1B2D]">{v.make} {v.model}</span>
+              <p className="text-xs text-[#5B6577]">{v.year} · {v.colour}</p>
             </div>
           </div>
         )
@@ -290,7 +290,7 @@ export default function AdminVehiclesPage() {
       header: "Registration",
       sortable: true,
       render: (row) => (
-        <span className="font-mono text-sm font-semibold text-[#172F52]">
+        <span className="font-mono text-sm font-semibold text-[#0F1B2D]">
           {(row as unknown as Vehicle).registration}
         </span>
       ),
@@ -299,7 +299,7 @@ export default function AdminVehiclesPage() {
       key: "vehicleType",
       header: "Type",
       render: (row) => (
-        <span className="rounded-full bg-[#172F52]/10 px-2.5 py-0.5 text-xs font-semibold text-[#172F52]">
+        <span className="rounded-full bg-[#0F1B2D]/10 px-2.5 py-0.5 text-xs font-semibold text-[#0F1B2D]">
           {getTypeLabel((row as unknown as Vehicle).vehicleType)}
         </span>
       ),
@@ -308,7 +308,7 @@ export default function AdminVehiclesPage() {
       key: "operatorId",
       header: "Operator",
       render: (row) => (
-        <span className="text-[#6B7280]">{getOperatorName((row as unknown as Vehicle).operatorId)}</span>
+        <span className="text-[#5B6577]">{getOperatorName((row as unknown as Vehicle).operatorId)}</span>
       ),
     },
     {
@@ -318,10 +318,10 @@ export default function AdminVehiclesPage() {
         const v = row as unknown as Vehicle
         return (
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-sm text-[#6B7280]">
+            <span className="flex items-center gap-1 text-sm text-[#5B6577]">
               <Users className="h-3.5 w-3.5" /> {v.passengerCapacity}
             </span>
-            <span className="flex items-center gap-1 text-sm text-[#6B7280]">
+            <span className="flex items-center gap-1 text-sm text-[#5B6577]">
               <Luggage className="h-3.5 w-3.5" /> {v.luggageCapacity}
             </span>
           </div>
@@ -385,7 +385,7 @@ export default function AdminVehiclesPage() {
               aria-label={`Change availability for ${v.make} ${v.model}`}
               value={current}
               onChange={(e) => handleSetAvailability(v, e.target.value as VehicleAvailabilityStatus)}
-              className="h-7 rounded-md border border-[#D9E0E8] bg-white px-1.5 text-xs text-[#172F52] outline-none focus:border-[#D4145A]"
+              className="h-7 rounded-md border border-[#E2E6EC] bg-white px-1.5 text-xs text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
             >
               {(Object.keys(AVAILABILITY_META) as VehicleAvailabilityStatus[]).map((status) => (
                 <option key={status} value={status}>
@@ -405,7 +405,7 @@ export default function AdminVehiclesPage() {
         return (
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); setSelectedVehicle(v); setDetailOpen(true) }}>
-              <Eye className="h-3.5 w-3.5 text-[#6B7280]" />
+              <Eye className="h-3.5 w-3.5 text-[#5B6577]" />
             </Button>
             {!v.isApproved && (
               <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); handleApproveVehicle(v) }}>
@@ -425,10 +425,10 @@ export default function AdminVehiclesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Vehicles & Rates</h1>
-          <p className="text-sm text-[#6B7280]">Manage vehicles and set pricing per vehicle type</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Vehicles & Rates</h1>
+          <p className="text-sm text-[#5B6577]">Manage vehicles and set pricing per vehicle type</p>
         </div>
-        <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90" onClick={() => setShowCreate(true)}>
+        <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90" onClick={() => setShowCreate(true)}>
           <Plus className="mr-1.5 h-4 w-4" />
           Add Vehicle
         </Button>
@@ -453,24 +453,24 @@ export default function AdminVehiclesPage() {
       )}
 
       {/* Pricing / Rates Section */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-[#D4145A]" />
-            <h2 className="text-lg font-bold text-[#172F52]">Vehicle Type Rates</h2>
+            <DollarSign className="h-5 w-5 text-[#1F4FD8]" />
+            <h2 className="text-lg font-bold text-[#0F1B2D]">Vehicle Type Rates</h2>
           </div>
           <Button size="sm" className="bg-[#168A55] text-white hover:bg-[#168A55]/90" onClick={saveRates} disabled={rateSaving}>
             <Save className="mr-1.5 h-3.5 w-3.5" />
             {rateSaved ? "Saved!" : rateSaving ? "Saving..." : "Save Rates"}
           </Button>
         </div>
-        <p className="mb-4 text-sm text-[#6B7280]">
+        <p className="mb-4 text-sm text-[#5B6577]">
           Set the base fare, per-mile rate, and other charges for each vehicle type. These rates are used to calculate quotes for passengers.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] text-left text-xs font-semibold uppercase text-[#6B7280]">
+              <tr className="border-b border-[#E2E6EC] text-left text-xs font-semibold uppercase text-[#5B6577]">
                 <th className="pb-2 pr-4">Vehicle Type</th>
                 <th className="pb-2 pr-4">Base Fare (£)</th>
                 <th className="pb-2 pr-4">Per Mile (£)</th>
@@ -482,7 +482,7 @@ export default function AdminVehiclesPage() {
             <tbody>
               {rates.map((rate, idx) => (
                 <tr key={rate.vehicleType} className="border-b border-[#F0F2F5]">
-                  <td className="py-2.5 pr-4 font-medium text-[#172F52]">{rate.label}</td>
+                  <td className="py-2.5 pr-4 font-medium text-[#0F1B2D]">{rate.label}</td>
                   <td className="py-2.5 pr-4">
                     <Input
                       type="number"
@@ -536,10 +536,10 @@ export default function AdminVehiclesPage() {
       </div>
 
       {/* Vehicle List Section */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
@@ -550,7 +550,7 @@ export default function AdminVehiclesPage() {
           <select
             value={typeFilter}
             onChange={(e) => { setTypeFilter(e.target.value); setPage(1) }}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Types</option>
             {VEHICLE_TYPES.map((vt) => (
@@ -560,7 +560,7 @@ export default function AdminVehiclesPage() {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Statuses</option>
             <option value="approved">Approved</option>
@@ -569,7 +569,7 @@ export default function AdminVehiclesPage() {
           <select
             value={availabilityFilter}
             onChange={(e) => { setAvailabilityFilter(e.target.value); setPage(1) }}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Availability</option>
             {(Object.keys(AVAILABILITY_META) as VehicleAvailabilityStatus[]).map((status) => (
@@ -588,13 +588,13 @@ export default function AdminVehiclesPage() {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-[#6B7280]">
+        <span className="text-xs text-[#5B6577]">
           Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length}
         </span>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(1)}>«</Button>
           <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
-          <span className="px-2 text-sm font-medium text-[#172F52]">{page} / {totalPages || 1}</span>
+          <span className="px-2 text-sm font-medium text-[#0F1B2D]">{page} / {totalPages || 1}</span>
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>›</Button>
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</Button>
         </div>
@@ -610,7 +610,7 @@ export default function AdminVehiclesPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Make *</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Make *</Label>
               <Input
                 value={newVehicle.make}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, make: e.target.value }))}
@@ -619,7 +619,7 @@ export default function AdminVehiclesPage() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Model *</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Model *</Label>
               <Input
                 value={newVehicle.model}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, model: e.target.value }))}
@@ -628,7 +628,7 @@ export default function AdminVehiclesPage() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Year *</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Year *</Label>
               <Input
                 type="number"
                 value={newVehicle.year}
@@ -637,7 +637,7 @@ export default function AdminVehiclesPage() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Registration *</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Registration *</Label>
               <Input
                 value={newVehicle.registration}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, registration: e.target.value }))}
@@ -646,7 +646,7 @@ export default function AdminVehiclesPage() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Colour</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Colour</Label>
               <Input
                 value={newVehicle.colour}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, colour: e.target.value }))}
@@ -655,11 +655,11 @@ export default function AdminVehiclesPage() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Vehicle Type *</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Vehicle Type *</Label>
               <select
                 value={newVehicle.vehicleType}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, vehicleType: e.target.value as VehicleType }))}
-                className="mt-1 h-10 w-full rounded-lg border border-[#D9E0E8] px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+                className="mt-1 h-10 w-full rounded-lg border border-[#E2E6EC] px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
               >
                 {VEHICLE_TYPES.map((vt) => (
                   <option key={vt.value} value={vt.value}>{vt.label}</option>
@@ -668,7 +668,7 @@ export default function AdminVehiclesPage() {
             </div>
             {VEHICLE_COMPLIANCE_FIELDS.map((f) => (
               <div key={f.key}>
-                <Label className="text-sm font-medium text-[#172033]">{f.label} expiry</Label>
+                <Label className="text-sm font-medium text-[#0F1B2D]">{f.label} expiry</Label>
                 <Input
                   type="date"
                   value={newVehicle[f.key]}
@@ -678,7 +678,7 @@ export default function AdminVehiclesPage() {
               </div>
             ))}
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Passenger Capacity</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Passenger Capacity</Label>
               <Input
                 type="number"
                 min={1}
@@ -689,7 +689,7 @@ export default function AdminVehiclesPage() {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-[#172033]">Luggage Capacity</Label>
+              <Label className="text-sm font-medium text-[#0F1B2D]">Luggage Capacity</Label>
               <Input
                 type="number"
                 min={0}
@@ -702,41 +702,41 @@ export default function AdminVehiclesPage() {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 text-sm text-[#172033]">
+            <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
               <input
                 type="checkbox"
                 checked={newVehicle.isElectric}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, isElectric: e.target.checked }))}
-                className="h-4 w-4 rounded border-[#D9E0E8] accent-[#D4145A]"
+                className="h-4 w-4 rounded border-[#E2E6EC] accent-[#1F4FD8]"
               />
               Electric
             </label>
-            <label className="flex items-center gap-2 text-sm text-[#172033]">
+            <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
               <input
                 type="checkbox"
                 checked={newVehicle.isHybrid}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, isHybrid: e.target.checked }))}
-                className="h-4 w-4 rounded border-[#D9E0E8] accent-[#D4145A]"
+                className="h-4 w-4 rounded border-[#E2E6EC] accent-[#1F4FD8]"
               />
               Hybrid
             </label>
-            <label className="flex items-center gap-2 text-sm text-[#172033]">
+            <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
               <input
                 type="checkbox"
                 checked={newVehicle.wheelchairAccessible}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, wheelchairAccessible: e.target.checked }))}
-                className="h-4 w-4 rounded border-[#D9E0E8] accent-[#D4145A]"
+                className="h-4 w-4 rounded border-[#E2E6EC] accent-[#1F4FD8]"
               />
               Wheelchair Accessible
             </label>
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-[#D9E0E8] pt-4">
+          <div className="flex items-center justify-end gap-3 border-t border-[#E2E6EC] pt-4">
             <Button variant="outline" onClick={() => setShowCreate(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
               onClick={handleCreateVehicle}
               disabled={!newVehicle.make || !newVehicle.model || !newVehicle.registration}
             >
@@ -757,44 +757,44 @@ export default function AdminVehiclesPage() {
         {selectedVehicle && (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#172F52]">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0F1B2D]">
                 <Car className="h-7 w-7 text-white" />
               </div>
               <div>
-                <p className="text-lg font-bold text-[#172F52]">
+                <p className="text-lg font-bold text-[#0F1B2D]">
                   {selectedVehicle.make} {selectedVehicle.model}
                 </p>
-                <p className="font-mono text-sm text-[#6B7280]">{selectedVehicle.registration}</p>
+                <p className="font-mono text-sm text-[#5B6577]">{selectedVehicle.registration}</p>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Year</p>
-                <p className="text-sm text-[#172F52]">{selectedVehicle.year}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Year</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedVehicle.year}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Colour</p>
-                <p className="text-sm text-[#172F52]">{selectedVehicle.colour}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Colour</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedVehicle.colour}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Type</p>
-                <p className="text-sm text-[#172F52]">{getTypeLabel(selectedVehicle.vehicleType)}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Type</p>
+                <p className="text-sm text-[#0F1B2D]">{getTypeLabel(selectedVehicle.vehicleType)}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Operator</p>
-                <p className="text-sm text-[#172F52]">{getOperatorName(selectedVehicle.operatorId)}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Operator</p>
+                <p className="text-sm text-[#0F1B2D]">{getOperatorName(selectedVehicle.operatorId)}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Driver</p>
-                <p className="text-sm text-[#172F52]">{getDriverName(selectedVehicle.driverId)}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Driver</p>
+                <p className="text-sm text-[#0F1B2D]">{getDriverName(selectedVehicle.driverId)}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Capacity</p>
-                <p className="text-sm text-[#172F52]">{selectedVehicle.passengerCapacity} passengers, {selectedVehicle.luggageCapacity} luggage</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Capacity</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedVehicle.passengerCapacity} passengers, {selectedVehicle.luggageCapacity} luggage</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Features</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Features</p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedVehicle.isElectric && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700">
@@ -813,8 +813,8 @@ export default function AdminVehiclesPage() {
                   )}
                 </div>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Status</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Status</p>
                 <span
                   className={cn(
                     "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
@@ -825,14 +825,14 @@ export default function AdminVehiclesPage() {
                   {selectedVehicle.isApproved ? "Approved" : "Pending Approval"}
                 </span>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3 sm:col-span-2">
-                <p className="mb-1.5 text-xs font-semibold uppercase text-[#6B7280]">Compliance documents</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3 sm:col-span-2">
+                <p className="mb-1.5 text-xs font-semibold uppercase text-[#5B6577]">Compliance documents</p>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {VEHICLE_COMPLIANCE_FIELDS.map((f) => {
                     const date = selectedVehicle[f.key]
                     const state = expiryState(date)
                     return (
-                      <label key={f.key} className="text-xs font-medium text-[#172F52]">
+                      <label key={f.key} className="text-xs font-medium text-[#0F1B2D]">
                         <span className="flex items-center justify-between gap-2">
                           {f.label}
                           <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", EXPIRY_BADGE[state])}>
@@ -850,8 +850,8 @@ export default function AdminVehiclesPage() {
                   })}
                 </div>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3 sm:col-span-2">
-                <p className="mb-1.5 text-xs font-semibold uppercase text-[#6B7280]">Fleet Availability</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3 sm:col-span-2">
+                <p className="mb-1.5 text-xs font-semibold uppercase text-[#5B6577]">Fleet Availability</p>
                 <div className="flex flex-wrap gap-2">
                   {(Object.keys(AVAILABILITY_META) as VehicleAvailabilityStatus[]).map((status) => {
                     const meta = AVAILABILITY_META[status]
@@ -866,7 +866,7 @@ export default function AdminVehiclesPage() {
                           "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
                           isCurrent
                             ? cn(meta.badgeClass, "border-transparent")
-                            : "border-[#D9E0E8] bg-white text-[#6B7280] hover:bg-[#F5F7FA]"
+                            : "border-[#E2E6EC] bg-white text-[#5B6577] hover:bg-[#F4F6F9]"
                         )}
                       >
                         <Icon className="h-3 w-3" />
@@ -876,7 +876,7 @@ export default function AdminVehiclesPage() {
                   })}
                 </div>
                 {selectedVehicle.availabilityNote && (
-                  <p className="mt-2 text-xs text-[#6B7280]">{selectedVehicle.availabilityNote}</p>
+                  <p className="mt-2 text-xs text-[#5B6577]">{selectedVehicle.availabilityNote}</p>
                 )}
               </div>
             </div>

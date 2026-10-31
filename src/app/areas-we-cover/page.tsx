@@ -60,7 +60,7 @@ const REGIONS = [
 export default function AreasPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Areas We Cover
@@ -78,10 +78,10 @@ export default function AreasPage() {
               <Card key={region.name} className="transition-shadow hover:shadow-lg">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4145A] text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1F4FD8] text-white">
                       <MapPin className="h-5 w-5" />
                     </div>
-                    <h2 className="text-xl font-bold text-[#172F52]">
+                    <h2 className="text-xl font-bold text-[#0F1B2D]">
                       {region.name}
                     </h2>
                   </div>
@@ -89,8 +89,8 @@ export default function AreasPage() {
                     {region.cities.map((city) => (
                       <Link
                         key={city}
-                        href="/book"
-                        className="rounded-full border border-[#D9E0E8] bg-[#F5F7FA] px-3 py-1 text-xs font-medium text-[#172F52] transition-colors hover:border-[#D4145A] hover:bg-[#FCE7EF] hover:text-[#D4145A]"
+                        href="/"
+                        className="rounded-full border border-[#E2E6EC] bg-[#F4F6F9] px-3 py-1 text-xs font-medium text-[#0F1B2D] transition-colors hover:border-[#1F4FD8] hover:bg-[#E7EEFF] hover:text-[#1F4FD8]"
                       >
                         {city}
                       </Link>
@@ -103,9 +103,9 @@ export default function AreasPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold text-[#172F52]">
+          <h2 className="text-3xl font-bold text-[#0F1B2D]">
             Can&apos;t Find Your Area?
           </h2>
           <p className="mt-4 text-gray-600">
@@ -113,7 +113,7 @@ export default function AreasPage() {
           </p>
           <Link
             href="/contact"
-            className="mt-6 inline-flex items-center gap-2 text-[#D4145A] font-semibold hover:underline"
+            className="mt-6 inline-flex items-center gap-2 text-[#1F4FD8] font-semibold hover:underline"
           >
             Get in Touch
             <ArrowRight className="h-4 w-4" />

@@ -92,13 +92,13 @@ export default function OperatorPricingPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Pricing Management</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Pricing Management</h1>
+          <p className="text-sm text-[#5B6577]">
             Configure fare rules for each vehicle type.
           </p>
         </div>
         <Button
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
           onClick={() => setAddModalOpen(true)}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -121,38 +121,38 @@ export default function OperatorPricingPage() {
           action={{ label: "Add Rule", onClick: () => setAddModalOpen(true) }}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[#D9E0E8] bg-white">
+        <div className="overflow-x-auto rounded-xl border border-[#E2E6EC] bg-white">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Vehicle Type
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Base Fare
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Per Mile
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Per Min
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Min Fare
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Booking Fee
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Airport Fee
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Night %
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Weekend %
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                   Actions
                 </th>
               </tr>
@@ -163,47 +163,47 @@ export default function OperatorPricingPage() {
                 return (
                   <tr
                     key={rule.id}
-                    className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
+                    className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50"
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="text-base">{typeInfo?.icon}</span>
                         <div>
-                          <p className="font-medium text-[#172F52]">
+                          <p className="font-medium text-[#0F1B2D]">
                             {typeInfo?.label ?? rule.vehicleType}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#172F52]">
+                    <td className="px-4 py-3 font-medium text-[#0F1B2D]">
                       £{rule.baseFare.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       £{rule.perMile.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       £{rule.perMinute.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       £{rule.minimumFare.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       £{rule.bookingFee.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       £{rule.airportFee.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       {rule.nightSurchargePercent}%
                     </td>
-                    <td className="px-4 py-3 text-[#172F52]">
+                    <td className="px-4 py-3 text-[#0F1B2D]">
                       {rule.weekendSurchargePercent}%
                     </td>
                     <td className="px-4 py-3">
                       <Button
                         size="sm"
                         variant="outline"
-                        className="border-[#D9E0E8]"
+                        className="border-[#E2E6EC]"
                         onClick={() => openEdit(rule)}
                       >
                         <Edit className="mr-1 h-3 w-3" />
@@ -269,11 +269,11 @@ export default function OperatorPricingPage() {
               onChange={(v) => setEditForm((p) => ({ ...p, weekendSurchargePercent: parseFloat(v) || 0 }))}
             />
           </div>
-          <div className="flex justify-end gap-2 border-t border-[#F5F7FA] pt-4">
-            <Button variant="outline" className="border-[#D9E0E8]" onClick={() => setEditModalOpen(false)}>
+          <div className="flex justify-end gap-2 border-t border-[#F4F6F9] pt-4">
+            <Button variant="outline" className="border-[#E2E6EC]" onClick={() => setEditModalOpen(false)}>
               Cancel
             </Button>
-            <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90" onClick={saveEdit}>
+            <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90" onClick={saveEdit}>
               <Save className="mr-2 h-4 w-4" />
               Save Changes
             </Button>
@@ -291,11 +291,11 @@ export default function OperatorPricingPage() {
       >
         <div className="space-y-4 pt-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Vehicle Type</label>
+            <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Vehicle Type</label>
             <select
               value={newRule.vehicleType}
               onChange={(e) => setNewRule((p) => ({ ...p, vehicleType: e.target.value as VehicleType }))}
-              className="flex h-9 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A] focus:ring-2 focus:ring-[#D4145A]/20"
+              className="flex h-9 w-full rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8] focus:ring-2 focus:ring-[#1F4FD8]/20"
             >
               <option value="">Select vehicle type...</option>
               {VEHICLE_TYPES.map((vt) => (
@@ -347,12 +347,12 @@ export default function OperatorPricingPage() {
               onChange={(v) => setNewRule((p) => ({ ...p, weekendSurchargePercent: v }))}
             />
           </div>
-          <div className="flex justify-end gap-2 border-t border-[#F5F7FA] pt-4">
-            <Button variant="outline" className="border-[#D9E0E8]" onClick={() => setAddModalOpen(false)}>
+          <div className="flex justify-end gap-2 border-t border-[#F4F6F9] pt-4">
+            <Button variant="outline" className="border-[#E2E6EC]" onClick={() => setAddModalOpen(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
               onClick={addNewRule}
               disabled={!newRule.vehicleType}
             >
@@ -377,7 +377,7 @@ function PricingField({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-[#172F52]">
+      <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">
         {label}
       </label>
       <Input

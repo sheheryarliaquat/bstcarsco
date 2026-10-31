@@ -37,6 +37,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "@/components/booking/BookingProgress";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { PaymentForm } from "@/components/shared/PaymentForm";
 import { BookingStatus, type Booking } from "@/types";
 import { createBooking } from "@/lib/services/booking-service";
@@ -69,7 +70,7 @@ const passengerSchema = z.object({
 
 type PassengerFormData = z.infer<typeof passengerSchema>;
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const [selection, setSelection] = useState<CheckoutSelection | null>(null);
   const [selectionChecked, setSelectionChecked] = useState(false);
@@ -220,25 +221,25 @@ export default function CheckoutPage() {
 
   if (!selectionChecked || !quote || !pickup || !destination || !search) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F4F6F9]">
         <div className="text-center">
-          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-[#D4145A]" />
-          <p className="text-sm text-[#6B7280]">Loading your booking...</p>
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-[#1F4FD8]" />
+          <p className="text-sm text-[#5B6577]">Loading your booking...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA]">
+    <div className="min-h-screen bg-[#F4F6F9]">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
         <BookingProgress currentStep="passenger" />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-5">
           <div className="space-y-6 lg:col-span-3">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
-                <h2 className="mb-4 text-lg font-bold text-[#172F52]">
+              <div className="rounded-xl border border-[#E2E6EC] bg-white p-5 sm:p-6">
+                <h2 className="mb-4 text-lg font-bold text-[#0F1B2D]">
                   Passenger Details
                 </h2>
 
@@ -246,12 +247,12 @@ export default function CheckoutPage() {
                   <div>
                     <Label
                       htmlFor="firstName"
-                      className="text-sm font-medium text-[#172033]"
+                      className="text-sm font-medium text-[#0F1B2D]"
                     >
                       First Name
                     </Label>
                     <div className="relative mt-1.5">
-                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                       <Input
                         id="firstName"
                         placeholder="James"
@@ -269,12 +270,12 @@ export default function CheckoutPage() {
                   <div>
                     <Label
                       htmlFor="lastName"
-                      className="text-sm font-medium text-[#172033]"
+                      className="text-sm font-medium text-[#0F1B2D]"
                     >
                       Last Name
                     </Label>
                     <div className="relative mt-1.5">
-                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                       <Input
                         id="lastName"
                         placeholder="Wilson"
@@ -294,12 +295,12 @@ export default function CheckoutPage() {
                 <div className="mt-4">
                   <Label
                     htmlFor="email"
-                    className="text-sm font-medium text-[#172033]"
+                    className="text-sm font-medium text-[#0F1B2D]"
                   >
                     Email
                   </Label>
                   <div className="relative mt-1.5">
-                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                     <Input
                       id="email"
                       type="email"
@@ -319,25 +320,22 @@ export default function CheckoutPage() {
                 <div className="mt-4">
                   <Label
                     htmlFor="phone"
-                    className="text-sm font-medium text-[#172033]"
+                    className="text-sm font-medium text-[#0F1B2D]"
                   >
                     Mobile
                   </Label>
                   <div className="relative mt-1.5">
-                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
-                    <div className="flex">
-                      <div className="flex h-11 items-center rounded-l-lg border border-r-0 border-[#D9E0E8] bg-[#F5F7FA] px-3 text-sm font-medium text-[#172033]">
-                        +44
-                      </div>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="7700900000"
-                        className="h-11 rounded-l-none"
-                        disabled={continueAsGuest === true}
-                        {...register("phone")}
-                      />
-                    </div>
+                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      placeholder="+447700900000"
+                      className="h-11 pl-10"
+                      disabled={continueAsGuest === true}
+                      {...register("phone")}
+                    />
                   </div>
                   {errors.phone && (
                     <p className="mt-1 text-xs text-red-600">
@@ -348,7 +346,7 @@ export default function CheckoutPage() {
 
                 {continueAsGuest !== true && (
                   <div className="mt-4">
-                    <label className="flex items-center gap-2 text-sm text-[#172033]">
+                    <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
                       <Checkbox
                         checked={createAccount === true}
                         onCheckedChange={(checked) =>
@@ -369,12 +367,12 @@ export default function CheckoutPage() {
                   <div className="mt-4">
                     <Label
                       htmlFor="password"
-                      className="text-sm font-medium text-[#172033]"
+                      className="text-sm font-medium text-[#0F1B2D]"
                     >
                       Password (optional)
                     </Label>
                     <div className="relative mt-1.5">
-                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                       <Input
                         id="password"
                         type="password"
@@ -387,7 +385,7 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="mt-4">
-                  <label className="flex items-center gap-2 text-sm text-[#172033]">
+                  <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
                     <Checkbox
                       checked={continueAsGuest === true}
                       onCheckedChange={(checked) =>
@@ -405,14 +403,14 @@ export default function CheckoutPage() {
               </div>
 
               {isReturn && (
-                <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
-                  <h2 className="mb-1 text-lg font-bold text-[#172F52]">Return journey</h2>
-                  <p className="mb-4 text-sm text-[#6B7280]">
+                <div className="rounded-xl border border-[#E2E6EC] bg-white p-5 sm:p-6">
+                  <h2 className="mb-1 text-lg font-bold text-[#0F1B2D]">Return journey</h2>
+                  <p className="mb-4 text-sm text-[#5B6577]">
                     From {destination.formattedAddress.split(",")[0]} back to {pickup.formattedAddress.split(",")[0]}.
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Label htmlFor="returnDate" className="text-sm font-medium text-[#172033]">
+                      <Label htmlFor="returnDate" className="text-sm font-medium text-[#0F1B2D]">
                         Return date *
                       </Label>
                       <Input
@@ -425,7 +423,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="returnTime" className="text-sm font-medium text-[#172033]">
+                      <Label htmlFor="returnTime" className="text-sm font-medium text-[#0F1B2D]">
                         Pick-up time *
                       </Label>
                       <Input
@@ -441,26 +439,26 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
+              <div className="rounded-xl border border-[#E2E6EC] bg-white p-5 sm:p-6">
                 <button
                   type="button"
                   onClick={() => setSpecialOpen(!specialOpen)}
                   className="flex w-full items-center justify-between"
                 >
-                  <h2 className="text-lg font-bold text-[#172F52]">
+                  <h2 className="text-lg font-bold text-[#0F1B2D]">
                     Special Requirements
                   </h2>
                   {specialOpen ? (
-                    <ChevronUp className="h-5 w-5 text-[#6B7280]" />
+                    <ChevronUp className="h-5 w-5 text-[#5B6577]" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-[#6B7280]" />
+                    <ChevronDown className="h-5 w-5 text-[#5B6577]" />
                   )}
                 </button>
                 {specialOpen && (
                   <div className="mt-4">
                     <Label
                       htmlFor="special"
-                      className="text-sm font-medium text-[#172033]"
+                      className="text-sm font-medium text-[#0F1B2D]"
                     >
                       Additional notes for the driver
                     </Label>
@@ -475,13 +473,13 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
-                <h2 className="mb-3 text-lg font-bold text-[#172F52]">
+              <div className="rounded-xl border border-[#E2E6EC] bg-white p-5 sm:p-6">
+                <h2 className="mb-3 text-lg font-bold text-[#0F1B2D]">
                   Promo Code
                 </h2>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                    <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                     <Input
                       placeholder="Enter promo code"
                       className="h-11 pl-10"
@@ -505,8 +503,8 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              <div className="rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
-                <h2 className="mb-4 text-lg font-bold text-[#172F52]">
+              <div className="rounded-xl border border-[#E2E6EC] bg-white p-5 sm:p-6">
+                <h2 className="mb-4 text-lg font-bold text-[#0F1B2D]">
                   Payment Method
                 </h2>
 
@@ -516,29 +514,29 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod("card")}
                     className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
                       paymentMethod === "card"
-                        ? "border-[#D4145A] bg-[#FCE7EF]/50"
-                        : "border-[#D9E0E8] hover:border-[#D4145A]/30"
+                        ? "border-[#1F4FD8] bg-[#E7EEFF]/50"
+                        : "border-[#E2E6EC] hover:border-[#1F4FD8]/30"
                     }`}
                   >
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                         paymentMethod === "card"
-                          ? "bg-[#D4145A] text-white"
-                          : "bg-[#F5F7FA] text-[#6B7280]"
+                          ? "bg-[#1F4FD8] text-white"
+                          : "bg-[#F4F6F9] text-[#5B6577]"
                       }`}
                     >
                       <CreditCard className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-[#172033]">
+                      <p className="font-semibold text-[#0F1B2D]">
                         Pay by Card
                       </p>
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#5B6577]">
                         Credit or debit card
                       </p>
                     </div>
                     {paymentMethod === "card" && (
-                      <CheckCircle2 className="ml-auto h-5 w-5 text-[#D4145A]" />
+                      <CheckCircle2 className="ml-auto h-5 w-5 text-[#1F4FD8]" />
                     )}
                   </button>
 
@@ -547,29 +545,29 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod("cash")}
                     className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
                       paymentMethod === "cash"
-                        ? "border-[#D4145A] bg-[#FCE7EF]/50"
-                        : "border-[#D9E0E8] hover:border-[#D4145A]/30"
+                        ? "border-[#1F4FD8] bg-[#E7EEFF]/50"
+                        : "border-[#E2E6EC] hover:border-[#1F4FD8]/30"
                     }`}
                   >
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                         paymentMethod === "cash"
-                          ? "bg-[#D4145A] text-white"
-                          : "bg-[#F5F7FA] text-[#6B7280]"
+                          ? "bg-[#1F4FD8] text-white"
+                          : "bg-[#F4F6F9] text-[#5B6577]"
                       }`}
                     >
                       <Banknote className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-[#172033]">
+                      <p className="font-semibold text-[#0F1B2D]">
                         Pay by Cash
                       </p>
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#5B6577]">
                         Pay the driver
                       </p>
                     </div>
                     {paymentMethod === "cash" && (
-                      <CheckCircle2 className="ml-auto h-5 w-5 text-[#D4145A]" />
+                      <CheckCircle2 className="ml-auto h-5 w-5 text-[#1F4FD8]" />
                     )}
                   </button>
                 </div>
@@ -610,7 +608,7 @@ export default function CheckoutPage() {
               <Button
                 type="submit"
                 disabled={paymentLoading}
-                className="h-12 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90"
+                className="h-12 w-full bg-[#1F4FD8] text-base font-semibold text-white hover:bg-[#1F4FD8]/90"
               >
                 {paymentLoading ? (
                   <>
@@ -634,27 +632,27 @@ export default function CheckoutPage() {
 
           <aside className="lg:col-span-2">
             <div className="sticky top-6 space-y-4">
-              <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
-                <h3 className="mb-4 text-sm font-semibold text-[#172F52]">
+              <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
+                <h3 className="mb-4 text-sm font-semibold text-[#0F1B2D]">
                   Booking Summary
                 </h3>
 
                 <div className="mb-4 space-y-2.5">
                   <div className="flex items-start gap-2">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4145A]" />
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#1F4FD8]" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-[#6B7280]">Pickup</p>
-                      <p className="truncate text-sm font-medium text-[#172033]">
+                      <p className="text-xs text-[#5B6577]">Pickup</p>
+                      <p className="truncate text-sm font-medium text-[#0F1B2D]">
                         {pickup.formattedAddress}
                       </p>
                     </div>
                   </div>
-                  <div className="ml-1.5 h-3 border-l-2 border-dashed border-[#D9E0E8]" />
+                  <div className="ml-1.5 h-3 border-l-2 border-dashed border-[#E2E6EC]" />
                   <div className="flex items-start gap-2">
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#168A55]" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-[#6B7280]">Destination</p>
-                      <p className="truncate text-sm font-medium text-[#172033]">
+                      <p className="text-xs text-[#5B6577]">Destination</p>
+                      <p className="truncate text-sm font-medium text-[#0F1B2D]">
                         {destination.formattedAddress}
                       </p>
                     </div>
@@ -664,29 +662,29 @@ export default function CheckoutPage() {
                 <Separator className="my-3" />
 
                 <div className="mb-3 space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-[#172033]">
-                    <Calendar className="h-3.5 w-3.5 text-[#6B7280]" />
+                  <div className="flex items-center gap-2 text-[#0F1B2D]">
+                    <Calendar className="h-3.5 w-3.5 text-[#5B6577]" />
                     {format(search.date ?? new Date(), "dd MMMM yyyy")}
                   </div>
-                  <div className="flex items-center gap-2 text-[#172033]">
-                    <Clock className="h-3.5 w-3.5 text-[#6B7280]" />
+                  <div className="flex items-center gap-2 text-[#0F1B2D]">
+                    <Clock className="h-3.5 w-3.5 text-[#5B6577]" />
                     {search.time}
                   </div>
-                  <div className="flex items-center gap-2 text-[#172033]">
-                    <Car className="h-3.5 w-3.5 text-[#6B7280]" />
+                  <div className="flex items-center gap-2 text-[#0F1B2D]">
+                    <Car className="h-3.5 w-3.5 text-[#5B6577]" />
                     {quote.vehicleDescription}
                   </div>
-                  <div className="flex items-center gap-2 text-[#172033]">
-                    <Building2 className="h-3.5 w-3.5 text-[#6B7280]" />
+                  <div className="flex items-center gap-2 text-[#0F1B2D]">
+                    <Building2 className="h-3.5 w-3.5 text-[#5B6577]" />
                     {quote.operatorName}
                   </div>
-                  <div className="flex items-center gap-2 text-[#172033]">
-                    <Users className="h-3.5 w-3.5 text-[#6B7280]" />
+                  <div className="flex items-center gap-2 text-[#0F1B2D]">
+                    <Users className="h-3.5 w-3.5 text-[#5B6577]" />
                     {search.passengers}{" "}
                     {search.passengers === 1 ? "Passenger" : "Passengers"}
                   </div>
-                  <div className="flex items-center gap-2 text-[#172033]">
-                    <Briefcase className="h-3.5 w-3.5 text-[#6B7280]" />
+                  <div className="flex items-center gap-2 text-[#0F1B2D]">
+                    <Briefcase className="h-3.5 w-3.5 text-[#5B6577]" />
                     {search.luggage}{" "}
                     {search.luggage === 1 ? "Luggage" : "Luggage items"}
                   </div>
@@ -698,7 +696,7 @@ export default function CheckoutPage() {
                   {priceLines.map((line) => (
                     <div
                       key={line.label}
-                      className={line.amount < 0 ? "flex justify-between text-[#168A55]" : "flex justify-between text-[#172033]"}
+                      className={line.amount < 0 ? "flex justify-between text-[#168A55]" : "flex justify-between text-[#0F1B2D]"}
                     >
                       <span>{line.label}</span>
                       <span>
@@ -712,28 +710,28 @@ export default function CheckoutPage() {
                       <span>-£{discount.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-[#172033]">
+                  <div className="flex justify-between text-[#0F1B2D]">
                     <span>VAT (20%)</span>
                     <span>£{tax.toFixed(2)}</span>
                   </div>
                 </div>
-                <div className="mt-2 flex justify-between border-t border-[#D9E0E8] pt-2 text-base font-bold text-[#172F52]">
+                <div className="mt-2 flex justify-between border-t border-[#E2E6EC] pt-2 text-base font-bold text-[#0F1B2D]">
                   <span>Total</span>
                   <span>£{total.toFixed(2)}</span>
                 </div>
 
                 {promoApplied && (
-                  <div className="mt-3 flex items-center gap-1.5 text-xs text-[#D4145A]">
+                  <div className="mt-3 flex items-center gap-1.5 text-xs text-[#1F4FD8]">
                     <Tag className="h-3 w-3" />
                     Promo: {promoInput.toUpperCase()}
                   </div>
                 )}
               </div>
 
-              <div className="rounded-xl border border-[#D9E0E8] bg-[#FCE7EF]/50 p-4">
+              <div className="rounded-xl border border-[#E2E6EC] bg-[#E7EEFF]/50 p-4">
                 <div className="flex items-start gap-2">
-                  <CreditCard className="mt-0.5 h-4 w-4 shrink-0 text-[#D4145A]" />
-                  <p className="text-xs text-[#6B7280]">
+                  <CreditCard className="mt-0.5 h-4 w-4 shrink-0 text-[#1F4FD8]" />
+                  <p className="text-xs text-[#5B6577]">
                     Your payment details are encrypted with 256-bit SSL.
                     Cancellation is free up to 2 hours before pickup.
                   </p>
@@ -744,5 +742,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <PublicLayout>
+      <CheckoutContent />
+    </PublicLayout>
   );
 }

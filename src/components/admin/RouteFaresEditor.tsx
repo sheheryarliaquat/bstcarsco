@@ -150,13 +150,13 @@ export function RouteFaresEditor() {
   }
 
   return (
-    <div className="rounded-xl border border-[#D9E0E8] bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D9E0E8] p-5">
+    <div className="rounded-xl border border-[#E2E6EC] bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E6EC] p-5">
         <div className="flex items-center gap-2">
-          <Route className="h-5 w-5 text-[#D4145A]" />
+          <Route className="h-5 w-5 text-[#1F4FD8]" />
           <div>
-            <h3 className="text-base font-bold text-[#172F52]">Fixed route fares</h3>
-            <p className="text-xs text-[#6B7280]">
+            <h3 className="text-base font-bold text-[#0F1B2D]">Fixed route fares</h3>
+            <p className="text-xs text-[#5B6577]">
               Set a fixed price from one point to another for each car type. Journeys that match a route use this
               price; all others use the mileage rates.
             </p>
@@ -164,7 +164,7 @@ export function RouteFaresEditor() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-[#6B7280]" />
+            <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-[#5B6577]" />
             <Input
               aria-label="Search routes"
               placeholder="Search routes"
@@ -176,7 +176,7 @@ export function RouteFaresEditor() {
           <Button
             onClick={save}
             disabled={!dirty || saving}
-            className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+            className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
           >
             <Save className="mr-1.5 h-4 w-4" />
             {saving ? "Saving..." : dirty ? "Save route fares" : "Saved"}
@@ -199,7 +199,7 @@ export function RouteFaresEditor() {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead>
-            <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA] text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+            <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9] text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
               <th className="px-4 py-3">From</th>
               <th className="px-3 py-3">To</th>
               {VEHICLE_TYPES.map((vt) => (
@@ -217,14 +217,14 @@ export function RouteFaresEditor() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={VEHICLE_TYPES.length + 5} className="px-4 py-6 text-center text-[#6B7280]">
+                <td colSpan={VEHICLE_TYPES.length + 5} className="px-4 py-6 text-center text-[#5B6577]">
                   Loading route fares...
                 </td>
               </tr>
             )}
             {!loading && visible.length === 0 && (
               <tr>
-                <td colSpan={VEHICLE_TYPES.length + 5} className="px-4 py-6 text-center text-[#6B7280]">
+                <td colSpan={VEHICLE_TYPES.length + 5} className="px-4 py-6 text-center text-[#5B6577]">
                   {routes.length === 0
                     ? "No fixed routes yet. Add your first route below, e.g. Central London to Heathrow."
                     : "No routes match your search."}
@@ -232,7 +232,7 @@ export function RouteFaresEditor() {
               </tr>
             )}
             {visible.map((r) => (
-              <tr key={r.id} className={cn("border-b border-[#F5F7FA] align-top", !r.active && "opacity-60")}>
+              <tr key={r.id} className={cn("border-b border-[#F4F6F9] align-top", !r.active && "opacity-60")}>
                 <td className="px-4 py-2">
                   <Input
                     aria-label="From name"
@@ -244,7 +244,7 @@ export function RouteFaresEditor() {
                     aria-label="From areas"
                     value={r.fromAreas.join(", ")}
                     onChange={(e) => patchRoute(r.id, { fromAreas: parseAreas(e.target.value) })}
-                    className="mt-1 h-7 w-40 text-xs text-[#6B7280]"
+                    className="mt-1 h-7 w-40 text-xs text-[#5B6577]"
                   />
                 </td>
                 <td className="px-3 py-2">
@@ -258,7 +258,7 @@ export function RouteFaresEditor() {
                     aria-label="To areas"
                     value={r.toAreas.join(", ")}
                     onChange={(e) => patchRoute(r.id, { toAreas: parseAreas(e.target.value) })}
-                    className="mt-1 h-7 w-36 text-xs text-[#6B7280]"
+                    className="mt-1 h-7 w-36 text-xs text-[#5B6577]"
                   />
                 </td>
                 {VEHICLE_TYPES.map((vt) => (
@@ -281,7 +281,7 @@ export function RouteFaresEditor() {
                     aria-label="Same fare both directions"
                     checked={r.bothWays}
                     onChange={(e) => patchRoute(r.id, { bothWays: e.target.checked })}
-                    className="h-4 w-4 accent-[#D4145A]"
+                    className="h-4 w-4 accent-[#1F4FD8]"
                   />
                 </td>
                 <td className="px-2 py-3">
@@ -290,7 +290,7 @@ export function RouteFaresEditor() {
                     aria-label="Route active"
                     checked={r.active}
                     onChange={(e) => patchRoute(r.id, { active: e.target.checked })}
-                    className="h-4 w-4 accent-[#D4145A]"
+                    className="h-4 w-4 accent-[#1F4FD8]"
                   />
                 </td>
                 <td className="px-2 py-2">
@@ -309,11 +309,11 @@ export function RouteFaresEditor() {
         </table>
       </div>
 
-      <div className="grid gap-6 border-t border-[#D9E0E8] p-5 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-6 border-t border-[#E2E6EC] p-5 lg:grid-cols-[2fr_1fr]">
         <div>
-          <h4 className="mb-3 text-sm font-bold text-[#172F52]">Add a route</h4>
+          <h4 className="mb-3 text-sm font-bold text-[#0F1B2D]">Add a route</h4>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="text-xs font-medium text-[#172F52]">
+            <label className="text-xs font-medium text-[#0F1B2D]">
               From (name)
               <Input
                 value={draft.fromLabel}
@@ -322,7 +322,7 @@ export function RouteFaresEditor() {
                 className="mt-1 h-9"
               />
             </label>
-            <label className="text-xs font-medium text-[#172F52]">
+            <label className="text-xs font-medium text-[#0F1B2D]">
               To (name)
               <Input
                 value={draft.toLabel}
@@ -331,7 +331,7 @@ export function RouteFaresEditor() {
                 className="mt-1 h-9"
               />
             </label>
-            <label className="text-xs font-medium text-[#172F52]">
+            <label className="text-xs font-medium text-[#0F1B2D]">
               From areas: postcodes, towns or airport codes
               <Input
                 value={draft.fromAreas}
@@ -340,7 +340,7 @@ export function RouteFaresEditor() {
                 className="mt-1 h-9"
               />
             </label>
-            <label className="text-xs font-medium text-[#172F52]">
+            <label className="text-xs font-medium text-[#0F1B2D]">
               To areas
               <Input
                 value={draft.toAreas}
@@ -350,13 +350,13 @@ export function RouteFaresEditor() {
               />
             </label>
           </div>
-          <p className="mt-2 text-xs text-[#6B7280]">
+          <p className="mt-2 text-xs text-[#5B6577]">
             Airport codes: {UK_AIRPORTS.map((a) => a.code).join(", ")}. &ldquo;SW1&rdquo; covers SW1A, SW1P etc.
             &ldquo;RG&rdquo; covers the whole RG area.
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {VEHICLE_TYPES.map((vt) => (
-              <label key={vt.value} className="text-xs font-medium text-[#172F52]">
+              <label key={vt.value} className="text-xs font-medium text-[#0F1B2D]">
                 {vt.label} £
                 <Input
                   type="number"
@@ -369,23 +369,23 @@ export function RouteFaresEditor() {
             ))}
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <label className="flex items-center gap-2 text-sm text-[#172F52]">
+            <label className="flex items-center gap-2 text-sm text-[#0F1B2D]">
               <input
                 type="checkbox"
                 checked={draft.bothWays}
                 onChange={(e) => setDraft({ ...draft, bothWays: e.target.checked })}
-                className="h-4 w-4 accent-[#D4145A]"
+                className="h-4 w-4 accent-[#1F4FD8]"
               />
               <ArrowLeftRight className="h-4 w-4" /> Same fare in both directions
             </label>
-            <Button onClick={addRoute} disabled={!draftValid} className="bg-[#172F52] text-white hover:bg-[#172F52]/90">
+            <Button onClick={addRoute} disabled={!draftValid} className="bg-[#0F1B2D] text-white hover:bg-[#0F1B2D]/90">
               <Plus className="mr-1.5 h-4 w-4" /> Add route
             </Button>
           </div>
         </div>
 
-        <div className="rounded-lg bg-[#F5F7FA] p-4">
-          <h4 className="mb-3 text-sm font-bold text-[#172F52]">Check a fare</h4>
+        <div className="rounded-lg bg-[#F4F6F9] p-4">
+          <h4 className="mb-3 text-sm font-bold text-[#0F1B2D]">Check a fare</h4>
           <div className="space-y-2">
             <Input
               aria-label="Test pick-up"
@@ -406,13 +406,13 @@ export function RouteFaresEditor() {
             <ul className="mt-3 space-y-1 text-sm">
               {testResults.map((t) => (
                 <li key={t.label} className="flex justify-between gap-2">
-                  <span className="text-[#6B7280]">{t.label}</span>
+                  <span className="text-[#5B6577]">{t.label}</span>
                   {t.price !== undefined ? (
-                    <span className="flex items-center gap-1 font-semibold text-[#172F52]">
+                    <span className="flex items-center gap-1 font-semibold text-[#0F1B2D]">
                       <CheckCircle className="h-3.5 w-3.5 text-green-600" />£{t.price.toFixed(2)}
                     </span>
                   ) : (
-                    <span className="text-xs text-[#6B7280]">mileage rate</span>
+                    <span className="text-xs text-[#5B6577]">mileage rate</span>
                   )}
                 </li>
               ))}

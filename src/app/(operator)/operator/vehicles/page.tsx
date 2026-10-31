@@ -92,11 +92,11 @@ export default function OperatorVehiclesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Vehicles</h1>
-          <p className="text-sm text-[#6B7280]">Manage your fleet vehicles.</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Vehicles</h1>
+          <p className="text-sm text-[#5B6577]">Manage your fleet vehicles.</p>
         </div>
         <Button
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
           onClick={() => setAddModalOpen(true)}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -107,7 +107,7 @@ export default function OperatorVehiclesPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -123,8 +123,8 @@ export default function OperatorVehiclesPage() {
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                 typeFilter === f
-                  ? "bg-[#172F52] text-white"
-                  : "bg-white text-[#6B7280] hover:bg-[#F5F7FA] border border-[#D9E0E8]"
+                  ? "bg-[#0F1B2D] text-white"
+                  : "bg-white text-[#5B6577] hover:bg-[#F4F6F9] border border-[#E2E6EC]"
               )}
             >
               {f}
@@ -155,13 +155,13 @@ export default function OperatorVehiclesPage() {
             return (
               <div
                 key={vehicle.id}
-                className="rounded-xl border border-[#D9E0E8] bg-white overflow-hidden transition-shadow hover:shadow-md"
+                className="rounded-xl border border-[#E2E6EC] bg-white overflow-hidden transition-shadow hover:shadow-md"
               >
                 {/* Vehicle Photo Placeholder */}
-                <div className="relative h-40 bg-gradient-to-br from-[#172F52]/5 to-[#D4145A]/5 flex items-center justify-center">
-                  <Car className="h-16 w-16 text-[#172F52]/20" />
+                <div className="relative h-40 bg-gradient-to-br from-[#0F1B2D]/5 to-[#1F4FD8]/5 flex items-center justify-center">
+                  <Car className="h-16 w-16 text-[#0F1B2D]/20" />
                   <div className="absolute top-3 left-3 flex gap-1.5">
-                    <Badge className="bg-[#172F52] text-white text-[10px]">
+                    <Badge className="bg-[#0F1B2D] text-white text-[10px]">
                       {typeInfo?.icon} {typeInfo?.label}
                     </Badge>
                     {vehicle.isElectric && (
@@ -186,19 +186,19 @@ export default function OperatorVehiclesPage() {
                 <div className="p-4">
                   <div className="mb-3 flex items-start justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-[#172F52]">
+                      <h3 className="text-sm font-bold text-[#0F1B2D]">
                         {vehicle.make} {vehicle.model}
                       </h3>
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#5B6577]">
                         {vehicle.year} · {vehicle.colour}
                       </p>
                     </div>
-                    <span className="rounded-md bg-[#F5F7FA] px-2 py-1 text-xs font-bold text-[#172F52]">
+                    <span className="rounded-md bg-[#F4F6F9] px-2 py-1 text-xs font-bold text-[#0F1B2D]">
                       {vehicle.registration}
                     </span>
                   </div>
 
-                  <div className="mb-3 flex items-center gap-4 text-xs text-[#6B7280]">
+                  <div className="mb-3 flex items-center gap-4 text-xs text-[#5B6577]">
                     <div className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
                       {vehicle.passengerCapacity} seats
@@ -210,20 +210,20 @@ export default function OperatorVehiclesPage() {
                   </div>
 
                   {driver && (
-                    <div className="mb-3 rounded-lg bg-[#F5F7FA] p-2">
-                      <p className="text-xs text-[#6B7280]">Assigned to</p>
-                      <p className="text-sm font-medium text-[#172F52]">
+                    <div className="mb-3 rounded-lg bg-[#F4F6F9] p-2">
+                      <p className="text-xs text-[#5B6577]">Assigned to</p>
+                      <p className="text-sm font-medium text-[#0F1B2D]">
                         {driver.firstName} {driver.lastName}
                       </p>
                     </div>
                   )}
 
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1 border-[#D9E0E8]">
+                    <Button size="sm" variant="outline" className="flex-1 border-[#E2E6EC]">
                       <Eye className="mr-1 h-3 w-3" />
                       View
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1 border-[#D9E0E8]">
+                    <Button size="sm" variant="outline" className="flex-1 border-[#E2E6EC]">
                       <Edit className="mr-1 h-3 w-3" />
                       Edit
                     </Button>
@@ -260,7 +260,7 @@ export default function OperatorVehiclesPage() {
         <div className="space-y-4 pt-2">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Make</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Make</label>
               <Input
                 value={newVehicle.make}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, make: e.target.value }))}
@@ -268,7 +268,7 @@ export default function OperatorVehiclesPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Model</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Model</label>
               <Input
                 value={newVehicle.model}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, model: e.target.value }))}
@@ -278,7 +278,7 @@ export default function OperatorVehiclesPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Year</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Year</label>
               <Input
                 type="number"
                 value={newVehicle.year}
@@ -287,7 +287,7 @@ export default function OperatorVehiclesPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Registration</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Registration</label>
               <Input
                 value={newVehicle.registration}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, registration: e.target.value }))}
@@ -296,7 +296,7 @@ export default function OperatorVehiclesPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Colour</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Colour</label>
               <Input
                 value={newVehicle.colour}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, colour: e.target.value }))}
@@ -306,11 +306,11 @@ export default function OperatorVehiclesPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Vehicle Type</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Vehicle Type</label>
               <select
                 value={newVehicle.vehicleType}
                 onChange={(e) => setNewVehicle((p) => ({ ...p, vehicleType: e.target.value as VehicleType }))}
-                className="flex h-9 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A] focus:ring-2 focus:ring-[#D4145A]/20"
+                className="flex h-9 w-full rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8] focus:ring-2 focus:ring-[#1F4FD8]/20"
               >
                 <option value="">Select type...</option>
                 {VEHICLE_TYPES.map((vt) => (
@@ -321,7 +321,7 @@ export default function OperatorVehiclesPage() {
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Passenger Capacity</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Passenger Capacity</label>
               <Input
                 type="number"
                 value={newVehicle.passengerCapacity}
@@ -331,7 +331,7 @@ export default function OperatorVehiclesPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#172F52]">Luggage Capacity</label>
+              <label className="mb-1.5 block text-sm font-medium text-[#0F1B2D]">Luggage Capacity</label>
               <Input
                 type="number"
                 value={newVehicle.luggageCapacity}
@@ -341,12 +341,12 @@ export default function OperatorVehiclesPage() {
               />
             </div>
           </div>
-          <div className="flex justify-end gap-2 border-t border-[#F5F7FA] pt-4">
-            <Button variant="outline" className="border-[#D9E0E8]" onClick={() => setAddModalOpen(false)}>
+          <div className="flex justify-end gap-2 border-t border-[#F4F6F9] pt-4">
+            <Button variant="outline" className="border-[#E2E6EC]" onClick={() => setAddModalOpen(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
               onClick={handleAddVehicle}
             >
               <Plus className="mr-2 h-4 w-4" />

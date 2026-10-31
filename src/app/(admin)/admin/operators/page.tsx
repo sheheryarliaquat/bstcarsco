@@ -88,12 +88,12 @@ export default function AdminOperatorsPage() {
         const o = row as unknown as Operator
         return (
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#172F52] text-xs font-bold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0F1B2D] text-xs font-bold text-white">
               {o.companyName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
             </div>
             <div>
-              <span className="font-medium text-[#172F52]">{o.companyName}</span>
-              <p className="text-xs text-[#6B7280]">{o.firstName} {o.lastName}</p>
+              <span className="font-medium text-[#0F1B2D]">{o.companyName}</span>
+              <p className="text-xs text-[#5B6577]">{o.firstName} {o.lastName}</p>
             </div>
           </div>
         )
@@ -106,8 +106,8 @@ export default function AdminOperatorsPage() {
         const o = row as unknown as Operator
         return (
           <div>
-            <p className="text-sm text-[#172F52]">{o.email}</p>
-            <p className="text-xs text-[#6B7280]">{o.phone}</p>
+            <p className="text-sm text-[#0F1B2D]">{o.email}</p>
+            <p className="text-xs text-[#5B6577]">{o.phone}</p>
           </div>
         )
       },
@@ -118,7 +118,7 @@ export default function AdminOperatorsPage() {
       sortable: true,
       render: (row) => {
         const o = row as unknown as Operator
-        return <span className="font-semibold text-[#172F52]">{getOperatorDrivers(o.uid).length}</span>
+        return <span className="font-semibold text-[#0F1B2D]">{getOperatorDrivers(o.uid).length}</span>
       },
     },
     {
@@ -127,7 +127,7 @@ export default function AdminOperatorsPage() {
       sortable: true,
       render: (row) => {
         const o = row as unknown as Operator
-        return <span className="font-semibold text-[#172F52]">{getOperatorVehicles(o.uid).length}</span>
+        return <span className="font-semibold text-[#0F1B2D]">{getOperatorVehicles(o.uid).length}</span>
       },
     },
     {
@@ -136,7 +136,7 @@ export default function AdminOperatorsPage() {
       sortable: true,
       render: (row) => {
         const o = row as unknown as Operator
-        return <span className="font-semibold text-[#172F52]">{getOperatorBookings(o.uid).length}</span>
+        return <span className="font-semibold text-[#0F1B2D]">{getOperatorBookings(o.uid).length}</span>
       },
     },
     {
@@ -145,7 +145,7 @@ export default function AdminOperatorsPage() {
       sortable: true,
       render: (row) => {
         const o = row as unknown as Operator
-        return <span className="font-semibold text-[#172F52]">£{getOperatorRevenue(o.uid).toFixed(0)}</span>
+        return <span className="font-semibold text-[#0F1B2D]">£{getOperatorRevenue(o.uid).toFixed(0)}</span>
       },
     },
     {
@@ -182,16 +182,16 @@ export default function AdminOperatorsPage() {
         return (
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); setSelectedOperator(o); setDetailOpen(true) }}>
-              <Eye className="h-3.5 w-3.5 text-[#6B7280]" />
+              <Eye className="h-3.5 w-3.5 text-[#5B6577]" />
             </Button>
             <Button variant="ghost" size="icon-xs" onClick={(e) => e.stopPropagation()}>
-              <Edit className="h-3.5 w-3.5 text-[#6B7280]" />
+              <Edit className="h-3.5 w-3.5 text-[#5B6577]" />
             </Button>
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); setSuspendTarget(o) }}>
               <UserX className="h-3.5 w-3.5 text-amber-600" />
             </Button>
             <Button variant="ghost" size="icon-xs" onClick={(e) => e.stopPropagation()}>
-              <Wallet className="h-3.5 w-3.5 text-[#6B7280]" />
+              <Wallet className="h-3.5 w-3.5 text-[#5B6577]" />
             </Button>
           </div>
         )
@@ -203,10 +203,10 @@ export default function AdminOperatorsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Operators</h1>
-          <p className="text-sm text-[#6B7280]">Manage all platform operators</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Operators</h1>
+          <p className="text-sm text-[#5B6577]">Manage all platform operators</p>
         </div>
-        <Button className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+        <Button className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
           <Plus className="mr-1.5 h-4 w-4" />
           Add Operator
         </Button>
@@ -220,10 +220,10 @@ export default function AdminOperatorsPage() {
         <DashboardCard title="Total Revenue" value={`£${operatorStats.totalRevenue.toFixed(0)}`} icon={<Banknote className="h-5 w-5" />} trend="up" change={10} />
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
@@ -234,7 +234,7 @@ export default function AdminOperatorsPage() {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -252,13 +252,13 @@ export default function AdminOperatorsPage() {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-[#6B7280]">
+        <span className="text-xs text-[#5B6577]">
           Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length}
         </span>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(1)}>«</Button>
           <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
-          <span className="px-2 text-sm font-medium text-[#172F52]">{page} / {totalPages || 1}</span>
+          <span className="px-2 text-sm font-medium text-[#0F1B2D]">{page} / {totalPages || 1}</span>
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>›</Button>
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</Button>
         </div>
@@ -274,52 +274,52 @@ export default function AdminOperatorsPage() {
         {selectedOperator && (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#172F52] text-lg font-bold text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0F1B2D] text-lg font-bold text-white">
                 {selectedOperator.companyName.split(" ").map((w) => w[0]).join("").slice(0, 2)}
               </div>
               <div>
-                <p className="text-lg font-bold text-[#172F52]">{selectedOperator.companyName}</p>
+                <p className="text-lg font-bold text-[#0F1B2D]">{selectedOperator.companyName}</p>
                 <RatingStars rating={selectedOperator.rating} size="sm" count={selectedOperator.totalReviews} />
               </div>
             </div>
 
-            <p className="text-sm text-[#6B7280]">{selectedOperator.description}</p>
+            <p className="text-sm text-[#5B6577]">{selectedOperator.description}</p>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Contact Person</p>
-                <p className="text-sm text-[#172F52]">{selectedOperator.firstName} {selectedOperator.lastName}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Contact Person</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedOperator.firstName} {selectedOperator.lastName}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Phone</p>
-                <p className="text-sm text-[#172F52]">{selectedOperator.phone}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Phone</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedOperator.phone}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Email</p>
-                <p className="text-sm text-[#172F52]">{selectedOperator.email}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Email</p>
+                <p className="text-sm text-[#0F1B2D]">{selectedOperator.email}</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3">
-                <p className="text-xs font-semibold uppercase text-[#6B7280]">Commission</p>
-                <p className="text-sm font-semibold text-[#172F52]">{selectedOperator.commission.percent}% + £{selectedOperator.commission.flatFee}</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3">
+                <p className="text-xs font-semibold uppercase text-[#5B6577]">Commission</p>
+                <p className="text-sm font-semibold text-[#0F1B2D]">{selectedOperator.commission.percent}% + £{selectedOperator.commission.flatFee}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-4 gap-3">
-              <div className="rounded-lg bg-[#F5F7FA] p-3 text-center">
-                <p className="text-lg font-bold text-[#172F52]">{getOperatorDrivers(selectedOperator.uid).length}</p>
-                <p className="text-[10px] text-[#6B7280]">Drivers</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3 text-center">
+                <p className="text-lg font-bold text-[#0F1B2D]">{getOperatorDrivers(selectedOperator.uid).length}</p>
+                <p className="text-[10px] text-[#5B6577]">Drivers</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3 text-center">
-                <p className="text-lg font-bold text-[#172F52]">{getOperatorVehicles(selectedOperator.uid).length}</p>
-                <p className="text-[10px] text-[#6B7280]">Vehicles</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3 text-center">
+                <p className="text-lg font-bold text-[#0F1B2D]">{getOperatorVehicles(selectedOperator.uid).length}</p>
+                <p className="text-[10px] text-[#5B6577]">Vehicles</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3 text-center">
-                <p className="text-lg font-bold text-[#172F52]">{getOperatorBookings(selectedOperator.uid).length}</p>
-                <p className="text-[10px] text-[#6B7280]">Bookings</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3 text-center">
+                <p className="text-lg font-bold text-[#0F1B2D]">{getOperatorBookings(selectedOperator.uid).length}</p>
+                <p className="text-[10px] text-[#5B6577]">Bookings</p>
               </div>
-              <div className="rounded-lg bg-[#F5F7FA] p-3 text-center">
-                <p className="text-lg font-bold text-[#172F52]">£{getOperatorRevenue(selectedOperator.uid).toFixed(0)}</p>
-                <p className="text-[10px] text-[#6B7280]">Revenue</p>
+              <div className="rounded-lg bg-[#F4F6F9] p-3 text-center">
+                <p className="text-lg font-bold text-[#0F1B2D]">£{getOperatorRevenue(selectedOperator.uid).toFixed(0)}</p>
+                <p className="text-[10px] text-[#5B6577]">Revenue</p>
               </div>
             </div>
           </div>

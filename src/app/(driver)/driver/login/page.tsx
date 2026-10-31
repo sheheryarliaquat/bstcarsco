@@ -78,10 +78,10 @@ export default function DriverLoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left branding panel */}
-      <div className="hidden w-1/2 bg-[#172F52] lg:flex lg:flex-col lg:items-center lg:justify-center">
+      <div className="hidden w-1/2 bg-[#0F1B2D] lg:flex lg:flex-col lg:items-center lg:justify-center">
         <div className="mx-auto max-w-md px-8 text-center">
           <div className="mb-8 flex items-center justify-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D4145A]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1F4FD8]">
               <Car className="h-8 w-8 text-white" />
             </div>
             <span className="text-2xl font-bold text-white">Blue Star Airport Transfers LTD</span>
@@ -101,13 +101,13 @@ export default function DriverLoginPage() {
       </div>
 
       {/* Right login form */}
-      <div className="flex w-full flex-col items-center justify-center bg-[#F5F7FA] px-4 py-12 lg:w-1/2">
+      <div className="flex w-full flex-col items-center justify-center bg-[#F4F6F9] px-4 py-12 lg:w-1/2">
         <div className="mb-8 lg:hidden">
           <Link
             href="/"
-            className="flex items-center gap-2 text-[#172F52]"
+            className="flex items-center gap-2 text-[#0F1B2D]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D4145A]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1F4FD8]">
               <Car className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold">Blue Star Airport Transfers LTD</span>
@@ -117,10 +117,10 @@ export default function DriverLoginPage() {
         <div className="w-full max-w-md">
           <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
             <div className="mb-6 text-center">
-              <h1 className="text-2xl font-bold text-[#172F52]">
+              <h1 className="text-2xl font-bold text-[#0F1B2D]">
                 Welcome back, Driver
               </h1>
-              <p className="mt-1 text-sm text-[#6B7280]">
+              <p className="mt-1 text-sm text-[#5B6577]">
                 Sign in to your driver account
               </p>
             </div>
@@ -136,12 +136,12 @@ export default function DriverLoginPage() {
               <div>
                 <Label
                   htmlFor="email"
-                  className="text-sm font-medium text-[#172033]"
+                  className="text-sm font-medium text-[#0F1B2D]"
                 >
                   Email address
                 </Label>
                 <div className="relative mt-1.5">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                   <Input
                     id="email"
                     type="email"
@@ -161,19 +161,19 @@ export default function DriverLoginPage() {
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="password"
-                    className="text-sm font-medium text-[#172033]"
+                    className="text-sm font-medium text-[#0F1B2D]"
                   >
                     Password
                   </Label>
                   <Link
                     href="/forgot-password"
-                    className="text-xs font-medium text-[#D4145A] hover:underline"
+                    className="text-xs font-medium text-[#1F4FD8] hover:underline"
                   >
                     Forgot password?
                   </Link>
                 </div>
                 <div className="relative mt-1.5">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -184,7 +184,7 @@ export default function DriverLoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#172033]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6577] hover:text-[#0F1B2D]"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -203,7 +203,7 @@ export default function DriverLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-11 w-full bg-[#D4145A] text-base font-semibold text-white hover:bg-[#D4145A]/90"
+                className="h-11 w-full bg-[#1F4FD8] text-base font-semibold text-white hover:bg-[#1F4FD8]/90"
               >
                 {loading ? (
                   <>
@@ -219,7 +219,7 @@ export default function DriverLoginPage() {
             <div className="mt-6 text-center">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6B7280] hover:text-[#172F52]"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5B6577] hover:text-[#0F1B2D]"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to main site
@@ -227,13 +227,13 @@ export default function DriverLoginPage() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-xs text-[#6B7280]">
+        <p className="mt-8 text-center text-xs text-[#5B6577]">
           By continuing, you agree to our{" "}
-          <Link href="/terms" className="text-[#D4145A] hover:underline">
+          <Link href="/terms" className="text-[#1F4FD8] hover:underline">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="text-[#D4145A] hover:underline">
+          <Link href="/privacy" className="text-[#1F4FD8] hover:underline">
             Privacy Policy
           </Link>
         </p>

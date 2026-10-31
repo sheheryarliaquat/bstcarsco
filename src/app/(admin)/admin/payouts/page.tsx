@@ -63,19 +63,19 @@ export default function AdminPayoutsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Payouts</h1>
-          <p className="text-sm text-[#6B7280]">Manage operator and driver payouts</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Payouts</h1>
+          <p className="text-sm text-[#5B6577]">Manage operator and driver payouts</p>
         </div>
       </div>
 
-      <div className="flex gap-1 rounded-lg bg-[#F5F7FA] p-1">
+      <div className="flex gap-1 rounded-lg bg-[#F4F6F9] p-1">
         <button
           onClick={() => setTab("operator")}
           className={cn(
             "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
             tab === "operator"
-              ? "bg-white text-[#172F52] shadow-sm"
-              : "text-[#6B7280] hover:text-[#172F52]"
+              ? "bg-white text-[#0F1B2D] shadow-sm"
+              : "text-[#5B6577] hover:text-[#0F1B2D]"
           )}
         >
           <Building className="h-4 w-4" />
@@ -86,8 +86,8 @@ export default function AdminPayoutsPage() {
           className={cn(
             "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
             tab === "driver"
-              ? "bg-white text-[#172F52] shadow-sm"
-              : "text-[#6B7280] hover:text-[#172F52]"
+              ? "bg-white text-[#0F1B2D] shadow-sm"
+              : "text-[#5B6577] hover:text-[#0F1B2D]"
           )}
         >
           <Users className="h-4 w-4" />
@@ -101,10 +101,10 @@ export default function AdminPayoutsPage() {
         <DashboardCard title="This Period" value={`£${thisMonth.toFixed(2)}`} icon={<PoundSterling className="h-5 w-5" />} />
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -115,7 +115,7 @@ export default function AdminPayoutsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
@@ -125,26 +125,26 @@ export default function AdminPayoutsPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">ID</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Recipient</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Period</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Gross</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Commission</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Net Amount</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Date</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Actions</th>
+              <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">ID</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Recipient</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Period</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Gross</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Commission</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Net Amount</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Status</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Date</th>
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-[#6B7280]">
+                  <td colSpan={9} className="px-4 py-12 text-center text-[#5B6577]">
                     No payouts found
                   </td>
                 </tr>
@@ -152,14 +152,14 @@ export default function AdminPayoutsPage() {
                 filtered.map((payout) => (
                   <tr
                     key={payout.id}
-                    className="border-b border-[#F5F7FA] transition-colors last:border-0 hover:bg-[#F5F7FA]/50"
+                    className="border-b border-[#F4F6F9] transition-colors last:border-0 hover:bg-[#F4F6F9]/50"
                   >
-                    <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{payout.id}</td>
-                    <td className="px-4 py-3 font-medium text-[#172F52]">{payout.recipientName}</td>
-                    <td className="px-4 py-3 text-[#6B7280]">{payout.period}</td>
-                    <td className="px-4 py-3 text-[#172F52]">£{payout.gross.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-[#D4145A]">-£{payout.commission.toFixed(2)}</td>
-                    <td className="px-4 py-3 font-semibold text-[#172F52]">£{payout.netAmount.toFixed(2)}</td>
+                    <td className="px-4 py-3 font-mono text-xs font-medium text-[#0F1B2D]">{payout.id}</td>
+                    <td className="px-4 py-3 font-medium text-[#0F1B2D]">{payout.recipientName}</td>
+                    <td className="px-4 py-3 text-[#5B6577]">{payout.period}</td>
+                    <td className="px-4 py-3 text-[#0F1B2D]">£{payout.gross.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-[#1F4FD8]">-£{payout.commission.toFixed(2)}</td>
+                    <td className="px-4 py-3 font-semibold text-[#0F1B2D]">£{payout.netAmount.toFixed(2)}</td>
                     <td className="px-4 py-3">
                       <span
                         className={cn(
@@ -172,7 +172,7 @@ export default function AdminPayoutsPage() {
                         {payout.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#6B7280]">
+                    <td className="px-4 py-3 text-xs text-[#5B6577]">
                       {new Date(payout.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3">

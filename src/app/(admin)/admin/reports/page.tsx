@@ -93,28 +93,28 @@ export default function AdminReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Reports</h1>
-          <p className="text-sm text-[#6B7280]">Platform analytics and data export</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Reports</h1>
+          <p className="text-sm text-[#5B6577]">Platform analytics and data export</p>
         </div>
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-[#6B7280]" />
+          <Calendar className="h-4 w-4 text-[#5B6577]" />
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           />
-          <span className="text-xs text-[#6B7280]">to</span>
+          <span className="text-xs text-[#5B6577]">to</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="h-9 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172F52] outline-none focus:border-[#D4145A]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-sm text-[#0F1B2D] outline-none focus:border-[#1F4FD8]"
           />
         </div>
       </div>
 
-      <div className="flex gap-1 rounded-lg bg-[#F5F7FA] p-1">
+      <div className="flex gap-1 rounded-lg bg-[#F4F6F9] p-1">
         {TABS.map((tab) => {
           const Icon = tab.icon
           return (
@@ -124,8 +124,8 @@ export default function AdminReportsPage() {
               className={cn(
                 "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
                 activeTab === tab.key
-                  ? "bg-white text-[#172F52] shadow-sm"
-                  : "text-[#6B7280] hover:text-[#172F52]"
+                  ? "bg-white text-[#0F1B2D] shadow-sm"
+                  : "text-[#5B6577] hover:text-[#0F1B2D]"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -144,10 +144,10 @@ export default function AdminReportsPage() {
             <DashboardCard title="Active" value={BOOKING_REPORT_DATA.filter((b) => b.status === "active").length} icon={<BarChart2 className="h-5 w-5" />} />
             <DashboardCard title="Total Revenue" value={`£${BOOKING_REPORT_DATA.reduce((s, b) => s + b.total, 0).toFixed(2)}`} icon={<Banknote className="h-5 w-5" />} />
           </div>
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Bookings Report</h3>
-              <Button variant="outline" size="sm" className="border-[#D9E0E8]" onClick={() => exportCSV(BOOKING_REPORT_DATA as unknown as Record<string, unknown>[], "bookings-report")}>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Bookings Report</h3>
+              <Button variant="outline" size="sm" className="border-[#E2E6EC]" onClick={() => exportCSV(BOOKING_REPORT_DATA as unknown as Record<string, unknown>[], "bookings-report")}>
                 <Download className="mr-1 h-3.5 w-3.5" />
                 Export CSV
               </Button>
@@ -155,37 +155,37 @@ export default function AdminReportsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Booking ID</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Date</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Passenger</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Operator</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Route</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Total</th>
+                  <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Booking ID</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Date</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Passenger</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Operator</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Route</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Status</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {BOOKING_REPORT_DATA.map((b) => (
-                    <tr key={b.id} className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50">
-                      <td className="px-4 py-3 font-mono text-xs font-medium text-[#172F52]">{b.id}</td>
-                      <td className="px-4 py-3 text-[#6B7280]">{b.date}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{b.passenger}</td>
-                      <td className="px-4 py-3 text-[#6B7280]">{b.operator}</td>
-                      <td className="px-4 py-3 text-[#6B7280]">{b.pickup} → {b.destination}</td>
+                    <tr key={b.id} className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50">
+                      <td className="px-4 py-3 font-mono text-xs font-medium text-[#0F1B2D]">{b.id}</td>
+                      <td className="px-4 py-3 text-[#5B6577]">{b.date}</td>
+                      <td className="px-4 py-3 text-[#0F1B2D]">{b.passenger}</td>
+                      <td className="px-4 py-3 text-[#5B6577]">{b.operator}</td>
+                      <td className="px-4 py-3 text-[#5B6577]">{b.pickup} → {b.destination}</td>
                       <td className="px-4 py-3">
                         <span className={cn(
                           "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
                           b.status === "completed" && "bg-green-50 text-green-700",
                           b.status === "active" && "bg-blue-50 text-blue-700",
-                          b.status === "confirmed" && "bg-[#172F52]/10 text-[#172F52]",
+                          b.status === "confirmed" && "bg-[#0F1B2D]/10 text-[#0F1B2D]",
                           b.status === "pending" && "bg-amber-50 text-amber-700",
                           b.status === "failed" && "bg-red-50 text-red-700"
                         )}>
                           {b.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">£{b.total.toFixed(2)}</td>
+                      <td className="px-4 py-3 font-semibold text-[#0F1B2D]">£{b.total.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -206,27 +206,27 @@ export default function AdminReportsPage() {
           </div>
 
           {/* Revenue Chart */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-            <h3 className="mb-4 text-base font-bold text-[#172F52]">Revenue by Operator</h3>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+            <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">Revenue by Operator</h3>
             <div className="flex items-end gap-4 h-48">
               {REVENUE_REPORT_DATA.map((item) => (
                 <div key={item.operator} className="flex flex-1 flex-col items-center gap-2">
-                  <span className="text-xs font-semibold text-[#172F52]">£{(item.revenue / 1000).toFixed(1)}k</span>
+                  <span className="text-xs font-semibold text-[#0F1B2D]">£{(item.revenue / 1000).toFixed(1)}k</span>
                   <div
-                    className="w-full max-w-[50px] rounded-t-lg bg-[#172F52] transition-all duration-500"
+                    className="w-full max-w-[50px] rounded-t-lg bg-[#0F1B2D] transition-all duration-500"
                     style={{ height: `${(item.revenue / REVENUE_MAX) * 140}px` }}
                   />
-                  <span className="text-center text-[10px] text-[#6B7280] leading-tight">{item.operator.split(" ")[0]}</span>
+                  <span className="text-center text-[10px] text-[#5B6577] leading-tight">{item.operator.split(" ")[0]}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Revenue Table */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Revenue Breakdown</h3>
-              <Button variant="outline" size="sm" className="border-[#D9E0E8]" onClick={() => exportCSV(REVENUE_REPORT_DATA as unknown as Record<string, unknown>[], "revenue-report")}>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Revenue Breakdown</h3>
+              <Button variant="outline" size="sm" className="border-[#E2E6EC]" onClick={() => exportCSV(REVENUE_REPORT_DATA as unknown as Record<string, unknown>[], "revenue-report")}>
                 <Download className="mr-1 h-3.5 w-3.5" />
                 Export CSV
               </Button>
@@ -234,22 +234,22 @@ export default function AdminReportsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Operator</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Bookings</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Revenue</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Commission</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Net</th>
+                  <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Operator</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Bookings</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Revenue</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Commission</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Net</th>
                   </tr>
                 </thead>
                 <tbody>
                   {REVENUE_REPORT_DATA.map((r) => (
-                    <tr key={r.operator} className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50">
-                      <td className="px-4 py-3 font-medium text-[#172F52]">{r.operator}</td>
-                      <td className="px-4 py-3 text-[#6B7280]">{r.bookings}</td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">£{r.revenue.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-[#D4145A]">£{r.commission.toLocaleString()}</td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">£{r.net.toLocaleString()}</td>
+                    <tr key={r.operator} className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50">
+                      <td className="px-4 py-3 font-medium text-[#0F1B2D]">{r.operator}</td>
+                      <td className="px-4 py-3 text-[#5B6577]">{r.bookings}</td>
+                      <td className="px-4 py-3 font-semibold text-[#0F1B2D]">£{r.revenue.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-[#1F4FD8]">£{r.commission.toLocaleString()}</td>
+                      <td className="px-4 py-3 font-semibold text-[#0F1B2D]">£{r.net.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -268,10 +268,10 @@ export default function AdminReportsPage() {
             <DashboardCard title="Total Revenue" value={`£${DRIVER_REPORT_DATA.reduce((s, d) => s + d.revenue, 0).toLocaleString()}`} icon={<Banknote className="h-5 w-5" />} />
             <DashboardCard title="Avg Rating" value={(DRIVER_REPORT_DATA.reduce((s, d) => s + d.rating, 0) / DRIVER_REPORT_DATA.length).toFixed(1)} icon={<TrendingUp className="h-5 w-5" />} />
           </div>
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Driver Performance</h3>
-              <Button variant="outline" size="sm" className="border-[#D9E0E8]" onClick={() => exportCSV(DRIVER_REPORT_DATA as unknown as Record<string, unknown>[], "driver-report")}>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Driver Performance</h3>
+              <Button variant="outline" size="sm" className="border-[#E2E6EC]" onClick={() => exportCSV(DRIVER_REPORT_DATA as unknown as Record<string, unknown>[], "driver-report")}>
                 <Download className="mr-1 h-3.5 w-3.5" />
                 Export CSV
               </Button>
@@ -279,22 +279,22 @@ export default function AdminReportsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Driver</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Operator</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Trips</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Revenue</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Rating</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Status</th>
+                  <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Driver</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Operator</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Trips</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Revenue</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Rating</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {DRIVER_REPORT_DATA.map((d) => (
-                    <tr key={d.name} className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50">
-                      <td className="px-4 py-3 font-medium text-[#172F52]">{d.name}</td>
-                      <td className="px-4 py-3 text-[#6B7280]">{d.operator}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{d.trips}</td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">£{d.revenue.toLocaleString()}</td>
+                    <tr key={d.name} className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50">
+                      <td className="px-4 py-3 font-medium text-[#0F1B2D]">{d.name}</td>
+                      <td className="px-4 py-3 text-[#5B6577]">{d.operator}</td>
+                      <td className="px-4 py-3 text-[#0F1B2D]">{d.trips}</td>
+                      <td className="px-4 py-3 font-semibold text-[#0F1B2D]">£{d.revenue.toLocaleString()}</td>
                       <td className="px-4 py-3">
                         <span className="text-amber-500">★</span> {d.rating}
                       </td>
@@ -326,10 +326,10 @@ export default function AdminReportsPage() {
             <DashboardCard title="Total Revenue" value={`£${OPERATOR_REPORT_DATA.reduce((s, o) => s + o.revenue, 0).toLocaleString()}`} icon={<Banknote className="h-5 w-5" />} />
             <DashboardCard title="Avg Response" value={`${(OPERATOR_REPORT_DATA.reduce((s, o) => s + parseFloat(o.responseTime), 0) / OPERATOR_REPORT_DATA.length).toFixed(1)}m`} icon={<TrendingUp className="h-5 w-5" />} />
           </div>
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Operator Performance</h3>
-              <Button variant="outline" size="sm" className="border-[#D9E0E8]" onClick={() => exportCSV(OPERATOR_REPORT_DATA as unknown as Record<string, unknown>[], "operator-report")}>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Operator Performance</h3>
+              <Button variant="outline" size="sm" className="border-[#E2E6EC]" onClick={() => exportCSV(OPERATOR_REPORT_DATA as unknown as Record<string, unknown>[], "operator-report")}>
                 <Download className="mr-1 h-3.5 w-3.5" />
                 Export CSV
               </Button>
@@ -337,26 +337,26 @@ export default function AdminReportsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Operator</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Drivers</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Bookings</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Revenue</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Avg Rating</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Response Time</th>
+                  <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Operator</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Drivers</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Bookings</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Revenue</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Avg Rating</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Response Time</th>
                   </tr>
                 </thead>
                 <tbody>
                   {OPERATOR_REPORT_DATA.map((o) => (
-                    <tr key={o.name} className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50">
-                      <td className="px-4 py-3 font-medium text-[#172F52]">{o.name}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{o.drivers}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{o.bookings}</td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">£{o.revenue.toLocaleString()}</td>
+                    <tr key={o.name} className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50">
+                      <td className="px-4 py-3 font-medium text-[#0F1B2D]">{o.name}</td>
+                      <td className="px-4 py-3 text-[#0F1B2D]">{o.drivers}</td>
+                      <td className="px-4 py-3 text-[#0F1B2D]">{o.bookings}</td>
+                      <td className="px-4 py-3 font-semibold text-[#0F1B2D]">£{o.revenue.toLocaleString()}</td>
                       <td className="px-4 py-3">
                         <span className="text-amber-500">★</span> {o.avgRating}
                       </td>
-                      <td className="px-4 py-3 text-[#6B7280]">{o.responseTime}</td>
+                      <td className="px-4 py-3 text-[#5B6577]">{o.responseTime}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -377,27 +377,27 @@ export default function AdminReportsPage() {
           </div>
 
           {/* Route Chart */}
-          <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-            <h3 className="mb-4 text-base font-bold text-[#172F52]">Bookings by Route</h3>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+            <h3 className="mb-4 text-base font-bold text-[#0F1B2D]">Bookings by Route</h3>
             <div className="space-y-3">
               {POPULAR_ROUTES_DATA.map((route) => {
                 const maxCount = POPULAR_ROUTES_DATA[0].count
                 return (
                   <div key={`${route.from}-${route.to}`} className="flex items-center gap-4">
-                    <div className="w-48 shrink-0 text-right text-xs text-[#6B7280]">
+                    <div className="w-48 shrink-0 text-right text-xs text-[#5B6577]">
                       {route.from} → {route.to}
                     </div>
                     <div className="flex-1">
-                      <div className="h-6 w-full overflow-hidden rounded bg-[#F5F7FA]">
+                      <div className="h-6 w-full overflow-hidden rounded bg-[#F4F6F9]">
                         <div
-                          className="h-full rounded bg-[#D4145A] transition-all duration-500"
+                          className="h-full rounded bg-[#1F4FD8] transition-all duration-500"
                           style={{ width: `${(route.count / maxCount) * 100}%` }}
                         />
                       </div>
                     </div>
                     <div className="w-24 shrink-0 text-right">
-                      <span className="text-sm font-semibold text-[#172F52]">{route.count}</span>
-                      <span className="ml-1 text-xs text-[#6B7280]">£{route.avgPrice.toFixed(2)}</span>
+                      <span className="text-sm font-semibold text-[#0F1B2D]">{route.count}</span>
+                      <span className="ml-1 text-xs text-[#5B6577]">£{route.avgPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 )
@@ -405,10 +405,10 @@ export default function AdminReportsPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#D9E0E8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#D9E0E8] px-6 py-4">
-              <h3 className="text-base font-bold text-[#172F52]">Popular Routes Data</h3>
-              <Button variant="outline" size="sm" className="border-[#D9E0E8]" onClick={() => exportCSV(POPULAR_ROUTES_DATA as unknown as Record<string, unknown>[], "popular-routes")}>
+          <div className="rounded-xl border border-[#E2E6EC] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EC] px-6 py-4">
+              <h3 className="text-base font-bold text-[#0F1B2D]">Popular Routes Data</h3>
+              <Button variant="outline" size="sm" className="border-[#E2E6EC]" onClick={() => exportCSV(POPULAR_ROUTES_DATA as unknown as Record<string, unknown>[], "popular-routes")}>
                 <Download className="mr-1 h-3.5 w-3.5" />
                 Export CSV
               </Button>
@@ -416,20 +416,20 @@ export default function AdminReportsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">From</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">To</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Bookings</th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">Avg Price</th>
+                  <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">From</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">To</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Bookings</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">Avg Price</th>
                   </tr>
                 </thead>
                 <tbody>
                   {POPULAR_ROUTES_DATA.map((r) => (
-                    <tr key={`${r.from}-${r.to}`} className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50">
-                      <td className="px-4 py-3 text-[#172F52]">{r.from}</td>
-                      <td className="px-4 py-3 text-[#172F52]">{r.to}</td>
-                      <td className="px-4 py-3 font-semibold text-[#172F52]">{r.count}</td>
-                      <td className="px-4 py-3 text-[#172F52]">£{r.avgPrice.toFixed(2)}</td>
+                    <tr key={`${r.from}-${r.to}`} className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50">
+                      <td className="px-4 py-3 text-[#0F1B2D]">{r.from}</td>
+                      <td className="px-4 py-3 text-[#0F1B2D]">{r.to}</td>
+                      <td className="px-4 py-3 font-semibold text-[#0F1B2D]">{r.count}</td>
+                      <td className="px-4 py-3 text-[#0F1B2D]">£{r.avgPrice.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>

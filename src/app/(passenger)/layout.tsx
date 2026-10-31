@@ -60,16 +60,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col bg-white">
       <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D4145A]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1F4FD8]">
           <Car className="h-5 w-5 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-[#172F52]">Blue Star Airport Transfers LTD</p>
-          <p className="text-[10px] text-[#6B7280]">Passenger Portal</p>
+          <p className="text-sm font-bold text-[#0F1B2D]">Blue Star Airport Transfers LTD</p>
+          <p className="text-[10px] text-[#5B6577]">Passenger Portal</p>
         </div>
       </div>
 
-      <Separator className="bg-[#F5F7FA]" />
+      <Separator className="bg-[#F4F6F9]" />
 
       <nav className="flex-1 space-y-1 px-3 py-4">
         {NAV_ITEMS.map((item) => {
@@ -83,8 +83,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-[#172F52] text-white"
-                  : "text-[#6B7280] hover:bg-[#F5F7FA] hover:text-[#172F52]"
+                  ? "bg-[#0F1B2D] text-white"
+                  : "text-[#5B6577] hover:bg-[#F4F6F9] hover:text-[#0F1B2D]"
               )}
             >
               <item.icon className="h-[18px] w-[18px]" />
@@ -97,7 +97,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <Separator className="bg-[#F5F7FA]" />
+      <Separator className="bg-[#F4F6F9]" />
 
       <div className="px-3 py-3">
         <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#DC2626] transition-colors hover:bg-red-50">
@@ -106,20 +106,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </button>
       </div>
 
-      <Separator className="bg-[#F5F7FA]" />
+      <Separator className="bg-[#F4F6F9]" />
 
       <div className="flex items-center gap-3 px-5 py-4">
         <Avatar size="sm">
           {avatarSrc ? <AvatarImage src={avatarSrc} alt={displayName} /> : null}
-          <AvatarFallback className="bg-[#172F52] text-xs text-white">
+          <AvatarFallback className="bg-[#0F1B2D] text-xs text-white">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[#172F52]">
+          <p className="truncate text-sm font-semibold text-[#0F1B2D]">
             {displayName}
           </p>
-          <p className="truncate text-[11px] text-[#6B7280]">
+          <p className="truncate text-[11px] text-[#5B6577]">
             {email}
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function PassengerLayout({
   const [sheetOpen, setSheetOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-[#F5F7FA]">
+    <div className="flex h-screen bg-[#F4F6F9]">
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-[#E5E7EB] lg:block">
         <SidebarContent />
@@ -149,7 +149,7 @@ export default function PassengerLayout({
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger
                 render={
-                  <button className="rounded-lg p-1.5 text-[#172F52] hover:bg-[#F5F7FA]" />
+                  <button className="rounded-lg p-1.5 text-[#0F1B2D] hover:bg-[#F4F6F9]" />
                 }
               >
                 <Menu className="h-5 w-5" />
@@ -159,10 +159,10 @@ export default function PassengerLayout({
               </SheetContent>
             </Sheet>
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4145A]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1F4FD8]">
                 <Car className="h-4 w-4 text-white" />
               </div>
-              <span className="text-sm font-bold text-[#172F52]">
+              <span className="text-sm font-bold text-[#0F1B2D]">
                 Blue Star Airport Transfers LTD
               </span>
             </div>

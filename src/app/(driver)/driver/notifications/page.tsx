@@ -37,7 +37,7 @@ const NOTIFICATION_COLORS: Record<string, string> = {
   payment: "bg-green-50 text-green-600",
   document: "bg-amber-50 text-amber-600",
   review: "bg-purple-50 text-purple-600",
-  system: "bg-[#172F52]/10 text-[#172F52]",
+  system: "bg-[#0F1B2D]/10 text-[#0F1B2D]",
   alert: "bg-red-50 text-red-600",
 }
 
@@ -65,8 +65,8 @@ export default function DriverNotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Notifications</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Notifications</h1>
+          <p className="text-sm text-[#5B6577]">
             {unreadCount > 0
               ? `You have ${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}`
               : "You're all caught up"}
@@ -77,7 +77,7 @@ export default function DriverNotificationsPage() {
             variant="outline"
             size="sm"
             onClick={handleMarkAllRead}
-            className="border-[#D9E0E8]"
+            className="border-[#E2E6EC]"
           >
             <CheckCheck className="mr-2 h-4 w-4" />
             Mark All Read
@@ -93,21 +93,21 @@ export default function DriverNotificationsPage() {
         />
       ) : (
         <div className="rounded-2xl bg-white ring-1 ring-[#E5E7EB]">
-          <div className="divide-y divide-[#F5F7FA]">
+          <div className="divide-y divide-[#F4F6F9]">
             {[...notifications]
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
               .map((notification) => (
                 <div
                   key={notification.id}
                   className={cn(
-                    "flex gap-4 p-5 transition-colors hover:bg-[#F5F7FA]/50",
-                    !notification.read && "bg-[#D4145A]/[0.02]"
+                    "flex gap-4 p-5 transition-colors hover:bg-[#F4F6F9]/50",
+                    !notification.read && "bg-[#1F4FD8]/[0.02]"
                   )}
                 >
                   <div
                     className={cn(
                       "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-                      NOTIFICATION_COLORS[notification.type] ?? "bg-[#172F52]/10 text-[#172F52]"
+                      NOTIFICATION_COLORS[notification.type] ?? "bg-[#0F1B2D]/10 text-[#0F1B2D]"
                     )}
                   >
                     {NOTIFICATION_ICONS[notification.type] ?? <Info className="h-4 w-4" />}
@@ -118,30 +118,30 @@ export default function DriverNotificationsPage() {
                       <div className="flex items-center gap-2">
                         <p
                           className={cn(
-                            "text-sm font-semibold text-[#172F52]",
+                            "text-sm font-semibold text-[#0F1B2D]",
                             !notification.read && "font-bold"
                           )}
                         >
                           {notification.title}
                         </p>
                         {!notification.read && (
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-[#D4145A]" />
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-[#1F4FD8]" />
                         )}
                       </div>
-                      <span className="shrink-0 text-xs text-[#6B7280]">
+                      <span className="shrink-0 text-xs text-[#5B6577]">
                         {new Date(notification.createdAt).toLocaleDateString("en-GB", {
                           day: "numeric",
                           month: "short",
                         })}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-[#6B7280]">
+                    <p className="mt-1 text-sm text-[#5B6577]">
                       {notification.message}
                     </p>
                     {!notification.read && (
                       <button
                         onClick={() => markNotificationRead(notification.id)}
-                        className="mt-2 flex items-center gap-1 text-xs font-medium text-[#D4145A] hover:underline"
+                        className="mt-2 flex items-center gap-1 text-xs font-medium text-[#1F4FD8] hover:underline"
                       >
                         <Check className="h-3 w-3" />
                         Mark as read

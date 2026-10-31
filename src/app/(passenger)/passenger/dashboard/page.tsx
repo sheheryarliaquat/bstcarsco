@@ -107,7 +107,7 @@ export default function PassengerDashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#D4145A] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1F4FD8] border-t-transparent" />
       </div>
     )
   }
@@ -115,8 +115,8 @@ export default function PassengerDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Dashboard</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Dashboard</h1>
+        <p className="text-sm text-[#5B6577]">
           Welcome back. Here&apos;s your travel overview.
         </p>
       </div>
@@ -136,45 +136,45 @@ export default function PassengerDashboardPage() {
       {/* Quick actions */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Link href="/">
-          <div className="flex items-center gap-3 rounded-xl border border-[#D9E0E8] bg-white p-4 transition-colors hover:border-[#D4145A]/30 hover:shadow-sm">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4145A]/10 text-[#D4145A]">
+          <div className="flex items-center gap-3 rounded-xl border border-[#E2E6EC] bg-white p-4 transition-colors hover:border-[#1F4FD8]/30 hover:shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1F4FD8]/10 text-[#1F4FD8]">
               <Car className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#172F52]">
+              <p className="text-sm font-semibold text-[#0F1B2D]">
                 Book a Car
               </p>
-              <p className="text-xs text-[#6B7280]">Get a quote now</p>
+              <p className="text-xs text-[#5B6577]">Get a quote now</p>
             </div>
-            <ArrowRight className="ml-auto h-4 w-4 text-[#6B7280]" />
+            <ArrowRight className="ml-auto h-4 w-4 text-[#5B6577]" />
           </div>
         </Link>
         <Link href="/airport-transfers">
-          <div className="flex items-center gap-3 rounded-xl border border-[#D9E0E8] bg-white p-4 transition-colors hover:border-[#D4145A]/30 hover:shadow-sm">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#172F52]/10 text-[#172F52]">
+          <div className="flex items-center gap-3 rounded-xl border border-[#E2E6EC] bg-white p-4 transition-colors hover:border-[#1F4FD8]/30 hover:shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F1B2D]/10 text-[#0F1B2D]">
               <Plane className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#172F52]">
+              <p className="text-sm font-semibold text-[#0F1B2D]">
                 Airport Transfer
               </p>
-              <p className="text-xs text-[#6B7280]">All major UK airports</p>
+              <p className="text-xs text-[#5B6577]">All major UK airports</p>
             </div>
-            <ArrowRight className="ml-auto h-4 w-4 text-[#6B7280]" />
+            <ArrowRight className="ml-auto h-4 w-4 text-[#5B6577]" />
           </div>
         </Link>
         <Link href="/passenger/bookings">
-          <div className="flex items-center gap-3 rounded-xl border border-[#D9E0E8] bg-white p-4 transition-colors hover:border-[#D4145A]/30 hover:shadow-sm">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#172F52]/10 text-[#172F52]">
+          <div className="flex items-center gap-3 rounded-xl border border-[#E2E6EC] bg-white p-4 transition-colors hover:border-[#1F4FD8]/30 hover:shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F1B2D]/10 text-[#0F1B2D]">
               <ClipboardList className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#172F52]">
+              <p className="text-sm font-semibold text-[#0F1B2D]">
                 View Bookings
               </p>
-              <p className="text-xs text-[#6B7280]">Manage your trips</p>
+              <p className="text-xs text-[#5B6577]">Manage your trips</p>
             </div>
-            <ArrowRight className="ml-auto h-4 w-4 text-[#6B7280]" />
+            <ArrowRight className="ml-auto h-4 w-4 text-[#5B6577]" />
           </div>
         </Link>
       </div>
@@ -182,43 +182,43 @@ export default function PassengerDashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Upcoming booking */}
         <div className="lg:col-span-1">
-          <h2 className="mb-3 text-lg font-semibold text-[#172F52]">
+          <h2 className="mb-3 text-lg font-semibold text-[#0F1B2D]">
             Upcoming Booking
           </h2>
           {upcomingBooking ? (
-            <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
+            <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
               <div className="mb-3 flex items-start justify-between">
-                <p className="text-xs font-medium text-[#6B7280]">
+                <p className="text-xs font-medium text-[#5B6577]">
                   {upcomingBooking.bookingNumber}
                 </p>
                 <StatusBadge status={upcomingBooking.bookingStatus} />
               </div>
               <div className="mb-4 space-y-3">
                 <div className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4145A]" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#1F4FD8]" />
                   <div>
-                    <p className="text-xs text-[#6B7280]">From</p>
-                    <p className="text-sm font-medium text-[#172F52]">
+                    <p className="text-xs text-[#5B6577]">From</p>
+                    <p className="text-sm font-medium text-[#0F1B2D]">
                       {upcomingBooking.pickup.formattedAddress.split(",")[0]}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#172F52]" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#0F1B2D]" />
                   <div>
-                    <p className="text-xs text-[#6B7280]">To</p>
-                    <p className="text-sm font-medium text-[#172F52]">
+                    <p className="text-xs text-[#5B6577]">To</p>
+                    <p className="text-sm font-medium text-[#0F1B2D]">
                       {upcomingBooking.destination.formattedAddress.split(",")[0]}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between border-t border-[#F5F7FA] pt-3">
-                <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+              <div className="flex items-center justify-between border-t border-[#F4F6F9] pt-3">
+                <div className="flex items-center gap-1.5 text-xs text-[#5B6577]">
                   <Clock className="h-3.5 w-3.5" />
                   {upcomingBooking.date} at {upcomingBooking.pickupTime}
                 </div>
-                <p className="text-sm font-bold text-[#172F52]">
+                <p className="text-sm font-bold text-[#0F1B2D]">
                   £{upcomingBooking.total.toFixed(2)}
                 </p>
               </div>
@@ -228,20 +228,20 @@ export default function PassengerDashboardPage() {
               >
                 <Button
                   variant="outline"
-                  className="w-full border-[#D9E0E8] text-[#172F52]"
+                  className="w-full border-[#E2E6EC] text-[#0F1B2D]"
                 >
                   View Details
                 </Button>
               </Link>
             </div>
           ) : (
-            <div className="rounded-xl border border-[#D9E0E8] bg-white p-8 text-center">
-              <CalendarClock className="mx-auto mb-3 h-10 w-10 text-[#D9E0E8]" />
-              <p className="text-sm font-medium text-[#6B7280]">
+            <div className="rounded-xl border border-[#E2E6EC] bg-white p-8 text-center">
+              <CalendarClock className="mx-auto mb-3 h-10 w-10 text-[#E2E6EC]" />
+              <p className="text-sm font-medium text-[#5B6577]">
                 No upcoming bookings
               </p>
               <Link href="/">
-                <Button className="mt-3 bg-[#D4145A] text-white hover:bg-[#D4145A]/90">
+                <Button className="mt-3 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
                   Book Now
                 </Button>
               </Link>
@@ -252,34 +252,34 @@ export default function PassengerDashboardPage() {
         {/* Recent bookings table */}
         <div className="lg:col-span-2">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[#172F52]">
+            <h2 className="text-lg font-semibold text-[#0F1B2D]">
               Recent Bookings
             </h2>
             <Link
               href="/ings"
-              className="text-xs font-medium text-[#D4145A] hover:underline"
+              className="text-xs font-medium text-[#1F4FD8] hover:underline"
             >
               View All
             </Link>
           </div>
-          <div className="overflow-hidden rounded-xl border border-[#D9E0E8] bg-white">
+          <div className="overflow-hidden rounded-xl border border-[#E2E6EC] bg-white">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#D9E0E8] bg-[#F5F7FA]">
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                  <tr className="border-b border-[#E2E6EC] bg-[#F4F6F9]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                       ID
                     </th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                       Route
                     </th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                       Date
                     </th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                       Price
                     </th>
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B7280]">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#5B6577]">
                       Status
                     </th>
                   </tr>
@@ -288,24 +288,24 @@ export default function PassengerDashboardPage() {
                   {recentBookings.map((booking) => (
                     <tr
                       key={booking.bookingNumber}
-                      className="border-b border-[#F5F7FA] last:border-0 hover:bg-[#F5F7FA]/50"
+                      className="border-b border-[#F4F6F9] last:border-0 hover:bg-[#F4F6F9]/50"
                     >
-                      <td className="px-4 py-3 text-xs font-medium text-[#6B7280]">
+                      <td className="px-4 py-3 text-xs font-medium text-[#5B6577]">
                         {booking.bookingNumber.split("-").pop()}
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm font-medium text-[#172F52]">
+                        <p className="text-sm font-medium text-[#0F1B2D]">
                           {booking.pickup.formattedAddress.split(",")[0]}
                         </p>
-                        <p className="text-xs text-[#6B7280]">
+                        <p className="text-xs text-[#5B6577]">
                           →{" "}
                           {booking.destination.formattedAddress.split(",")[0]}
                         </p>
                       </td>
-                      <td className="px-4 py-3 text-sm text-[#6B7280]">
+                      <td className="px-4 py-3 text-sm text-[#5B6577]">
                         {booking.date}
                       </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-[#172F52]">
+                      <td className="px-4 py-3 text-sm font-semibold text-[#0F1B2D]">
                         £{booking.total.toFixed(2)}
                       </td>
                       <td className="px-4 py-3">

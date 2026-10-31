@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BookingProgress } from "@/components/booking/BookingProgress";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { getBookingByIdAnySource } from "@/lib/services/booking-service";
 import { ensureAuthSession } from "@/lib/firebase/auth";
 import { getVehicle } from "@/lib/services/vehicle-service";
@@ -75,10 +76,10 @@ function ConfirmationContent() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F4F6F9]">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#D4145A] border-t-transparent" />
-          <p className="text-sm text-[#6B7280]">Loading booking details...</p>
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#1F4FD8] border-t-transparent" />
+          <p className="text-sm text-[#5B6577]">Loading booking details...</p>
         </div>
       </div>
     );
@@ -86,16 +87,16 @@ function ConfirmationContent() {
 
   if (!booking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F4F6F9]">
         <div className="text-center">
-          <h1 className="text-xl font-bold text-[#172F52]">Booking not found</h1>
-          <p className="mt-2 text-sm text-[#6B7280]">
+          <h1 className="text-xl font-bold text-[#0F1B2D]">Booking not found</h1>
+          <p className="mt-2 text-sm text-[#5B6577]">
             We couldn&apos;t find that booking. If you just paid, check your email for confirmation.
           </p>
           <Button
             render={<Link href="/" />}
             nativeButton={false}
-            className="mt-4 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+            className="mt-4 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
           >
             Back to Home
           </Button>
@@ -105,7 +106,7 @@ function ConfirmationContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA]">
+    <div className="min-h-screen bg-[#F4F6F9]">
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
         <BookingProgress currentStep="confirmed" />
 
@@ -116,12 +117,12 @@ function ConfirmationContent() {
               <CheckCircle2 className="h-10 w-10 text-[#168A55]" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-[#172F52]">
+          <h1 className="text-3xl font-bold text-[#0F1B2D]">
             {isCash ? "Booking Submitted!" : "Booking Confirmed!"}
           </h1>
-          <p className="mt-2 text-[#6B7280]">
+          <p className="mt-2 text-[#5B6577]">
             Your booking reference is{" "}
-            <span className="font-mono font-bold text-[#172F52]">
+            <span className="font-mono font-bold text-[#0F1B2D]">
               {booking.bookingNumber}
             </span>
           </p>
@@ -144,9 +145,9 @@ function ConfirmationContent() {
           )}
         </div>
 
-        <div className="mt-8 rounded-xl border border-[#D9E0E8] bg-white p-5 sm:p-6">
+        <div className="mt-8 rounded-xl border border-[#E2E6EC] bg-white p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-[#172F52]">
+            <h2 className="text-lg font-bold text-[#0F1B2D]">
               Booking Details
             </h2>
             <Badge
@@ -162,20 +163,20 @@ function ConfirmationContent() {
 
           <div className="mb-4 space-y-3">
             <div className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4145A]" />
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#1F4FD8]" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-[#6B7280]">Pickup</p>
-                <p className="text-sm font-medium text-[#172033]">
+                <p className="text-xs text-[#5B6577]">Pickup</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.pickup.formattedAddress}
                 </p>
               </div>
             </div>
-            <div className="ml-1.5 h-3 border-l-2 border-dashed border-[#D9E0E8]" />
+            <div className="ml-1.5 h-3 border-l-2 border-dashed border-[#E2E6EC]" />
             <div className="flex items-start gap-3">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#168A55]" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-[#6B7280]">Destination</p>
-                <p className="text-sm font-medium text-[#172033]">
+                <p className="text-xs text-[#5B6577]">Destination</p>
+                <p className="text-sm font-medium text-[#0F1B2D]">
                   {booking.destination.formattedAddress}
                 </p>
               </div>
@@ -186,47 +187,47 @@ function ConfirmationContent() {
 
           <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
             <div>
-              <p className="text-xs text-[#6B7280]">Date & Time</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
-                <Calendar className="h-3.5 w-3.5 text-[#6B7280]" />
+              <p className="text-xs text-[#5B6577]">Date & Time</p>
+              <div className="mt-1 flex items-center gap-1.5 text-[#0F1B2D]">
+                <Calendar className="h-3.5 w-3.5 text-[#5B6577]" />
                 <span className="font-medium">
                   {format(new Date(booking.date), "dd MMM yyyy")}
                 </span>
               </div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-[#172033]">
-                <Clock className="h-3.5 w-3.5 text-[#6B7280]" />
+              <div className="mt-0.5 flex items-center gap-1.5 text-[#0F1B2D]">
+                <Clock className="h-3.5 w-3.5 text-[#5B6577]" />
                 <span className="font-medium">{booking.pickupTime}</span>
               </div>
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Vehicle</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
-                <Car className="h-3.5 w-3.5 text-[#6B7280]" />
+              <p className="text-xs text-[#5B6577]">Vehicle</p>
+              <div className="mt-1 flex items-center gap-1.5 text-[#0F1B2D]">
+                <Car className="h-3.5 w-3.5 text-[#5B6577]" />
                 <span className="font-medium">
                   {vehicleDescription ?? booking.vehicleType}
                 </span>
               </div>
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Operator</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
-                <Building2 className="h-3.5 w-3.5 text-[#6B7280]" />
+              <p className="text-xs text-[#5B6577]">Operator</p>
+              <div className="mt-1 flex items-center gap-1.5 text-[#0F1B2D]">
+                <Building2 className="h-3.5 w-3.5 text-[#5B6577]" />
                 <span className="font-medium">{operatorName ?? "Unknown Operator"}</span>
               </div>
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Driver</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
-                <User className="h-3.5 w-3.5 text-[#6B7280]" />
-                <span className="font-medium text-[#6B7280]">
+              <p className="text-xs text-[#5B6577]">Driver</p>
+              <div className="mt-1 flex items-center gap-1.5 text-[#0F1B2D]">
+                <User className="h-3.5 w-3.5 text-[#5B6577]" />
+                <span className="font-medium text-[#5B6577]">
                   To be assigned
                 </span>
               </div>
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Passengers</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
-                <Users className="h-3.5 w-3.5 text-[#6B7280]" />
+              <p className="text-xs text-[#5B6577]">Passengers</p>
+              <div className="mt-1 flex items-center gap-1.5 text-[#0F1B2D]">
+                <Users className="h-3.5 w-3.5 text-[#5B6577]" />
                 <span className="font-medium">
                   {booking.passengers}{" "}
                   {booking.passengers === 1 ? "Passenger" : "Passengers"}
@@ -234,9 +235,9 @@ function ConfirmationContent() {
               </div>
             </div>
             <div>
-              <p className="text-xs text-[#6B7280]">Luggage</p>
-              <div className="mt-1 flex items-center gap-1.5 text-[#172033]">
-                <Briefcase className="h-3.5 w-3.5 text-[#6B7280]" />
+              <p className="text-xs text-[#5B6577]">Luggage</p>
+              <div className="mt-1 flex items-center gap-1.5 text-[#0F1B2D]">
+                <Briefcase className="h-3.5 w-3.5 text-[#5B6577]" />
                 <span className="font-medium">
                   {booking.luggage}{" "}
                   {booking.luggage === 1 ? "Item" : "Items"}
@@ -249,15 +250,15 @@ function ConfirmationContent() {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[#5B6577]">
                 {isCash ? "Amount to Pay" : "Total Paid"}
               </p>
-              <p className="text-2xl font-bold text-[#172F52]">
+              <p className="text-2xl font-bold text-[#0F1B2D]">
                 £{booking.total.toFixed(2)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-[#6B7280]">Payment Status</p>
+              <p className="text-xs text-[#5B6577]">Payment Status</p>
               <div className="mt-1 flex items-center gap-1.5">
                 {isCash ? (
                   <>
@@ -286,7 +287,7 @@ function ConfirmationContent() {
             render={<Link href="/passenger/history" />}
             nativeButton={false}
           >
-            <ExternalLink className="h-5 w-5 text-[#172F52]" />
+            <ExternalLink className="h-5 w-5 text-[#0F1B2D]" />
             <span className="text-xs">View Booking</span>
           </Button>
           <Button
@@ -295,7 +296,7 @@ function ConfirmationContent() {
             render={<Link href="#" />}
             nativeButton={false}
           >
-            <Download className="h-5 w-5 text-[#172F52]" />
+            <Download className="h-5 w-5 text-[#0F1B2D]" />
             <span className="text-xs">Download Receipt</span>
           </Button>
           <Button
@@ -304,7 +305,7 @@ function ConfirmationContent() {
             render={<Link href="#" />}
             nativeButton={false}
           >
-            <Mail className="h-5 w-5 text-[#172F52]" />
+            <Mail className="h-5 w-5 text-[#0F1B2D]" />
             <span className="text-xs">Email Confirmation</span>
           </Button>
           <Button
@@ -313,7 +314,7 @@ function ConfirmationContent() {
             render={<Link href="/help" />}
             nativeButton={false}
           >
-            <Headphones className="h-5 w-5 text-[#172F52]" />
+            <Headphones className="h-5 w-5 text-[#0F1B2D]" />
             <span className="text-xs">Contact Support</span>
           </Button>
         </div>
@@ -323,7 +324,7 @@ function ConfirmationContent() {
             render={<Link href="/" />}
             nativeButton={false}
             size="lg"
-            className="bg-[#D4145A] px-8 text-white hover:bg-[#D4145A]/90"
+            className="bg-[#1F4FD8] px-8 text-white hover:bg-[#1F4FD8]/90"
           >
             Book Another Journey
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -336,17 +337,19 @@ function ConfirmationContent() {
 
 export default function BookingConfirmationPage() {
   return (
+    <PublicLayout>
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#F5F7FA]">
+        <div className="flex min-h-screen items-center justify-center bg-[#F4F6F9]">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#D4145A] border-t-transparent" />
-            <p className="text-sm text-[#6B7280]">Loading booking details...</p>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#1F4FD8] border-t-transparent" />
+            <p className="text-sm text-[#5B6577]">Loading booking details...</p>
           </div>
         </div>
       }
     >
       <ConfirmationContent />
     </Suspense>
+    </PublicLayout>
   );
 }

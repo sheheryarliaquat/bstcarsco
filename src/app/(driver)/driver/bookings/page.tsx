@@ -59,8 +59,8 @@ export default function DriverBookingsPage() {
         const b = row as unknown as Booking
         return (
           <div>
-            <p className="font-medium text-[#172F52]">{b.date}</p>
-            <p className="text-xs text-[#6B7280]">{b.pickupTime}</p>
+            <p className="font-medium text-[#0F1B2D]">{b.date}</p>
+            <p className="text-xs text-[#5B6577]">{b.pickupTime}</p>
           </div>
         )
       },
@@ -72,8 +72,8 @@ export default function DriverBookingsPage() {
         const b = row as unknown as Booking
         return (
           <div className="max-w-[250px]">
-            <p className="truncate text-sm text-[#172F52]">{b.pickup.formattedAddress.split(",")[0]}</p>
-            <p className="truncate text-xs text-[#6B7280]">→ {b.destination.formattedAddress.split(",")[0]}</p>
+            <p className="truncate text-sm text-[#0F1B2D]">{b.pickup.formattedAddress.split(",")[0]}</p>
+            <p className="truncate text-xs text-[#5B6577]">→ {b.destination.formattedAddress.split(",")[0]}</p>
           </div>
         )
       },
@@ -82,7 +82,7 @@ export default function DriverBookingsPage() {
       key: "passengers",
       header: "Passengers",
       render: (row) => (
-        <span className="text-sm text-[#172F52]">{(row as unknown as Booking).passengers}</span>
+        <span className="text-sm text-[#0F1B2D]">{(row as unknown as Booking).passengers}</span>
       ),
     },
     {
@@ -95,7 +95,7 @@ export default function DriverBookingsPage() {
       header: "Fare",
       sortable: true,
       render: (row) => (
-        <span className="font-semibold text-[#172F52]">£{(row as unknown as Booking).total.toFixed(2)}</span>
+        <span className="font-semibold text-[#0F1B2D]">£{(row as unknown as Booking).total.toFixed(2)}</span>
       ),
     },
     {
@@ -103,7 +103,7 @@ export default function DriverBookingsPage() {
       header: "Actions",
       render: () => (
         <Link href="/driver/active-trip">
-          <Button variant="ghost" size="sm" className="text-[#D4145A] hover:bg-[#D4145A]/10 hover:text-[#D4145A]">
+          <Button variant="ghost" size="sm" className="text-[#1F4FD8] hover:bg-[#1F4FD8]/10 hover:text-[#1F4FD8]">
             <Eye className="mr-1 h-3.5 w-3.5" />
             View
           </Button>
@@ -116,15 +116,15 @@ export default function DriverBookingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">My Trips</h1>
-          <p className="text-sm text-[#6B7280]">View and manage all your trips</p>
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">My Trips</h1>
+          <p className="text-sm text-[#5B6577]">View and manage all your trips</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="border-[#D9E0E8]">
+          <Button variant="outline" size="sm" className="border-[#E2E6EC]">
             <CalendarIcon className="mr-2 h-4 w-4" />
             Date Range
           </Button>
-          <Button variant="outline" size="sm" className="border-[#D9E0E8]">
+          <Button variant="outline" size="sm" className="border-[#E2E6EC]">
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
@@ -133,16 +133,16 @@ export default function DriverBookingsPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="bg-white border border-[#E5E7EB]">
-          <TabsTrigger value="all" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+          <TabsTrigger value="all" className="data-[state=active]:bg-[#1F4FD8] data-[state=active]:text-white">
             All ({trips.length})
           </TabsTrigger>
-          <TabsTrigger value="active" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+          <TabsTrigger value="active" className="data-[state=active]:bg-[#1F4FD8] data-[state=active]:text-white">
             Active
           </TabsTrigger>
-          <TabsTrigger value="completed" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+          <TabsTrigger value="completed" className="data-[state=active]:bg-[#1F4FD8] data-[state=active]:text-white">
             Completed
           </TabsTrigger>
-          <TabsTrigger value="cancelled" className="data-[state=active]:bg-[#D4145A] data-[state=active]:text-white">
+          <TabsTrigger value="cancelled" className="data-[state=active]:bg-[#1F4FD8] data-[state=active]:text-white">
             Cancelled
           </TabsTrigger>
         </TabsList>

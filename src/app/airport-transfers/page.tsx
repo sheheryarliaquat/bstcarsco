@@ -32,7 +32,7 @@ const FEATURES = [
 export default function AirportTransfersPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Airport Transfers
@@ -43,8 +43,8 @@ export default function AirportTransfersPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl">
+      <section className="bg-[#F4F6F9] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl">
           <BookingSearch />
         </div>
       </section>
@@ -52,15 +52,15 @@ export default function AirportTransfersPage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">Airport Transfer Features</h2>
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">Airport Transfer Features</h2>
           </div>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <div key={f.title} className="rounded-xl bg-white p-6 text-center shadow-sm ring-1 ring-black/5">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#FCE7EF]">
-                  <f.icon className="h-7 w-7 text-[#D4145A]" />
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E7EEFF]">
+                  <f.icon className="h-7 w-7 text-[#1F4FD8]" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[#172F52]">{f.title}</h3>
+                <h3 className="mt-4 text-lg font-semibold text-[#0F1B2D]">{f.title}</h3>
                 <p className="mt-2 text-sm text-gray-600">{f.description}</p>
               </div>
             ))}
@@ -68,26 +68,26 @@ export default function AirportTransfersPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#172F52]">UK Airports We Cover</h2>
+            <h2 className="text-3xl font-bold text-[#0F1B2D]">UK Airports We Cover</h2>
             <p className="mt-2 text-gray-600">Click an airport to see routes and pricing</p>
           </div>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {AIRPORTS.map((airport) => (
-              <Link key={airport.code} href="/book">
+              <Link key={airport.code} href="/">
                 <Card className="transition-shadow hover:shadow-lg">
                   <CardContent className="flex items-start gap-4 p-6">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[#172F52] text-white">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[#0F1B2D] text-white">
                       <span className="text-sm font-bold">{airport.code}</span>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-[#172F52]">{airport.name}</h3>
+                      <h3 className="font-semibold text-[#0F1B2D]">{airport.name}</h3>
                       <p className="mt-1 text-sm text-gray-500">{airport.city}</p>
                       <p className="mt-1 text-xs text-gray-400">{airport.distance}</p>
                     </div>
-                    <ArrowRight className="mt-1 h-5 w-5 text-[#D4145A]" />
+                    <ArrowRight className="mt-1 h-5 w-5 text-[#1F4FD8]" />
                   </CardContent>
                 </Card>
               </Link>
@@ -96,7 +96,7 @@ export default function AirportTransfersPage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-r from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold text-white">Book Your Airport Transfer</h2>
           <p className="mt-4 text-gray-300">
@@ -104,8 +104,8 @@ export default function AirportTransfersPage() {
           </p>
           <Button
             size="lg"
-            className="mt-8 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-            render={<Link href="/book" />}
+            className="mt-8 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
+            render={<Link href="/" />}
             nativeButton={false}
           >
             Get Quotes

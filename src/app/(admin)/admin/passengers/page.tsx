@@ -104,10 +104,10 @@ export default function AdminPassengersPage() {
         const p = row as unknown as Passenger
         return (
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#172F52] text-xs font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0F1B2D] text-xs font-bold text-white">
               {p.firstName[0]}{p.lastName[0]}
             </div>
-            <span className="font-medium text-[#172F52]">
+            <span className="font-medium text-[#0F1B2D]">
               {p.firstName} {p.lastName}
             </span>
           </div>
@@ -118,12 +118,12 @@ export default function AdminPassengersPage() {
       key: "email",
       header: "Email",
       sortable: true,
-      render: (row) => <span className="text-[#6B7280]">{(row as unknown as Passenger).email}</span>,
+      render: (row) => <span className="text-[#5B6577]">{(row as unknown as Passenger).email}</span>,
     },
     {
       key: "phone",
       header: "Phone",
-      render: (row) => <span className="text-[#6B7280]">{(row as unknown as Passenger).phone}</span>,
+      render: (row) => <span className="text-[#5B6577]">{(row as unknown as Passenger).phone}</span>,
     },
     {
       key: "totalBookings",
@@ -131,7 +131,7 @@ export default function AdminPassengersPage() {
       sortable: true,
       render: (row) => {
         const count = getPassengerBookings((row as unknown as Passenger).uid).length
-        return <span className="font-semibold text-[#172F52]">{count}</span>
+        return <span className="font-semibold text-[#0F1B2D]">{count}</span>
       },
     },
     {
@@ -139,7 +139,7 @@ export default function AdminPassengersPage() {
       header: "Total Spent",
       sortable: true,
       render: (row) => (
-        <span className="font-semibold text-[#172F52]">
+        <span className="font-semibold text-[#0F1B2D]">
           £{getPassengerSpent((row as unknown as Passenger).uid).toFixed(2)}
         </span>
       ),
@@ -166,7 +166,7 @@ export default function AdminPassengersPage() {
       sortable: true,
       render: (row) => {
         const date = new Date((row as unknown as Passenger).createdAt)
-        return <span className="text-[#6B7280]">{date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+        return <span className="text-[#5B6577]">{date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
       },
     },
     {
@@ -175,7 +175,7 @@ export default function AdminPassengersPage() {
       sortable: true,
       render: (row) => {
         const date = new Date((row as unknown as Passenger).lastLoginAt)
-        return <span className="text-[#6B7280]">{date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+        return <span className="text-[#5B6577]">{date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
       },
     },
     {
@@ -186,10 +186,10 @@ export default function AdminPassengersPage() {
         return (
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); handleViewPassenger(p) }}>
-              <Eye className="h-3.5 w-3.5 text-[#6B7280]" />
+              <Eye className="h-3.5 w-3.5 text-[#5B6577]" />
             </Button>
             <Button variant="ghost" size="icon-xs" onClick={(e) => e.stopPropagation()}>
-              <ClipboardList className="h-3.5 w-3.5 text-[#6B7280]" />
+              <ClipboardList className="h-3.5 w-3.5 text-[#5B6577]" />
             </Button>
             <Button variant="ghost" size="icon-xs" onClick={(e) => { e.stopPropagation(); setSuspendTarget(p) }}>
               <UserX className="h-3.5 w-3.5 text-amber-600" />
@@ -206,8 +206,8 @@ export default function AdminPassengersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Passengers</h1>
-        <p className="text-sm text-[#6B7280]">Manage all platform passengers</p>
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Passengers</h1>
+        <p className="text-sm text-[#5B6577]">Manage all platform passengers</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -217,9 +217,9 @@ export default function AdminPassengersPage() {
         <DashboardCard title="Total Revenue" value={`£${passengerStats.totalRevenue.toFixed(0)}`} icon={<Banknote className="h-5 w-5" />} />
       </div>
 
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-4">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-4">
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
           <Input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
@@ -238,13 +238,13 @@ export default function AdminPassengersPage() {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-[#6B7280]">
+        <span className="text-xs text-[#5B6577]">
           Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length}
         </span>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(1)}>«</Button>
           <Button variant="outline" size="icon-xs" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
-          <span className="px-2 text-sm font-medium text-[#172F52]">{page} / {totalPages || 1}</span>
+          <span className="px-2 text-sm font-medium text-[#0F1B2D]">{page} / {totalPages || 1}</span>
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>›</Button>
           <Button variant="outline" size="icon-xs" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</Button>
         </div>
@@ -260,11 +260,11 @@ export default function AdminPassengersPage() {
         {selectedPassenger && (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#172F52] text-lg font-bold text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0F1B2D] text-lg font-bold text-white">
                 {selectedPassenger.firstName[0]}{selectedPassenger.lastName[0]}
               </div>
               <div>
-                <p className="text-lg font-bold text-[#172F52]">
+                <p className="text-lg font-bold text-[#0F1B2D]">
                   {selectedPassenger.firstName} {selectedPassenger.lastName}
                 </p>
                 <span
@@ -280,43 +280,43 @@ export default function AdminPassengersPage() {
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="flex items-center gap-2 rounded-lg bg-[#F5F7FA] p-3">
-                <Mail className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#172F52]">{selectedPassenger.email}</span>
+              <div className="flex items-center gap-2 rounded-lg bg-[#F4F6F9] p-3">
+                <Mail className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#0F1B2D]">{selectedPassenger.email}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-lg bg-[#F5F7FA] p-3">
-                <Phone className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#172F52]">{selectedPassenger.phone}</span>
+              <div className="flex items-center gap-2 rounded-lg bg-[#F4F6F9] p-3">
+                <Phone className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#0F1B2D]">{selectedPassenger.phone}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-lg bg-[#F5F7FA] p-3">
-                <Calendar className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm text-[#172F52]">
+              <div className="flex items-center gap-2 rounded-lg bg-[#F4F6F9] p-3">
+                <Calendar className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm text-[#0F1B2D]">
                   Joined {new Date(selectedPassenger.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                 </span>
               </div>
-              <div className="flex items-center gap-2 rounded-lg bg-[#F5F7FA] p-3">
-                <Banknote className="h-4 w-4 text-[#6B7280]" />
-                <span className="text-sm font-semibold text-[#172F52]">
+              <div className="flex items-center gap-2 rounded-lg bg-[#F4F6F9] p-3">
+                <Banknote className="h-4 w-4 text-[#5B6577]" />
+                <span className="text-sm font-semibold text-[#0F1B2D]">
                   £{getPassengerSpent(selectedPassenger.uid).toFixed(2)} spent
                 </span>
               </div>
             </div>
-            <div className="border-t border-[#F5F7FA] pt-4">
-              <p className="mb-2 text-xs font-semibold uppercase text-[#6B7280]">Recent Bookings</p>
+            <div className="border-t border-[#F4F6F9] pt-4">
+              <p className="mb-2 text-xs font-semibold uppercase text-[#5B6577]">Recent Bookings</p>
               {getPassengerBookings(selectedPassenger.uid).length === 0 ? (
-                <p className="text-sm text-[#6B7280]">No bookings found</p>
+                <p className="text-sm text-[#5B6577]">No bookings found</p>
               ) : (
                 <div className="space-y-2">
                   {getPassengerBookings(selectedPassenger.uid).slice(0, 3).map((b) => (
-                    <div key={b.bookingNumber} className="flex items-center justify-between rounded-lg bg-[#F5F7FA] px-3 py-2">
+                    <div key={b.bookingNumber} className="flex items-center justify-between rounded-lg bg-[#F4F6F9] px-3 py-2">
                       <div>
-                        <p className="font-mono text-xs font-medium text-[#172F52]">{b.bookingNumber}</p>
-                        <p className="text-xs text-[#6B7280]">
+                        <p className="font-mono text-xs font-medium text-[#0F1B2D]">{b.bookingNumber}</p>
+                        <p className="text-xs text-[#5B6577]">
                           {b.pickup.formattedAddress.split(",")[0]} → {b.destination.formattedAddress.split(",")[0]}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-[#172F52]">£{b.total.toFixed(2)}</p>
+                        <p className="text-sm font-semibold text-[#0F1B2D]">£{b.total.toFixed(2)}</p>
                         <StatusBadge status={b.bookingStatus} type="booking" />
                       </div>
                     </div>

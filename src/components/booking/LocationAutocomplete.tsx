@@ -14,6 +14,8 @@ interface LocationAutocompleteProps {
   icon?: "MapPin" | "Plane" | "Train"
   label?: string
   className?: string
+  /** "icon" puts the use-my-location control inside the field so rows stay aligned. */
+  geoButton?: "link" | "icon"
   id?: string
 }
 
@@ -35,6 +37,7 @@ export function LocationAutocomplete({
   icon = "MapPin",
   label,
   className,
+  geoButton = "link",
   id,
 }: LocationAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
@@ -192,7 +195,7 @@ export function LocationAutocomplete({
       {label && (
         <label
           htmlFor={id}
-          className="mb-1 block text-sm font-medium text-[#172033]"
+          className="mb-1.5 block text-[13px] font-semibold text-[#4A5568]"
         >
           {label}
         </label>
@@ -207,39 +210,55 @@ export function LocationAutocomplete({
             if (suggestions.length > 0) setShowSuggestions(true)
           }}
           placeholder={placeholder}
-          className="h-11 pl-10 pr-10"
+          className={cn("h-12 rounded-[10px] pl-10 text-[15px]", geoButton === "icon" ? "pr-[4.5rem]" : "pr-10")}
         />
         {value && (
           <button
             type="button"
+            aria-label="Clear"
             onClick={() => {
               onChange("")
               setSuggestions([])
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600",
+              geoButton === "icon" ? "right-11" : "right-3"
+            )}
           >
             <X className="h-4 w-4" />
+          </button>
+        )}
+        {geoButton === "icon" && (
+          <button
+            type="button"
+            onClick={handleUseMyLocation}
+            disabled={geoLoading}
+            aria-label="Use my location"
+            title="Use my location"
+            className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-[#1F4FD8] hover:bg-[#F4F6F9] disabled:opacity-50"
+          >
+            <Navigation className={cn("h-4 w-4", geoLoading && "animate-pulse")} />
           </button>
         )}
       </div>
 
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-[#D9E0E8] bg-white shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-[#E2E6EC] bg-white shadow-lg">
           {suggestions.map((s) => (
             <button
               key={s.placeId}
               type="button"
               onClick={() => selectSuggestion(s)}
-              className="flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[#F5F7FA]"
+              className="flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[#F4F6F9]"
             >
               <div className="mt-0.5">
                 {getIconForSuggestion(s.types)}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-[#172033]">
+                <p className="truncate text-sm font-medium text-[#0F1B2D]">
                   {s.mainText}
                 </p>
-                <p className="truncate text-xs text-[#6B7280]">
+                <p className="truncate text-xs text-[#5B6577]">
                   {s.secondaryText}
                 </p>
               </div>
@@ -252,20 +271,22 @@ export function LocationAutocomplete({
         value.length >= 3 &&
         suggestions.length === 0 &&
         !loading && (
-          <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-[#D9E0E8] bg-white p-4 text-center shadow-lg">
-            <p className="text-sm text-[#6B7280]">No locations found</p>
+          <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-[#E2E6EC] bg-white p-4 text-center shadow-lg">
+            <p className="text-sm text-[#5B6577]">No locations found</p>
           </div>
         )}
 
+      {geoButton === "link" && (
       <button
         type="button"
         onClick={handleUseMyLocation}
         disabled={geoLoading}
-        className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#D4145A] hover:text-[#D4145A]/80 disabled:opacity-50"
+        className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#1F4FD8] hover:text-[#1F4FD8]/80 disabled:opacity-50"
       >
         <Navigation className="h-3.5 w-3.5" />
         {geoLoading ? "Locating..." : "Use My Location"}
       </button>
+      )}
     </div>
   )
 }

@@ -39,35 +39,35 @@ const SERVICES = [
     title: "Minibus Hire",
     description:
       "Group travel made easy. 6, 8, and 16-seater minibuses available for events, nights out, and group transfers.",
-    href: "/book",
+    href: "/",
   },
   {
     icon: Crown,
     title: "Executive Travel",
     description:
       "Travel in style with our premium executive vehicles. Perfect for VIP clients, special occasions, and business travel.",
-    href: "/book",
+    href: "/",
   },
   {
     icon: Accessibility,
     title: "Wheelchair Accessible",
     description:
       "Fully wheelchair-accessible vehicles with trained drivers. Dignified, comfortable transport for all passengers.",
-    href: "/book",
+    href: "/",
   },
   {
     icon: Route,
     title: "Long Distance",
     description:
       "Inter-city and long-distance travel across the UK. Comfortable vehicles with fixed, transparent pricing.",
-    href: "/book",
+    href: "/",
   },
 ];
 
 export default function PrivateHireServicesPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Our Private Hire Services
@@ -84,10 +84,10 @@ export default function PrivateHireServicesPage() {
             {SERVICES.map((service) => (
               <Card key={service.title} className="group transition-shadow hover:shadow-lg">
                 <CardContent className="flex flex-col gap-4 p-8">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FCE7EF]">
-                    <service.icon className="h-7 w-7 text-[#D4145A]" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E7EEFF]">
+                    <service.icon className="h-7 w-7 text-[#1F4FD8]" />
                   </div>
-                  <h2 className="text-xl font-bold text-[#172F52]">
+                  <h2 className="text-xl font-bold text-[#0F1B2D]">
                     {service.title}
                   </h2>
                   <p className="flex-1 text-sm text-gray-600">
@@ -95,7 +95,7 @@ export default function PrivateHireServicesPage() {
                   </p>
                   <Button
                     variant="outline"
-                    className="self-start border-[#D4145A] text-[#D4145A] hover:bg-[#D4145A] hover:text-white"
+                    className="self-start border-[#1F4FD8] text-[#1F4FD8] hover:bg-[#1F4FD8] hover:text-white"
                     render={<Link href={service.href} />}
                     nativeButton={false}
                   >
@@ -109,9 +109,9 @@ export default function PrivateHireServicesPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold text-[#172F52]">
+          <h2 className="text-3xl font-bold text-[#0F1B2D]">
             Need Something Specific?
           </h2>
           <p className="mt-4 text-gray-600">
@@ -120,7 +120,7 @@ export default function PrivateHireServicesPage() {
           </p>
           <Button
             size="lg"
-            className="mt-8 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+            className="mt-8 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             render={<Link href="/contact" />}
             nativeButton={false}
           >

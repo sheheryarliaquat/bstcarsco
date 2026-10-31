@@ -167,10 +167,10 @@ export default function SavedLocationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">
             Saved Locations
           </h1>
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-sm text-[#5B6577]">
             Manage your frequently used addresses for quick booking.
           </p>
         </div>
@@ -179,7 +179,7 @@ export default function SavedLocationsPage() {
             resetForm()
             setAddOpen(true)
           }}
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
         >
           <Plus className="h-4 w-4" /> Add Location
         </Button>
@@ -203,10 +203,10 @@ export default function SavedLocationsPage() {
           {locations.map((loc) => (
             <div
               key={loc.id}
-              className="group relative rounded-xl border border-[#D9E0E8] bg-white p-5 transition-shadow hover:shadow-sm"
+              className="group relative rounded-xl border border-[#E2E6EC] bg-white p-5 transition-shadow hover:shadow-sm"
             >
               <div className="mb-3 flex items-start justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#172F52]/10 text-[#172F52]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F1B2D]/10 text-[#0F1B2D]">
                   {iconMap[loc.icon ?? "home"] ?? (
                     <MapPin className="h-5 w-5" />
                   )}
@@ -214,22 +214,22 @@ export default function SavedLocationsPage() {
                 <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
                     onClick={() => openEdit(loc)}
-                    className="rounded-md p-1.5 text-[#6B7280] hover:bg-[#F5F7FA] hover:text-[#172F52]"
+                    className="rounded-md p-1.5 text-[#5B6577] hover:bg-[#F4F6F9] hover:text-[#0F1B2D]"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => openDelete(loc)}
-                    className="rounded-md p-1.5 text-[#6B7280] hover:bg-red-50 hover:text-[#DC2626]"
+                    className="rounded-md p-1.5 text-[#5B6577] hover:bg-red-50 hover:text-[#DC2626]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
-              <p className="mb-1 text-sm font-semibold text-[#172F52]">
+              <p className="mb-1 text-sm font-semibold text-[#0F1B2D]">
                 {loc.label}
               </p>
-              <p className="line-clamp-2 text-xs text-[#6B7280]">
+              <p className="line-clamp-2 text-xs text-[#5B6577]">
                 {loc.location.formattedAddress}
               </p>
             </div>
@@ -273,8 +273,8 @@ export default function SavedLocationsPage() {
                   onClick={() => setFormIcon(opt.value)}
                   className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     formIcon === opt.value
-                      ? "border-[#D4145A] bg-[#D4145A]/5 text-[#D4145A]"
-                      : "border-[#D9E0E8] text-[#6B7280] hover:border-[#D4145A]/30"
+                      ? "border-[#1F4FD8] bg-[#1F4FD8]/5 text-[#1F4FD8]"
+                      : "border-[#E2E6EC] text-[#5B6577] hover:border-[#1F4FD8]/30"
                   }`}
                 >
                   {opt.icon} {opt.label}
@@ -289,7 +289,7 @@ export default function SavedLocationsPage() {
             <Button
               onClick={handleAdd}
               disabled={!formLabel || !formAddress}
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               Save Location
             </Button>
@@ -332,8 +332,8 @@ export default function SavedLocationsPage() {
                   onClick={() => setFormIcon(opt.value)}
                   className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     formIcon === opt.value
-                      ? "border-[#D4145A] bg-[#D4145A]/5 text-[#D4145A]"
-                      : "border-[#D9E0E8] text-[#6B7280] hover:border-[#D4145A]/30"
+                      ? "border-[#1F4FD8] bg-[#1F4FD8]/5 text-[#1F4FD8]"
+                      : "border-[#E2E6EC] text-[#5B6577] hover:border-[#1F4FD8]/30"
                   }`}
                 >
                   {opt.icon} {opt.label}
@@ -348,7 +348,7 @@ export default function SavedLocationsPage() {
             <Button
               onClick={handleEdit}
               disabled={!formLabel || !formAddress}
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               Update Location
             </Button>

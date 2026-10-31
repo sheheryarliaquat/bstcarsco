@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Car, Phone, Mail, MapPin } from "lucide-react"
+import { Car, Phone, Mail, MapPin, PlaneTakeoff } from "lucide-react"
 
 const FOOTER_COLUMNS = [
   {
@@ -23,7 +23,7 @@ const FOOTER_COLUMNS = [
   {
     title: "For Passengers",
     links: [
-      { label: "Book a Car", href: "/book" },
+      { label: "Book a Car", href: "/" },
       { label: "My Bookings", href: "/passenger/bookings" },
       { label: "Support", href: "/support" },
       { label: "FAQs", href: "/faqs" },
@@ -32,7 +32,7 @@ const FOOTER_COLUMNS = [
   {
     title: "For Drivers",
     links: [
-      { label: "Drive With Us", href: "/drive" },
+      { label: "Drive With Us", href: "/drivers" },
       { label: "Driver Portal", href: "/driver/dashboard" },
       { label: "Requirements", href: "/drive/requirements" },
       { label: "Benefits", href: "/drive/benefits" },
@@ -57,15 +57,18 @@ const LEGAL_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="bg-[#172F52] text-white">
+    <footer className="bg-[#0F1B2D] text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Link href="/" className="mb-4 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D4145A]">
-                <Car className="h-5 w-5 text-white" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#F2B233]">
+                <PlaneTakeoff className="h-5 w-5 text-[#0F1B2D]" aria-hidden="true" />
               </div>
-              <span className="text-lg font-bold">Blue Star Airport Transfers LTD</span>
+              <span className="font-display text-lg font-bold leading-tight">
+                BST Cars
+                <span className="block text-xs font-normal text-gray-300">Blue Star Airport Transfers LTD</span>
+              </span>
             </Link>
             <p className="mb-4 max-w-xs text-sm text-gray-300">
               Your trusted platform for booking cars across the United Kingdom.

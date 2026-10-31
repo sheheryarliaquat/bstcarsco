@@ -105,7 +105,7 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#D4145A] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1F4FD8] border-t-transparent" />
       </div>
     )
   }
@@ -113,36 +113,36 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#172F52]">Profile</h1>
-        <p className="text-sm text-[#6B7280]">
+        <h1 className="text-2xl font-bold text-[#0F1B2D]">Profile</h1>
+        <p className="text-sm text-[#5B6577]">
           Manage your account settings and preferences.
         </p>
       </div>
 
       {/* Profile photo */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#5B6577]">
           Profile Photo
         </h2>
         <div className="flex items-center gap-5">
           <div className="relative">
             <Avatar size="lg" className="h-20 w-20">
               <AvatarImage src={userData?.photoURL} alt={firstName} />
-              <AvatarFallback className="bg-[#172F52] text-lg text-white">
+              <AvatarFallback className="bg-[#0F1B2D] text-lg text-white">
                 {firstName[0]}
                 {lastName[0]}
               </AvatarFallback>
             </Avatar>
-            <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#D4145A] text-white shadow-sm hover:bg-[#D4145A]/90">
+            <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#1F4FD8] text-white shadow-sm hover:bg-[#1F4FD8]/90">
               <Camera className="h-3.5 w-3.5" />
             </button>
           </div>
           <div>
-            <p className="text-sm font-medium text-[#172F52]">
+            <p className="text-sm font-medium text-[#0F1B2D]">
               {firstName} {lastName}
             </p>
             {userData?.createdAt && (
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-[#5B6577]">
                 Member since{" "}
                 {new Date(userData.createdAt).toLocaleDateString("en-GB", {
                   month: "long",
@@ -155,15 +155,15 @@ export default function ProfilePage() {
       </div>
 
       {/* Personal info */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#5B6577]">
           Personal Information
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label>First Name</Label>
             <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -174,7 +174,7 @@ export default function ProfilePage() {
           <div>
             <Label>Last Name</Label>
             <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -185,7 +185,7 @@ export default function ProfilePage() {
           <div>
             <Label>Email</Label>
             <div className="relative mt-1.5">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 type="email"
                 value={userData?.email ?? ""}
@@ -197,7 +197,7 @@ export default function ProfilePage() {
           <div>
             <Label>Phone</Label>
             <div className="relative mt-1.5">
-              <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 type="tel"
                 value={phone}
@@ -219,7 +219,7 @@ export default function ProfilePage() {
         )}
         <div className="mt-4 flex justify-end">
           <Button
-            className="bg-[#172F52] text-white hover:bg-[#172F52]/90"
+            className="bg-[#0F1B2D] text-white hover:bg-[#0F1B2D]/90"
             onClick={handleSave}
             disabled={saving || !user}
           >
@@ -229,15 +229,15 @@ export default function ProfilePage() {
       </div>
 
       {/* Change password */}
-      <div className="rounded-xl border border-[#D9E0E8] bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
+      <div className="rounded-xl border border-[#E2E6EC] bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#5B6577]">
           Change Password
         </h2>
         <div className="space-y-4">
           <div>
             <Label>Current Password</Label>
             <div className="relative mt-1.5">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
               <Input
                 type="password"
                 value={currentPassword}
@@ -251,7 +251,7 @@ export default function ProfilePage() {
             <div>
               <Label>New Password</Label>
               <div className="relative mt-1.5">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                 <Input
                   type="password"
                   value={newPassword}
@@ -264,7 +264,7 @@ export default function ProfilePage() {
             <div>
               <Label>Confirm Password</Label>
               <div className="relative mt-1.5">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
                 <Input
                   type="password"
                   value={confirmPassword}
@@ -288,7 +288,7 @@ export default function ProfilePage() {
           <div className="flex justify-end">
             <Button
               variant="outline"
-              className="border-[#D9E0E8]"
+              className="border-[#E2E6EC]"
               onClick={handleChangePassword}
               disabled={passwordSaving || !currentPassword || !newPassword}
             >
@@ -303,7 +303,7 @@ export default function ProfilePage() {
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-[#DC2626]">
           Danger Zone
         </h2>
-        <p className="mb-4 text-xs text-[#6B7280]">
+        <p className="mb-4 text-xs text-[#5B6577]">
           Deactivate your account. Your bookings and reviews will be
           preserved, but you won&apos;t be able to sign in until an admin
           reactivates it.

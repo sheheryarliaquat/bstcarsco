@@ -137,7 +137,7 @@ const FAQ_SECTIONS = [
 export default function FAQPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Frequently Asked Questions
@@ -152,7 +152,7 @@ export default function FAQPage() {
         <div className="mx-auto max-w-3xl">
           {FAQ_SECTIONS.map((section) => (
             <div key={section.title} className="mb-12 last:mb-0">
-              <h2 className="mb-6 text-2xl font-bold text-[#172F52]">
+              <h2 className="mb-6 text-2xl font-bold text-[#0F1B2D]">
                 {section.title}
               </h2>
               <Accordion>
@@ -168,9 +168,9 @@ export default function FAQPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5F7FA] px-4 py-16 sm:px-6 lg:px-8">
+      <section className="bg-[#F4F6F9] px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold text-[#172F52]">
+          <h2 className="text-3xl font-bold text-[#0F1B2D]">
             Still Have Questions?
           </h2>
           <p className="mt-4 text-gray-600">
@@ -179,7 +179,7 @@ export default function FAQPage() {
           </p>
           <Button
             size="lg"
-            className="mt-8 bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+            className="mt-8 bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             render={<Link href="/contact" />}
             nativeButton={false}
           >

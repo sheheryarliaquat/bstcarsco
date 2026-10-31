@@ -140,13 +140,13 @@ export default function SupportPage() {
             setSelectedTicket(null)
             setReplyText("")
           }}
-          className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#172F52]"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5B6577] hover:text-[#0F1B2D]"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Tickets
         </button>
 
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold text-[#172F52]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">
             {selectedTicket.id}
           </h1>
           <StatusBadge
@@ -167,14 +167,14 @@ export default function SupportPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
             {/* Original message */}
-            <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
-              <h3 className="mb-2 text-sm font-semibold text-[#172F52]">
+            <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
+              <h3 className="mb-2 text-sm font-semibold text-[#0F1B2D]">
                 {selectedTicket.subject}
               </h3>
-              <p className="mb-3 text-sm leading-relaxed text-[#6B7280]">
+              <p className="mb-3 text-sm leading-relaxed text-[#5B6577]">
                 {selectedTicket.message}
               </p>
-              <div className="flex items-center gap-4 border-t border-[#F5F7FA] pt-3">
+              <div className="flex items-center gap-4 border-t border-[#F4F6F9] pt-3">
                 <span className="text-xs text-[#ADB5BD]">
                   Created{" "}
                   {new Date(selectedTicket.createdAt).toLocaleDateString(
@@ -206,16 +206,16 @@ export default function SupportPage() {
 
             {/* Support reply (demo) */}
             {selectedTicket.status !== "open" && (
-              <div className="rounded-xl border border-[#172F52]/10 bg-[#172F52]/[0.02] p-5">
+              <div className="rounded-xl border border-[#0F1B2D]/10 bg-[#0F1B2D]/[0.02] p-5">
                 <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#172F52] text-[10px] font-bold text-white">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0F1B2D] text-[10px] font-bold text-white">
                     A
                   </div>
-                  <p className="text-sm font-semibold text-[#172F52]">
+                  <p className="text-sm font-semibold text-[#0F1B2D]">
                     Support Team
                   </p>
                 </div>
-                <p className="text-sm leading-relaxed text-[#6B7280]">
+                <p className="text-sm leading-relaxed text-[#5B6577]">
                   Thank you for contacting us. We&apos;re looking into your
                   inquiry and will get back to you shortly. Your reference
                   number is {selectedTicket.id}.
@@ -237,8 +237,8 @@ export default function SupportPage() {
             {/* Reply box */}
             {selectedTicket.status !== "resolved" &&
               selectedTicket.status !== "closed" && (
-                <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
-                  <h3 className="mb-3 text-sm font-semibold text-[#172F52]">
+                <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
+                  <h3 className="mb-3 text-sm font-semibold text-[#0F1B2D]">
                     Reply
                   </h3>
                   <Textarea
@@ -248,13 +248,13 @@ export default function SupportPage() {
                     rows={3}
                   />
                   <div className="mt-3 flex items-center justify-between">
-                    <button className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#172F52]">
+                    <button className="flex items-center gap-1.5 text-xs text-[#5B6577] hover:text-[#0F1B2D]">
                       <Paperclip className="h-3.5 w-3.5" /> Attach File
                     </button>
                     <Button
                       onClick={() => setReplyText("")}
                       disabled={!replyText}
-                      className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+                      className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
                     >
                       <Send className="h-4 w-4" /> Send Reply
                     </Button>
@@ -265,25 +265,25 @@ export default function SupportPage() {
 
           {/* Ticket details sidebar */}
           <div className="lg:col-span-1">
-            <div className="rounded-xl border border-[#D9E0E8] bg-white p-5">
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#6B7280]">
+            <div className="rounded-xl border border-[#E2E6EC] bg-white p-5">
+              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#5B6577]">
                 Ticket Details
               </h3>
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-[#6B7280]">Category</p>
-                  <p className="text-sm font-medium capitalize text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Category</p>
+                  <p className="text-sm font-medium capitalize text-[#0F1B2D]">
                     {selectedTicket.category.replace(/_/g, " ")}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Priority</p>
-                  <p className="text-sm font-medium capitalize text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Priority</p>
+                  <p className="text-sm font-medium capitalize text-[#0F1B2D]">
                     {selectedTicket.priority}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Status</p>
+                  <p className="text-xs text-[#5B6577]">Status</p>
                   <StatusBadge
                     status={selectedTicket.status}
                     type="payment"
@@ -291,8 +291,8 @@ export default function SupportPage() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Created</p>
-                  <p className="text-sm text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Created</p>
+                  <p className="text-sm text-[#0F1B2D]">
                     {new Date(
                       selectedTicket.createdAt
                     ).toLocaleDateString("en-GB", {
@@ -303,8 +303,8 @@ export default function SupportPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6B7280]">Last Updated</p>
-                  <p className="text-sm text-[#172F52]">
+                  <p className="text-xs text-[#5B6577]">Last Updated</p>
+                  <p className="text-sm text-[#0F1B2D]">
                     {new Date(
                       selectedTicket.updatedAt
                     ).toLocaleDateString("en-GB", {
@@ -326,14 +326,14 @@ export default function SupportPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#172F52]">Support</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-2xl font-bold text-[#0F1B2D]">Support</h1>
+          <p className="text-sm text-[#5B6577]">
             Get help with your bookings and account.
           </p>
         </div>
         <Button
           onClick={() => setCreateOpen(true)}
-          className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
         >
           <Plus className="h-4 w-4" /> New Ticket
         </Button>
@@ -341,7 +341,7 @@ export default function SupportPage() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5B6577]" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -367,25 +367,25 @@ export default function SupportPage() {
             <button
               key={ticket.id}
               onClick={() => setSelectedTicket(ticket)}
-              className="flex w-full items-center gap-4 rounded-xl border border-[#D9E0E8] bg-white p-4 text-left transition-colors hover:border-[#D4145A]/20 hover:bg-[#F5F7FA]/50"
+              className="flex w-full items-center gap-4 rounded-xl border border-[#E2E6EC] bg-white p-4 text-left transition-colors hover:border-[#1F4FD8]/20 hover:bg-[#F4F6F9]/50"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#172F52]/10 text-[#172F52]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0F1B2D]/10 text-[#0F1B2D]">
                 <MessageSquare className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-[#6B7280]">
+                  <span className="text-xs font-medium text-[#5B6577]">
                     {ticket.id}
                   </span>
-                  <span className="text-[#D9E0E8]">·</span>
-                  <span className="text-xs capitalize text-[#6B7280]">
+                  <span className="text-[#E2E6EC]">·</span>
+                  <span className="text-xs capitalize text-[#5B6577]">
                     {ticket.category.replace(/_/g, " ")}
                   </span>
                 </div>
-                <p className="mt-0.5 truncate text-sm font-medium text-[#172F52]">
+                <p className="mt-0.5 truncate text-sm font-medium text-[#0F1B2D]">
                   {ticket.subject}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-[#6B7280]">
+                <p className="mt-0.5 truncate text-xs text-[#5B6577]">
                   {ticket.message}
                 </p>
               </div>
@@ -468,9 +468,9 @@ export default function SupportPage() {
           </div>
           <div>
             <Label>Attachments</Label>
-            <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-dashed border-[#D9E0E8] p-4 text-center">
-              <Paperclip className="h-4 w-4 text-[#6B7280]" />
-              <p className="text-xs text-[#6B7280]">
+            <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-dashed border-[#E2E6EC] p-4 text-center">
+              <Paperclip className="h-4 w-4 text-[#5B6577]" />
+              <p className="text-xs text-[#5B6577]">
                 Drag files here or click to browse
               </p>
             </div>
@@ -482,7 +482,7 @@ export default function SupportPage() {
             <Button
               onClick={handleCreate}
               disabled={!category || !subject || !message}
-              className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
+              className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
             >
               <Send className="h-4 w-4" /> Submit Ticket
             </Button>

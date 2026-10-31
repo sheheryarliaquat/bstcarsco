@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function CookiePolicyPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Cookie Policy
@@ -23,7 +23,7 @@ export default function CookiePolicyPage() {
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl prose prose-slate">
-          <h2 className="text-2xl font-bold text-[#172F52]">1. What Are Cookies?</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">1. What Are Cookies?</h2>
           <p className="text-gray-600">
             Cookies are small text files placed on your device when you visit a
             website. They help us recognise your device, remember your
@@ -31,7 +31,7 @@ export default function CookiePolicyPage() {
             used across the internet and do not harm your device.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">2. How We Use Cookies</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">2. How We Use Cookies</h2>
           <p className="text-gray-600">
             We use cookies for the following purposes:
           </p>
@@ -59,24 +59,24 @@ export default function CookiePolicyPage() {
             </li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">3. Specific Cookies We Use</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">3. Specific Cookies We Use</h2>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-sm text-gray-600">
               <thead>
-                <tr className="border-b border-[#D9E0E8] text-left">
-                  <th className="py-3 pr-4 font-semibold text-[#172F52]">
+                <tr className="border-b border-[#E2E6EC] text-left">
+                  <th className="py-3 pr-4 font-semibold text-[#0F1B2D]">
                     Cookie
                   </th>
-                  <th className="py-3 pr-4 font-semibold text-[#172F52]">
+                  <th className="py-3 pr-4 font-semibold text-[#0F1B2D]">
                     Purpose
                   </th>
-                  <th className="py-3 pr-4 font-semibold text-[#172F52]">
+                  <th className="py-3 pr-4 font-semibold text-[#0F1B2D]">
                     Duration
                   </th>
-                  <th className="py-3 font-semibold text-[#172F52]">Type</th>
+                  <th className="py-3 font-semibold text-[#0F1B2D]">Type</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#D9E0E8]">
+              <tbody className="divide-y divide-[#E2E6EC]">
                 <tr>
                   <td className="py-3 pr-4">session_id</td>
                   <td className="py-3 pr-4">Maintains your session</td>
@@ -111,7 +111,7 @@ export default function CookiePolicyPage() {
             </table>
           </div>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">4. Third-Party Cookies</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">4. Third-Party Cookies</h2>
           <p className="text-gray-600">
             Some cookies are placed by third-party services that appear on our
             pages. We use third-party services for analytics (Google Analytics)
@@ -119,7 +119,7 @@ export default function CookiePolicyPage() {
             in accordance with their own privacy policies.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">5. Managing Cookies</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">5. Managing Cookies</h2>
           <p className="text-gray-600">
             You can control and manage cookies in several ways:
           </p>
@@ -144,7 +144,7 @@ export default function CookiePolicyPage() {
             work.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">6. Changes to This Policy</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">6. Changes to This Policy</h2>
           <p className="text-gray-600">
             We may update this Cookie Policy to reflect changes in technology or
             legislation. We will notify you of significant changes by updating
@@ -152,7 +152,7 @@ export default function CookiePolicyPage() {
             notice on the Platform.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">7. Contact Us</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">7. Contact Us</h2>
           <p className="text-gray-600">
             If you have questions about our use of cookies, please contact us at
             privacy@bstcars.co or write to:

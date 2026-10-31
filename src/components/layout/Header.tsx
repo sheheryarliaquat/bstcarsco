@@ -1,16 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
-import {
-  Car,
-  Menu,
-  Phone,
-  ChevronDown,
-  X,
-  LogIn,
-  UserPlus,
-} from "lucide-react"
+import { LogIn, Menu, Phone, PlaneTakeoff, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -22,98 +13,79 @@ import {
 } from "@/components/ui/sheet"
 
 const NAV_LINKS = [
-  { label: "Book a Car", href: "/book" },
-  { label: "Airport Transfers", href: "/airport-transfers" },
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "For Business", href: "/business" },
-  { label: "Drive With Us", href: "/drive" },
+  { label: "Airport transfers", href: "/airport-transfers" },
+  { label: "How it works", href: "/how-it-works" },
+  { label: "For business", href: "/corporate" },
+  { label: "Manage booking", href: "/passenger/bookings" },
+  { label: "Help", href: "/contact" },
 ]
 
-export function Header() {
-  const [scrolled, setScrolled] = useState(false)
+const PHONE_DISPLAY = "020 3002 9067"
+const PHONE_HREF = "tel:+442030029067"
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
+function Logo({ size = "md" }: { size?: "md" | "sm" }) {
+  const box = size === "md" ? "h-9 w-9" : "h-8 w-8"
   return (
-    <header
-      className={`sticky top-0 z-50 w-full bg-white transition-shadow duration-200 ${
-        scrolled ? "shadow-md" : "shadow-sm"
-      }`}
-    >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D4145A]">
-            <Car className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-lg font-bold text-[#172F52]">
-            Blue Star Airport Transfers LTD
-          </span>
+    <span className={`flex ${box} items-center justify-center rounded-[10px] bg-[#F2B233]`}>
+      <PlaneTakeoff className="h-5 w-5 text-[#0F1B2D]" aria-hidden="true" />
+    </span>
+  )
+}
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-50 w-full bg-[#0F1B2D] text-white">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="BST Cars home">
+          <Logo />
+          <span className="font-display text-xl font-bold text-white">BST Cars</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-[#172033] transition-colors hover:bg-[#F5F7FA] hover:text-[#D4145A]"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-[#C9D2E0] transition-colors hover:bg-white/10 hover:text-white"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="ghost" size="sm" render={<Link href="/login" />} nativeButton={false}>
-            <LogIn className="mr-1 h-4 w-4" />
-            Login
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            render={<Link href="/register" />}
-            nativeButton={false}
+        <div className="hidden items-center gap-3 lg:flex">
+          <a href={PHONE_HREF} className="flex items-center gap-1.5 text-sm font-semibold text-[#F2B233] hover:underline">
+            <Phone className="h-4 w-4" aria-hidden="true" />
+            {PHONE_DISPLAY}
+          </a>
+          <Link
+            href="/login"
+            className="flex h-9 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
           >
-            <UserPlus className="mr-1 h-4 w-4" />
-            Register
-          </Button>
-          <Button
-            size="sm"
-            className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-            render={<Link href="/book" />}
-            nativeButton={false}
-          >
-            <Phone className="mr-1 h-4 w-4" />
-            Book Now
-          </Button>
+            <LogIn className="h-4 w-4" aria-hidden="true" />
+            Log in
+          </Link>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
-          <Button
-            size="sm"
-            className="bg-[#D4145A] text-white hover:bg-[#D4145A]/90"
-            render={<Link href="/book" />}
-            nativeButton={false}
+        <div className="flex items-center gap-1 lg:hidden">
+          <a
+            href={PHONE_HREF}
+            aria-label={`Call ${PHONE_DISPLAY}`}
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-[#F2B233] hover:bg-white/10"
           >
-            Book Now
-          </Button>
-
+            <Phone className="h-5 w-5" />
+          </a>
           <Sheet>
             <SheetTrigger
-              render={<Button variant="ghost" size="icon-sm" />}
+              render={<Button variant="ghost" size="icon-sm" aria-label="Open menu" className="h-10 w-10 text-white hover:bg-white/10 hover:text-white" />}
             >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="left" className="w-72 p-0">
-              <SheetHeader className="border-b border-[#D9E0E8] p-4">
+              <SheetHeader className="border-b border-[#E2E6EC] p-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D4145A]">
-                    <Car className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-[#172F52]">Blue Star Airport Transfers LTD</span>
+                  <Logo size="sm" />
+                  <span className="font-display text-[#0F1B2D]">BST Cars</span>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-1 p-4">
@@ -123,7 +95,7 @@ export function Header() {
                     render={
                       <Link
                         href={link.href}
-                        className="rounded-lg px-3 py-2.5 text-sm font-medium text-[#172033] transition-colors hover:bg-[#F5F7FA]"
+                        className="rounded-lg px-3 py-2.5 text-sm font-medium text-[#0F1B2D] transition-colors hover:bg-[#F4F6F9]"
                       />
                     }
                   >
@@ -131,23 +103,30 @@ export function Header() {
                   </SheetClose>
                 ))}
               </div>
-              <div className="flex flex-col gap-2 border-t border-[#D9E0E8] p-4">
+              <div className="flex flex-col gap-2 border-t border-[#E2E6EC] p-4">
+                <a
+                  href={PHONE_HREF}
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-[#F2B233] px-4 text-sm font-semibold text-[#0F1B2D]"
+                >
+                  <Phone className="h-4 w-4" />
+                  {PHONE_DISPLAY}
+                </a>
                 <SheetClose
                   render={
                     <Link
                       href="/login"
-                      className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D9E0E8] px-4 text-sm font-medium text-[#172033] transition-colors hover:bg-[#F5F7FA]"
+                      className="inline-flex h-10 items-center justify-center rounded-lg border border-[#E2E6EC] px-4 text-sm font-medium text-[#0F1B2D] transition-colors hover:bg-[#F4F6F9]"
                     />
                   }
                 >
                   <LogIn className="mr-1 h-4 w-4" />
-                  Login
+                  Log in
                 </SheetClose>
                 <SheetClose
                   render={
                     <Link
                       href="/register"
-                      className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D9E0E8] px-4 text-sm font-medium text-[#172033] transition-colors hover:bg-[#F5F7FA]"
+                      className="inline-flex h-10 items-center justify-center rounded-lg border border-[#E2E6EC] px-4 text-sm font-medium text-[#0F1B2D] transition-colors hover:bg-[#F4F6F9]"
                     />
                   }
                 >

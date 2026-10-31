@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <PublicLayout>
-      <section className="bg-gradient-to-br from-[#172F52] to-[#102544] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section className="bg-gradient-to-br from-[#0F1B2D] to-[#0A1422] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Privacy Policy
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl prose prose-slate">
-          <h2 className="text-2xl font-bold text-[#172F52]">1. Introduction</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">1. Introduction</h2>
           <p className="text-gray-600">
             Blue Star Airport Transfers LTD Ltd (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is committed to protecting
             your privacy. This Privacy Policy explains how we collect, use,
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
             the Data Protection Act 2018.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">2. Information We Collect</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">2. Information We Collect</h2>
           <p className="text-gray-600">
             We may collect the following types of information:
           </p>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
             </li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">3. How We Use Your Information</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">3. How We Use Your Information</h2>
           <p className="text-gray-600">We use your information to:</p>
           <ul className="list-disc space-y-2 pl-6 text-gray-600">
             <li>Process and manage your car bookings</li>
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
             <li>Comply with legal obligations</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">4. Legal Basis for Processing</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">4. Legal Basis for Processing</h2>
           <p className="text-gray-600">
             Under the UK GDPR, we process your data on the following legal bases:
           </p>
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
             </li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">5. Data Sharing</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">5. Data Sharing</h2>
           <p className="text-gray-600">
             We may share your information with:
           </p>
@@ -127,7 +127,7 @@ export default function PrivacyPage() {
             We do not sell your personal data to third parties.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">6. Data Security</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">6. Data Security</h2>
           <p className="text-gray-600">
             We implement industry-standard security measures including SSL
             encryption, secure server infrastructure, access controls, and
@@ -135,7 +135,7 @@ export default function PrivacyPage() {
             internet is 100% secure, and we cannot guarantee absolute security.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">7. Data Retention</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">7. Data Retention</h2>
           <p className="text-gray-600">
             We retain your personal data for as long as your account is active or
             as needed to provide our services. Booking data is retained for 6
@@ -143,7 +143,7 @@ export default function PrivacyPage() {
             account and associated data at any time.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">8. Your Rights</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">8. Your Rights</h2>
           <p className="text-gray-600">
             Under UK GDPR, you have the right to:
           </p>
@@ -161,21 +161,21 @@ export default function PrivacyPage() {
             privacy@bstcars.co. We will respond within 30 days.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">9. Cookies</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">9. Cookies</h2>
           <p className="text-gray-600">
             We use cookies to improve your experience on the Platform. For
             detailed information about the cookies we use, please see our Cookie
             Policy.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">10. Changes to This Policy</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">10. Changes to This Policy</h2>
           <p className="text-gray-600">
             We may update this Privacy Policy from time to time. We will notify
             you of significant changes by posting the new policy on this page and
             updating the &quot;Last updated&quot; date.
           </p>
 
-          <h2 className="text-2xl font-bold text-[#172F52]">11. Contact Us</h2>
+          <h2 className="text-2xl font-bold text-[#0F1B2D]">11. Contact Us</h2>
           <p className="text-gray-600">
             For questions about this Privacy Policy or our data practices, contact
             our Data Protection Officer at:
