@@ -21,6 +21,7 @@ import {
   getRouteFares,
   locationInPlaces,
 } from "@/lib/services/route-fare-service"
+import { ensureAuthSession } from "@/lib/firebase/auth"
 import type { Location, RouteFare, TripType, SpecialRequirements } from "@/types"
 import { format } from "date-fns"
 
@@ -78,7 +79,11 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
 
   useEffect(() => {
     let cancelled = false
-    getRouteFares()
+    // Route fares live in Firestore `settings`, which needs a (possibly anonymous)
+    // session — same as the quotes page. Without it a visitor gets no price list.
+    ensureAuthSession()
+      .catch(() => null)
+      .then(() => getRouteFares())
       .then((r) => !cancelled && setRouteFares(r))
       .catch(() => !cancelled && setRouteFares([]))
     return () => {

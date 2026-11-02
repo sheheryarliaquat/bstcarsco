@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { MapPin, Plane, Train, Navigation, Search, X } from "lucide-react"
+import { ChevronDown, MapPin, Plane, Train, Navigation, Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { UK_AIRPORTS } from "@/constants"
@@ -156,6 +156,9 @@ export function LocationAutocomplete({
   const [notCovered, setNotCovered] = useState<string | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [picking, setPicking] = useState(false)
+  /** Opened from the ▾ button: list every place, ignoring what is typed. */
+  const [showAll, setShowAll] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const restricted = Array.isArray(allowedPlaces)
   const placesRef = useRef(allowedPlaces)
   useEffect(() => {
@@ -247,6 +250,7 @@ export function LocationAutocomplete({
     const val = e.target.value
     onChange(val)
     setNotCovered(null)
+    setShowAll(false)
     setActiveIndex(0)
     setShowSuggestions(true)
     debouncedFetch(val)
@@ -277,8 +281,23 @@ export function LocationAutocomplete({
   }
 
   // Places (zones) that match what the customer has typed, shown first in the dropdown.
-  const placeMatches = restricted ? allowedPlaces!.filter((p) => placeMatchesText(p, value)) : []
-  const addressMatches = restricted && value.trim().length >= 3 ? suggestions : []
+  const placeMatches = restricted
+    ? showAll
+      ? allowedPlaces!
+      : allowedPlaces!.filter((p) => placeMatchesText(p, value))
+    : []
+  const addressMatches = restricted && !showAll && value.trim().length >= 3 ? suggestions : []
+
+  function toggleList() {
+    if (showSuggestions && showAll) {
+      setShowSuggestions(false)
+      return
+    }
+    setShowAll(true)
+    setActiveIndex(0)
+    setShowSuggestions(true)
+    inputRef.current?.focus()
+  }
   const optionCount = placeMatches.length + addressMatches.length
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -360,11 +379,17 @@ export function LocationAutocomplete({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <Input
+          ref={inputRef}
           id={id}
           value={value}
           onChange={handleInputChange}
           onFocus={() => {
             setFocused(true)
+            setShowSuggestions(true)
+          }}
+          onClick={() => {
+            // Like a select: clicking shows the whole list; typing then filters it.
+            setShowAll(true)
             setShowSuggestions(true)
           }}
           onBlur={() => setFocused(false)}
@@ -393,7 +418,20 @@ export function LocationAutocomplete({
             <X className="h-4 w-4" />
           </button>
         )}
-        {geoButton === "icon" && (
+        {geoButton === "icon" && restricted && (
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={toggleList}
+            disabled={disabled || picking}
+            aria-label="Show all places"
+            title="Show all places"
+            className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-[#1F4FD8] hover:bg-[#F4F6F9] disabled:opacity-50"
+          >
+            <ChevronDown className={cn("h-4 w-4 transition-transform", showSuggestions && showAll && "rotate-180")} />
+          </button>
+        )}
+        {geoButton === "icon" && !restricted && (
           <button
             type="button"
             onClick={handleUseMyLocation}
