@@ -4,7 +4,8 @@ import { getDocument } from '@/lib/firebase/firestore';
 import { getAllVehicles, getVehicleRates, type VehicleRate } from './vehicle-service';
 import { calculateDistance, estimateDuration } from './pricing';
 import { getRouteFares, findRouteFare } from './route-fare-service';
-import type { Location, Operator, Quote, Vehicle } from '@/types';
+import { VEHICLE_TYPES } from '@/constants';
+import type { Location, Operator, Quote, VehicleType } from '@/types';
 
 const DEFAULT_RATE: Omit<VehicleRate, 'vehicleType' | 'label'> = {
   baseFare: 4.0,
@@ -43,9 +44,16 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
       (!search.wheelchairAccessible || v.wheelchairAccessible)
   );
 
-  if (eligible.length === 0) return [];
-
   const distanceMiles = calculateDistance(search.pickup, search.destination);
+
+  // Fixed fares the admin set for this journey, per car type.
+  const fixedByType = new Map<VehicleType, number>();
+  for (const t of VEHICLE_TYPES) {
+    const f = findRouteFare(routeFares, search.pickup, search.destination, t.value);
+    if (f) fixedByType.set(t.value, roundTo2(f.price));
+  }
+
+  if (eligible.length === 0 && fixedByType.size === 0) return [];
   const operatorCache = new Map<string, Operator | null>();
 
   const quotes: Quote[] = [];
@@ -61,9 +69,10 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
     const bookingFee = rate?.bookingFee ?? DEFAULT_RATE.bookingFee;
 
     // An admin-set fixed fare for this route and car type wins over mileage pricing.
-    const fixed = findRouteFare(routeFares, search.pickup, search.destination, vehicle.vehicleType);
+    const fixedPrice = fixedByType.get(vehicle.vehicleType);
+    const fixed = fixedPrice !== undefined;
     const subtotal = baseFare + distanceMiles * perMile + durationMinutes * perMinute + bookingFee;
-    const price = fixed ? roundTo2(fixed.price) : roundTo2(Math.max(subtotal, minimumFare));
+    const price = fixed ? fixedPrice : roundTo2(Math.max(subtotal, minimumFare));
     if (fixed) fixedIds.add(vehicle.id);
 
     let operator = operatorCache.get(vehicle.operatorId);
@@ -101,8 +110,39 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
     });
   }
 
-  // When this route has fixed fares, only offer the car types the admin priced for it.
-  const offered = fixedIds.size > 0 ? quotes.filter((q) => fixedIds.has(q.id)) : quotes;
+  // When this route has fixed fares, offer exactly the car types the admin priced for it.
+  // A priced type with no registered vehicle is still offered; the booking is made for
+  // that car type and a driver is assigned later from the dispatch board.
+  let offered = quotes;
+  if (fixedByType.size > 0) {
+    offered = quotes.filter((q) => fixedIds.has(q.id));
+    for (const [vehicleType, price] of fixedByType) {
+      if (offered.some((q) => q.vehicleType === vehicleType)) continue;
+      const meta = VEHICLE_TYPES.find((t) => t.value === vehicleType);
+      if (!meta) continue;
+      if (search.wheelchairAccessible && vehicleType !== 'wheelchair_accessible') continue;
+      if (meta.passengerCapacity < search.passengers || meta.luggageCapacity < search.luggage) continue;
+      offered.push({
+        id: `type-${vehicleType}`,
+        bookingId: '',
+        operatorId: '',
+        operatorName: 'BST Cars',
+        vehicleType,
+        vehicleDescription: `${meta.label} - ${meta.passengerCapacity} Seats`,
+        passengerCapacity: meta.passengerCapacity,
+        luggageCapacity: meta.luggageCapacity,
+        rating: 0,
+        totalReviews: 0,
+        estimatedJourneyTime: estimateDuration(distanceMiles, vehicleType),
+        isElectric: vehicleType === 'electric',
+        isHybrid: false,
+        price,
+        paymentTypes: ['card', 'cash'],
+        features: ['Fixed fare'],
+        isLowestPrice: false,
+      });
+    }
+  }
 
   const lowest = offered.reduce(
     (min, q) => (q.price < min ? q.price : min),
