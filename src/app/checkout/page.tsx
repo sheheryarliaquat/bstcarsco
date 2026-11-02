@@ -171,7 +171,8 @@ function CheckoutContent() {
         passengerId,
         operatorId: quote.operatorId,
         driverId: "",
-        vehicleId: quote.id,
+        // "type-…" quotes are a car type with no specific vehicle yet (assigned at dispatch).
+        vehicleId: quote.id.startsWith("type-") ? "" : quote.id,
         tripType: search.tripType,
         ...(isReturn && { returnDate, returnTime }),
         pickup,
