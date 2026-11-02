@@ -391,12 +391,14 @@ export default function BookingDetail({
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-sm">
-                <span className="text-[#5B6577]">Tax (VAT)</span>
-                <span className="text-[#0F1B2D]">
-                  £{booking.tax.toFixed(2)}
-                </span>
-              </div>
+              {booking.tax > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#5B6577]">Tax (VAT)</span>
+                  <span className="text-[#0F1B2D]">
+                    £{booking.tax.toFixed(2)}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between border-t border-[#F4F6F9] pt-2 text-sm font-bold">
                 <span className="text-[#0F1B2D]">Total</span>
                 <span className="text-[#0F1B2D]">

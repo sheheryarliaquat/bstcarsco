@@ -266,7 +266,8 @@ export const PRICING_DEFAULTS = {
   weekendSurchargePercent: 10,
   peakTimeSurchargePercent: 25,
   congestionCharge: 15.0,
-  taxRate: 20,
+  /** VAT % added on top of fares. 0 = prices shown are the final price. */
+  taxRate: 0,
   cancellationFee: 5.0,
   waitingFeePerMinute: 0.5,
   freeWaitingMinutes: 5,
