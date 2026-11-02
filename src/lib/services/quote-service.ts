@@ -49,6 +49,7 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
   const operatorCache = new Map<string, Operator | null>();
 
   const quotes: Quote[] = [];
+  const fixedIds = new Set<string>();
   for (const vehicle of eligible) {
     const rate = rates?.find((r) => r.vehicleType === vehicle.vehicleType);
     const durationMinutes = estimateDuration(distanceMiles, vehicle.vehicleType);
@@ -63,6 +64,7 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
     const fixed = findRouteFare(routeFares, search.pickup, search.destination, vehicle.vehicleType);
     const subtotal = baseFare + distanceMiles * perMile + durationMinutes * perMinute + bookingFee;
     const price = fixed ? roundTo2(fixed.price) : roundTo2(Math.max(subtotal, minimumFare));
+    if (fixed) fixedIds.add(vehicle.id);
 
     let operator = operatorCache.get(vehicle.operatorId);
     if (operator === undefined) {
@@ -99,9 +101,12 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
     });
   }
 
-  const lowest = quotes.reduce(
+  // When this route has fixed fares, only offer the car types the admin priced for it.
+  const offered = fixedIds.size > 0 ? quotes.filter((q) => fixedIds.has(q.id)) : quotes;
+
+  const lowest = offered.reduce(
     (min, q) => (q.price < min ? q.price : min),
-    quotes[0]?.price ?? 0
+    offered[0]?.price ?? 0
   );
-  return quotes.map((q) => ({ ...q, isLowestPrice: q.price === lowest }));
+  return offered.map((q) => ({ ...q, isLowestPrice: q.price === lowest }));
 }
