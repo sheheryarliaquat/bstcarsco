@@ -36,18 +36,74 @@ interface Suggestion {
   location: Location
 }
 
-/** Airports inside the allowed zones, offered as one-tap picks. */
-function airportPicks(places: PricedPlace[]): Location[] {
-  const codes = new Set(places.flatMap((p) => p.areas.map((a) => a.trim().toUpperCase())))
-  return UK_AIRPORTS.filter((a) => codes.has(a.code)).map((a) => ({
-    formattedAddress: `${a.name} (${a.code})`,
-    latitude: a.location.latitude,
-    longitude: a.location.longitude,
-    placeId: `airport-${a.code}`,
-    postcode: a.postcode,
-    city: a.city,
+const DISTRICT = /^[A-Z]{1,2}\d[A-Z\d]?$/i
+
+function placeAirport(place: PricedPlace) {
+  const codes = place.areas.map((a) => a.trim().toUpperCase())
+  return UK_AIRPORTS.find((a) => codes.includes(a.code))
+}
+
+/** Does the typed text match this priced place (its name or one of its postcodes/towns)? */
+function placeMatchesText(place: PricedPlace, text: string): boolean {
+  const q = text.trim().toLowerCase()
+  if (!q) return true
+  if (place.label.toLowerCase().includes(q)) return true
+  if (place.areas.some((a) => a.toLowerCase().startsWith(q) || q.startsWith(a.toLowerCase()))) return true
+  const airport = placeAirport(place)
+  return Boolean(airport && airport.name.toLowerCase().includes(q))
+}
+
+async function geocodePlace(place: PricedPlace): Promise<{ lat: number; lng: number } | null> {
+  const district = place.areas.find((a) => DISTRICT.test(a.trim()))
+  if (district) {
+    try {
+      const r = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(district.trim())}`)
+      const d = await r.json()
+      if (d?.result?.latitude) return { lat: d.result.latitude, lng: d.result.longitude }
+    } catch {
+      // fall through to a name search
+    }
+  }
+  for (const q of [place.label, ...place.areas]) {
+    try {
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=gb&limit=1`
+      )
+      const d = await r.json()
+      if (d?.[0]) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) }
+    } catch {
+      // try the next name
+    }
+  }
+  return null
+}
+
+/** Turn a priced place into a Location that matches its own route fares. */
+async function placeToLocation(place: PricedPlace): Promise<Location> {
+  const airport = placeAirport(place)
+  if (airport) {
+    return {
+      formattedAddress: `${airport.name} (${airport.code})`,
+      latitude: airport.location.latitude,
+      longitude: airport.location.longitude,
+      placeId: `airport-${airport.code}`,
+      postcode: airport.postcode,
+      city: airport.city,
+      country: "United Kingdom",
+    }
+  }
+  const district = place.areas.find((a) => DISTRICT.test(a.trim()))?.trim().toUpperCase() ?? ""
+  const town = place.areas.find((a) => !DISTRICT.test(a.trim()) && a.trim().length > 2)?.trim() ?? ""
+  const coords = await geocodePlace(place)
+  return {
+    formattedAddress: place.label,
+    latitude: coords?.lat ?? 0,
+    longitude: coords?.lng ?? 0,
+    placeId: `zone-${place.label}`,
+    postcode: district,
+    city: town,
     country: "United Kingdom",
-  }))
+  }
 }
 
 /** Nominatim often leaves the postcode out — look it up from the coordinates (postcodes.io, one request). */
@@ -98,6 +154,8 @@ export function LocationAutocomplete({
   const [geoLoading, setGeoLoading] = useState(false)
   const [focused, setFocused] = useState(false)
   const [notCovered, setNotCovered] = useState<string | null>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [picking, setPicking] = useState(false)
   const restricted = Array.isArray(allowedPlaces)
   const placesRef = useRef(allowedPlaces)
   useEffect(() => {
@@ -189,6 +247,7 @@ export function LocationAutocomplete({
     const val = e.target.value
     onChange(val)
     setNotCovered(null)
+    setActiveIndex(0)
     setShowSuggestions(true)
     debouncedFetch(val)
   }
@@ -204,6 +263,41 @@ export function LocationAutocomplete({
     }
     setNotCovered(null)
     onLocationSelect?.(loc)
+  }
+
+  async function selectPlace(place: PricedPlace) {
+    onChange(place.label)
+    setShowSuggestions(false)
+    setPicking(true)
+    try {
+      chooseLocation(await placeToLocation(place))
+    } finally {
+      setPicking(false)
+    }
+  }
+
+  // Places (zones) that match what the customer has typed, shown first in the dropdown.
+  const placeMatches = restricted ? allowedPlaces!.filter((p) => placeMatchesText(p, value)) : []
+  const addressMatches = restricted && value.trim().length >= 3 ? suggestions : []
+  const optionCount = placeMatches.length + addressMatches.length
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!restricted) return
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setShowSuggestions(true)
+      setActiveIndex((i) => Math.min(i + 1, Math.max(optionCount - 1, 0)))
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setActiveIndex((i) => Math.max(i - 1, 0))
+    } else if (e.key === "Enter" && showSuggestions && optionCount > 0) {
+      e.preventDefault()
+      const i = Math.min(activeIndex, optionCount - 1)
+      if (i < placeMatches.length) void selectPlace(placeMatches[i])
+      else selectSuggestion(addressMatches[i - placeMatches.length])
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false)
+    }
   }
 
   function selectSuggestion(suggestion: Suggestion) {
@@ -274,7 +368,11 @@ export function LocationAutocomplete({
             setShowSuggestions(true)
           }}
           onBlur={() => setFocused(false)}
-          disabled={disabled}
+          onKeyDown={handleKeyDown}
+          role={restricted ? "combobox" : undefined}
+          aria-expanded={restricted ? showSuggestions : undefined}
+          autoComplete="off"
+          disabled={disabled || picking}
           placeholder={placeholder}
           className={cn("h-12 rounded-[10px] pl-10 text-[15px]", geoButton === "icon" ? "pr-[4.5rem]" : "pr-10")}
         />
@@ -309,6 +407,8 @@ export function LocationAutocomplete({
         )}
       </div>
 
+      {!restricted && (
+        <>
       {showSuggestions && value.length >= 3 && suggestions.length > 0 && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-[#E2E6EC] bg-white shadow-lg">
           {suggestions.map((s) => (
@@ -339,42 +439,92 @@ export function LocationAutocomplete({
         suggestions.length === 0 &&
         !loading && (
           <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-[#E2E6EC] bg-white p-4 text-center shadow-lg">
-            <p className="text-sm text-[#5B6577]">
-              {restricted ? "No covered locations match. Try a postcode in one of the areas below." : "No locations found"}
-            </p>
-            {restricted && allowedPlaces!.length > 0 && (
-              <p className="mt-1 text-xs text-[#5B6577]">
-                {allowedPlaces!.map((p) => p.label).join(" · ")}
-              </p>
-            )}
+            <p className="text-sm text-[#5B6577]">No locations found</p>
           </div>
         )}
 
-      {restricted && showSuggestions && focused && value.length < 3 && !disabled && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-72 overflow-y-auto rounded-lg border border-[#E2E6EC] bg-white shadow-lg">
+        </>
+      )}
+
+      {restricted && showSuggestions && focused && !disabled && (
+        <div
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-lg border border-[#E2E6EC] bg-white shadow-lg"
+        >
           {allowedPlaces!.length === 0 ? (
             <p className="p-4 text-center text-sm text-[#5B6577]">No fixed-price journeys from this pick-up.</p>
           ) : (
             <>
-              {airportPicks(allowedPlaces!).map((loc) => (
-                <button
-                  key={loc.placeId}
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => chooseLocation(loc)}
-                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[#F4F6F9]"
-                >
-                  <Plane className="h-4 w-4 text-gray-400" />
-                  <span className="truncate text-sm font-medium text-[#0F1B2D]">{loc.formattedAddress}</span>
-                </button>
-              ))}
-              <div className="border-t border-[#E2E6EC] px-3 py-2.5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#5B6577]">Areas with fixed prices</p>
-                <p className="mt-1 text-xs leading-relaxed text-[#0F1B2D]">
-                  {allowedPlaces!.map((p) => p.label).join(" · ")}
+              {placeMatches.length > 0 && (
+                <p className="sticky top-0 bg-[#F4F6F9] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5B6577]">
+                  Places with fixed prices
                 </p>
-                <p className="mt-1 text-xs text-[#5B6577]">Type your address or postcode in one of these areas.</p>
-              </div>
+              )}
+              {placeMatches.map((p, i) => {
+                const airport = placeAirport(p)
+                return (
+                  <button
+                    key={`place-${p.label}`}
+                    type="button"
+                    role="option"
+                    aria-selected={activeIndex === i}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    onClick={() => void selectPlace(p)}
+                    className={cn(
+                      "flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors",
+                      activeIndex === i ? "bg-[#EEF2FC]" : "hover:bg-[#F4F6F9]"
+                    )}
+                  >
+                    <div className="mt-0.5">
+                      {airport ? <Plane className="h-4 w-4 text-[#1F4FD8]" /> : <MapPin className="h-4 w-4 text-[#1F4FD8]" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-[#0F1B2D]">{airport ? airport.name : p.label}</p>
+                      {!airport && <p className="truncate text-xs text-[#5B6577]">{p.areas.join(", ")}</p>}
+                    </div>
+                  </button>
+                )
+              })}
+
+              {addressMatches.length > 0 && (
+                <p className="sticky top-0 bg-[#F4F6F9] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5B6577]">
+                  Addresses in these areas
+                </p>
+              )}
+              {addressMatches.map((s, j) => {
+                const i = placeMatches.length + j
+                return (
+                  <button
+                    key={s.placeId}
+                    type="button"
+                    role="option"
+                    aria-selected={activeIndex === i}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    onClick={() => selectSuggestion(s)}
+                    className={cn(
+                      "flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors",
+                      activeIndex === i ? "bg-[#EEF2FC]" : "hover:bg-[#F4F6F9]"
+                    )}
+                  >
+                    <div className="mt-0.5">{getIconForSuggestion(s.types)}</div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-[#0F1B2D]">{s.mainText}</p>
+                      <p className="truncate text-xs text-[#5B6577]">{s.secondaryText}</p>
+                    </div>
+                  </button>
+                )
+              })}
+
+              {optionCount === 0 && !loading && (
+                <p className="p-4 text-center text-sm text-[#5B6577]">
+                  No covered place matches &ldquo;{value}&rdquo;. Clear the box to see every place we cover.
+                </p>
+              )}
+              {loading && value.trim().length >= 3 && (
+                <p className="px-3 py-2 text-xs text-[#5B6577]">Searching addresses…</p>
+              )}
             </>
           )}
         </div>
