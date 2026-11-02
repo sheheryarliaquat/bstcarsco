@@ -42,6 +42,7 @@ import { PaymentForm } from "@/components/shared/PaymentForm";
 import { BookingStatus, type Booking } from "@/types";
 import { createBooking } from "@/lib/services/booking-service";
 import { calculateDistance } from "@/lib/services/pricing";
+import { PRICING_DEFAULTS } from "@/constants";
 import { ensureAuthSession } from "@/lib/firebase/auth";
 import {
   getCheckoutSelection,
@@ -108,7 +109,7 @@ function CheckoutContent() {
   const isReturn = search?.tripType === "return";
   const returnMissing = isReturn && (!returnDate || !returnTime);
   const discount = promoDiscount;
-  const tax = (basePrice - discount) * 0.2;
+  const tax = Math.round((basePrice - discount) * PRICING_DEFAULTS.taxRate) / 100;
   const total = basePrice - discount + tax;
 
   const {
@@ -711,10 +712,12 @@ function CheckoutContent() {
                       <span>-£{discount.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-[#0F1B2D]">
-                    <span>VAT (20%)</span>
-                    <span>£{tax.toFixed(2)}</span>
-                  </div>
+                  {PRICING_DEFAULTS.taxRate > 0 && (
+                    <div className="flex justify-between text-[#0F1B2D]">
+                      <span>VAT ({PRICING_DEFAULTS.taxRate}%)</span>
+                      <span>£{tax.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-2 flex justify-between border-t border-[#E2E6EC] pt-2 text-base font-bold text-[#0F1B2D]">
                   <span>Total</span>

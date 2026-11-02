@@ -507,10 +507,12 @@ function QuotesContent() {
                       </span>
                     </div>
                   ))}
-                  <div className="flex justify-between">
-                    <span className="text-[#5B6577]">VAT ({PRICING_DEFAULTS.taxRate}%)</span>
-                    <span className="text-[#0F1B2D]">{money(vat)}</span>
-                  </div>
+                  {PRICING_DEFAULTS.taxRate > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-[#5B6577]">VAT ({PRICING_DEFAULTS.taxRate}%)</span>
+                      <span className="text-[#0F1B2D]">{money(vat)}</span>
+                    </div>
+                  )}
                   <div className="flex items-baseline justify-between pt-2">
                     <span className="text-base font-semibold text-[#0F1B2D]">Total</span>
                     <span className="font-display text-3xl font-bold text-[#0F1B2D]">{money(total)}</span>
