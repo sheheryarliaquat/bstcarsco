@@ -134,3 +134,56 @@ export function findRouteFare(
   }
   return null;
 }
+
+// ---------------------------------------------------------------------------
+// Covered places — used by the booking search to only offer priced journeys.
+// ---------------------------------------------------------------------------
+
+/** A zone that appears in the admin's route fares, e.g. "Central London" → [SW1, W1]. */
+export interface PricedPlace {
+  label: string;
+  areas: string[];
+}
+
+function hasAnyPrice(route: RouteFare): boolean {
+  return Object.values(route.prices ?? {}).some((p) => typeof p === 'number' && p > 0);
+}
+
+function usableRoutes(routes: RouteFare[]): RouteFare[] {
+  return routes.filter((r) => r.active && hasAnyPrice(r) && r.fromAreas?.length && r.toAreas?.length);
+}
+
+function addPlace(list: PricedPlace[], label: string, areas: string[]): void {
+  const name = (label || areas.join(', ')).trim();
+  const existing = list.find((p) => p.label.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    for (const a of areas) if (!existing.areas.includes(a)) existing.areas.push(a);
+  } else {
+    list.push({ label: name, areas: [...areas] });
+  }
+}
+
+/** Every zone a journey can start from. Empty when no route fares are set up. */
+export function getPickupPlaces(routes: RouteFare[]): PricedPlace[] {
+  const places: PricedPlace[] = [];
+  for (const r of usableRoutes(routes)) {
+    addPlace(places, r.fromLabel, r.fromAreas);
+    if (r.bothWays) addPlace(places, r.toLabel, r.toAreas);
+  }
+  return places;
+}
+
+/** Zones that have a fixed fare from this pick-up. */
+export function getDropoffPlaces(routes: RouteFare[], pickup: Location): PricedPlace[] {
+  const places: PricedPlace[] = [];
+  for (const r of usableRoutes(routes)) {
+    if (sideMatches(pickup, r.fromAreas)) addPlace(places, r.toLabel, r.toAreas);
+    if (r.bothWays && sideMatches(pickup, r.toAreas)) addPlace(places, r.fromLabel, r.fromAreas);
+  }
+  return places;
+}
+
+/** Is this location inside one of the given zones? */
+export function locationInPlaces(loc: Location, places: PricedPlace[]): boolean {
+  return places.some((p) => sideMatches(loc, p.areas));
+}
