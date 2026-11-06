@@ -93,15 +93,49 @@ export interface SaveDriverDocumentInput {
   onProgress?: (percentage: number) => void;
 }
 
+// If an upload makes no progress for this long, give up with a clear error
+// instead of sitting at 0% forever (happens when Storage rules block the
+// write, or Firebase Storage isn't enabled for the project).
+const UPLOAD_STALL_MS = 30_000;
+
+function friendlyUploadError(err: unknown): Error {
+  const code = (err as { code?: string })?.code ?? '';
+  if (code === 'storage/unauthorized') {
+    return new Error('Upload blocked by Firebase Storage permissions. The latest storage.rules need to be deployed.');
+  }
+  if (code === 'storage/canceled') {
+    return new Error('Upload stalled and was cancelled. Check that Firebase Storage is enabled and storage.rules are deployed, then try again.');
+  }
+  if (code === 'storage/quota-exceeded') {
+    return new Error('Firebase Storage quota exceeded.');
+  }
+  return err instanceof Error ? err : new Error('Upload failed. Please try again.');
+}
+
 function uploadWithProgress(path: string, file: File, onProgress?: (p: number) => void): Promise<string> {
   return new Promise((resolve, reject) => {
-    uploadFileWithProgress(
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const task = uploadFileWithProgress(
       path,
       file,
-      (p) => onProgress?.(Math.round(p.percentage)),
-      (err) => reject(err),
-      (url) => resolve(url)
+      (p) => {
+        onProgress?.(Math.round(p.percentage));
+        armTimer();
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(friendlyUploadError(err));
+      },
+      (url) => {
+        clearTimeout(timer);
+        resolve(url);
+      }
     );
+    function armTimer() {
+      clearTimeout(timer);
+      timer = setTimeout(() => task.cancel(), UPLOAD_STALL_MS);
+    }
+    armTimer();
   });
 }
 
