@@ -274,13 +274,22 @@ export async function signOutUser(): Promise<void> {
  * getSecondaryAuthInstance()'s docstring in ./config for why a second app
  * instance is needed here.
  */
-export async function createDriverAccount(
+/**
+ * Creates a real Firebase Auth login for someone an admin is onboarding
+ * (driver or operator) without signing the admin out: the account is made
+ * on a secondary app instance, then the users/{uid} profile is written from
+ * the admin's own session. `extra` is merged into the users doc (e.g. an
+ * operator's company details).
+ */
+async function createManagedAccount(
+  role: Extract<UserRole, 'driver' | 'operator'>,
   email: string,
   password: string,
-  profile: { firstName: string; lastName: string; phone: string }
+  profile: { firstName: string; lastName: string; phone: string },
+  extra: Record<string, unknown> = {}
 ): Promise<{ uid: string }> {
   if (!isFirebaseAvailable()) {
-    throw new Error('Firebase is not configured — cannot create a real driver login.');
+    throw new Error(`Firebase is not configured — cannot create a real ${role} login.`);
   }
   const secondary = secondaryAuth();
   const credential = await createUserWithEmailAndPassword(secondary, email, password);
@@ -288,9 +297,10 @@ export async function createDriverAccount(
   await signOut(secondary);
 
   await setDoc(doc(getDb(), 'users', uid), {
+    ...extra,
     uid,
     email,
-    role: 'driver' as UserRole,
+    role,
     displayName: `${profile.firstName} ${profile.lastName}`,
     firstName: profile.firstName,
     lastName: profile.lastName,
@@ -305,6 +315,33 @@ export async function createDriverAccount(
   });
 
   return { uid };
+}
+
+export async function createDriverAccount(
+  email: string,
+  password: string,
+  profile: { firstName: string; lastName: string; phone: string }
+): Promise<{ uid: string }> {
+  return createManagedAccount('driver', email, password, profile);
+}
+
+export async function createOperatorAccount(
+  email: string,
+  password: string,
+  profile: { firstName: string; lastName: string; phone: string },
+  company: {
+    companyName: string;
+    description: string;
+    fleetSize: number;
+    commission: { percent: number; flatFee: number };
+  }
+): Promise<{ uid: string }> {
+  return createManagedAccount('operator', email, password, profile, {
+    ...company,
+    rating: 0,
+    totalReviews: 0,
+    isVerified: false,
+  });
 }
 
 export async function changePassword(
