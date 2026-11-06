@@ -113,6 +113,17 @@ export interface DriverDocument {
   uploadedAt: string;
   reviewedAt?: string;
   reviewedBy?: string;
+  /** Set on records stored in the `driverDocuments` collection. */
+  driverId?: string;
+  driverName?: string;
+  /** Storage path of the uploaded file, so it can be replaced/deleted. */
+  filePath?: string;
+  fileName?: string;
+  fileType?: string;
+  /** Admin's reason when a document is rejected. */
+  notes?: string;
+  /** 'admin' when an admin added it on the driver's behalf. */
+  uploadedBy?: 'driver' | 'admin';
 }
 
 export interface DriverAvailability {

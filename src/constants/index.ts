@@ -225,7 +225,10 @@ export const DOCUMENT_TYPES = [
   'Medical Certificate',
   'Topographical Assessment',
   'Vehicle Registration',
+  'Other',
 ] as const;
+
+export type DriverDocumentType = (typeof DOCUMENT_TYPES)[number];
 
 export const CANCELLATION_REASONS: { value: CancellationReason; label: string }[] = [
   { value: CancellationReason.ChangedMind, label: 'Changed my mind' },

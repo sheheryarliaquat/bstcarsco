@@ -100,19 +100,17 @@ service firebase.storage {
       allow read: if isOwner(driverId) || isAdmin() ||
         (isOperator() && firestore.get(/databases/(default)/documents/drivers/$(driverId)).data.operatorId == request.auth.uid);
 
-      // Driver can upload documents for themselves
-      allow create: if isOwner(driverId) &&
+      // Driver can upload documents for themselves; admins can upload on a
+      // driver's behalf. docType is a slug of the labels in DOCUMENT_TYPES
+      // (src/constants/index.ts), e.g. driving_licence, pco_licence.
+      allow create: if (isOwner(driverId) || isAdmin()) &&
         isDocument() &&
         fileSizeUnder10MB() &&
         request.resource.size > 0 &&
-        docType in [
-          'driving_licence', 'insurance', 'mot_certificate',
-          'pco_licence', 'dbs_check', 'vehicle_registration',
-          'profile_photo', 'vehicle_photo', 'other'
-        ];
+        docType.matches('^[a-z0-9_]{1,60}$');
 
-      // Driver can update (replace) their own documents
-      allow update: if isOwner(driverId) &&
+      // Driver (or an admin) can update (replace) documents
+      allow update: if (isOwner(driverId) || isAdmin()) &&
         isDocument() &&
         fileSizeUnder10MB() &&
         request.resource.size > 0;

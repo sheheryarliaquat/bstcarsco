@@ -169,6 +169,38 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // DRIVER DOCUMENTS
+    // One doc per driver per document type: {driverId}__{type_slug}
+    // (see src/lib/services/driver-document-service.ts).
+    // Drivers may submit/replace their own documents, but only as
+    // 'pending' and never with review fields, so they can't self-approve.
+    // Admins can add, approve, reject and delete anything.
+    // ============================================================
+
+    match /driverDocuments/{docId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.driverId == request.auth.uid) ||
+        (isOperator() &&
+          get(/databases/$(database)/documents/drivers/$(resource.data.driverId)).data.operatorId == request.auth.uid);
+
+      allow create: if isAdmin() ||
+        (isDriver() &&
+          docId.matches(request.auth.uid + '__.*') &&
+          request.resource.data.driverId == request.auth.uid &&
+          request.resource.data.status == 'pending' &&
+          !request.resource.data.keys().hasAny(['reviewedAt', 'reviewedBy']));
+
+      allow update: if isAdmin() ||
+        (isDriver() &&
+          resource.data.driverId == request.auth.uid &&
+          request.resource.data.driverId == request.auth.uid &&
+          request.resource.data.status == 'pending' &&
+          !request.resource.data.keys().hasAny(['reviewedAt', 'reviewedBy']));
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
     // OPERATORS COLLECTION
     // ============================================================
 
