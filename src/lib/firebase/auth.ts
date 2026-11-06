@@ -168,21 +168,52 @@ export async function signUp(
   return createDemoUserCredential(newUser);
 }
 
+function friendlyAuthError(err: unknown): string {
+  const code = (err as { code?: string })?.code ?? '';
+  switch (code) {
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+    case 'auth/invalid-email':
+      return 'Invalid email or password. Please try again.';
+    case 'auth/user-disabled':
+      return 'This account has been disabled.';
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Please wait a few minutes or reset your password.';
+    case 'auth/network-request-failed':
+      return 'Network error — check your connection and try again.';
+    default:
+      return err instanceof Error ? err.message : 'Sign-in failed. Please try again.';
+  }
+}
+
 export async function signIn(
   email: string,
   password: string
 ): Promise<UserCredential> {
+  let firebaseError: unknown = null;
+
   if (isFirebaseAvailable()) {
+    let credential: UserCredential | null = null;
     try {
-      const credential = await signInWithEmailAndPassword(getAuth(), email, password);
-      await setDoc(
-        doc(getDb(), 'users', credential.user.uid),
-        { lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() },
-        { merge: true }
-      );
+      credential = await signInWithEmailAndPassword(getAuth(), email, password);
+    } catch (err) {
+      firebaseError = err;
+    }
+
+    if (credential) {
+      // Recording the login time is best-effort: if Firestore rules block
+      // the write, the user is still signed in.
+      try {
+        await setDoc(
+          doc(getDb(), 'users', credential.user.uid),
+          { lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() },
+          { merge: true }
+        );
+      } catch {
+        // ignore
+      }
       return credential;
-    } catch {
-      // Fall through to demo mode
     }
   }
 
@@ -191,6 +222,8 @@ export async function signIn(
   const user = users[key];
 
   if (!user) {
+    // Surface the real Firebase reason instead of a misleading demo-mode message.
+    if (firebaseError) throw new Error(friendlyAuthError(firebaseError));
     throw new Error('No account found with this email.');
   }
   if (user.password !== password) {
