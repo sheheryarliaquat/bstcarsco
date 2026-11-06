@@ -7,8 +7,6 @@ import {
   Edit,
   UserX,
   CheckCircle,
-  XCircle,
-  FileText,
   Car,
   Star,
   Shield,
@@ -19,7 +17,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DataTable, type Column } from "@/components/shared/DataTable"
-import { StatusBadge } from "@/components/shared/StatusBadge"
 import { RatingStars } from "@/components/shared/RatingStars"
 import { Modal } from "@/components/shared/Modal"
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
@@ -27,7 +24,10 @@ import { setDriverProfile, listenToDrivers, updateDriver } from "@/lib/services/
 import { createDriverAccount } from "@/lib/firebase/auth"
 import { getVehicle } from "@/lib/services/vehicle-service"
 import { getDocument } from "@/lib/firebase/firestore"
-import type { Driver, DriverStatus, Operator } from "@/types"
+import { listenToAllDriverDocuments, effectiveStatus } from "@/lib/services/driver-document-service"
+import { DriverDocumentsPanel } from "@/components/admin/DriverDocumentsPanel"
+import { useAuth } from "@/hooks/useAuth"
+import type { Driver, DriverDocument, DriverStatus, Operator } from "@/types"
 
 interface NewDriver {
   firstName: string
@@ -66,6 +66,24 @@ export default function AdminDriversPage() {
   const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null)
   const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
   const [vehicleInfoMap, setVehicleInfoMap] = useState<Record<string, string>>({})
+  const [allDocuments, setAllDocuments] = useState<DriverDocument[]>([])
+  const { user } = useAuth()
+
+  useEffect(() => {
+    const unsubscribe = listenToAllDriverDocuments(
+      (docs) => setAllDocuments(docs),
+      () => setAllDocuments([])
+    )
+    return () => unsubscribe()
+  }, [])
+
+  const documentsByDriver = useMemo(() => {
+    const map: Record<string, DriverDocument[]> = {}
+    allDocuments.forEach((d) => {
+      if (d.driverId) (map[d.driverId] ??= []).push(d)
+    })
+    return map
+  }, [allDocuments])
 
   useEffect(() => {
     const unsubscribe = listenToDrivers(
@@ -293,11 +311,17 @@ export default function AdminDriversPage() {
       header: "Documents",
       render: (row) => {
         const d = row as unknown as Driver
-        const docs = d.documents?.length ?? 0
+        const docs = documentsByDriver[d.uid] ?? []
+        const approved = docs.filter((x) => effectiveStatus(x) === "approved").length
+        const pending = docs.filter((x) => effectiveStatus(x) === "pending").length
+        const problem = docs.some((x) => ["rejected", "expired"].includes(effectiveStatus(x)))
         return (
-          <span className={cn("text-sm", docs > 0 ? "text-green-600" : "text-amber-600")}>
-            {docs} docs
-          </span>
+          <div className="text-sm">
+            <span className={cn(docs.length === 0 ? "text-amber-600" : problem ? "text-red-600" : "text-green-600")}>
+              {approved}/{docs.length} approved
+            </span>
+            {pending > 0 && <p className="text-xs text-amber-600">{pending} to review</p>}
+          </div>
         )
       },
     },
@@ -623,47 +647,14 @@ export default function AdminDriversPage() {
               </div>
             </div>
 
-            {/* Document Verification Section */}
+            {/* Documents */}
             <div className="border-t border-[#F4F6F9] pt-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase text-[#5B6577]">Documents</p>
-                {selectedDriver.documents?.length === 0 && (
-                  <span className="text-xs text-amber-600">No documents uploaded</span>
-                )}
-              </div>
-              {selectedDriver.documents && selectedDriver.documents.length > 0 ? (
-                <div className="mt-2 space-y-2">
-                  {selectedDriver.documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between rounded-lg bg-[#F4F6F9] px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-[#5B6577]" />
-                        <div>
-                          <p className="text-sm font-medium text-[#0F1B2D]">{doc.documentType}</p>
-                          <p className="text-xs text-[#5B6577]">Expires: {doc.expiryDate}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <StatusBadge status={doc.status} type="payment" />
-                        {doc.status === "pending" && (
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="icon-xs" className="text-green-600">
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon-xs" className="text-red-600">
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-2 rounded-lg bg-[#F4F6F9] p-4 text-center">
-                  <FileText className="mx-auto mb-2 h-6 w-6 text-[#E2E6EC]" />
-                  <p className="text-sm text-[#5B6577]">No documents on file</p>
-                </div>
-              )}
+              <DriverDocumentsPanel
+                driverId={selectedDriver.uid}
+                driverName={`${selectedDriver.firstName} ${selectedDriver.lastName}`}
+                documents={documentsByDriver[selectedDriver.uid] ?? []}
+                reviewerId={user?.uid ?? "admin"}
+              />
             </div>
           </div>
         )}
