@@ -44,3 +44,7 @@ firebase-adminsdk*.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase -> MySQL export output (customer data, password hashes) — never commit
+/firebase-export/
+/firebase-storage/
