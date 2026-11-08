@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, Baby, Calendar, Clock, Plane, UserCheck } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -15,7 +15,10 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { LocationAutocomplete } from "./LocationAutocomplete"
-import type { Location, TripType, SpecialRequirements } from "@/types"
+import { getPickupPlaces, getRouteFares, type PricedPlace } from "@/lib/services/route-fare-service"
+import { ensureAuthSession } from "@/lib/firebase/auth"
+import { UK_AIRPORTS } from "@/constants"
+import type { Location, RouteFare, TripType, SpecialRequirements } from "@/types"
 import { format } from "date-fns"
 
 function generateTimeOptions() {
@@ -68,6 +71,33 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
   const [meetGreet, setMeetGreet] = useState(initial?.specialRequirements?.meetAndGreet ?? false)
   const [flightNumber, setFlightNumber] = useState(initial?.specialRequirements?.flightNumber ?? "")
   const [dateOpen, setDateOpen] = useState(false)
+  const [routeFares, setRouteFares] = useState<RouteFare[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+    // Route fares are in `settings`, which needs a (possibly guest) session.
+    ensureAuthSession()
+      .catch(() => null)
+      .then(() => getRouteFares())
+      .then((r) => !cancelled && setRouteFares(r))
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Shown first in both boxes: every UK airport, then the admin's fixed-price
+  // zones. Any other UK address can still be typed and chosen.
+  const featuredPlaces = useMemo<PricedPlace[]>(() => {
+    const priced = getPickupPlaces(routeFares)
+    const airports: PricedPlace[] = UK_AIRPORTS.map((a) => {
+      const own = priced.find((p) => p.areas.some((x) => x.trim().toUpperCase() === a.code))
+      return own ?? { label: a.name, areas: [a.code] }
+    })
+    const zones = priced.filter((p) => !UK_AIRPORTS.some((a) => p.areas.some((x) => x.trim().toUpperCase() === a.code)))
+    return [...airports, ...zones]
+  }, [routeFares])
+
   // Any UK address can be booked: London routes in the admin's price list get
   // their fixed fare on the quotes page, everywhere else is priced per mile.
   function handlePickupSelect(loc: Location) {
@@ -155,6 +185,7 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
           value={pickupText}
           onChange={handlePickupText}
           onLocationSelect={handlePickupSelect}
+          featuredPlaces={featuredPlaces}
           placeholder="e.g. SW1A 2AA or 10 Downing Street"
           icon="MapPin"
           geoButton="icon"
@@ -166,6 +197,7 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
           value={destinationText}
           onChange={handleDestinationText}
           onLocationSelect={setDestination}
+          featuredPlaces={featuredPlaces}
           placeholder="e.g. Heathrow Terminal 5"
           icon="Plane"
           geoButton="icon"
