@@ -1,27 +1,40 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signInAnonymously,
-  GoogleAuthProvider,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updatePassword as firebaseUpdatePassword,
-  signOut,
-  sendPasswordResetEmail,
-  updateProfile as firebaseUpdateProfile,
-  onAuthStateChanged as firebaseOnAuthStateChanged,
-  type User,
-  type UserCredential,
-} from 'firebase/auth';
-import {
-  doc,
-  setDoc,
-  getDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
-import { auth as getAuth, db as getDb, isFirebaseConfigured, secondaryAuth } from './config';
+// Logins for the site — now backed by the GoDaddy MySQL database through
+// /api/auth (see src/app/api/auth/[action]/route.ts), not Firebase Auth.
+//
+// The file keeps its old path and function names so the rest of the site is
+// unchanged. When the server reports that no database is configured (e.g.
+// local development without MySQL), the previous localStorage demo mode is
+// used instead, as before.
+
+import { apiFetch, apiPost, isBackendUnavailable } from '@/lib/api-client';
+import { addDocument, getDocument } from './firestore';
 import type { User as AppUser, UserRole } from '@/types';
+
+/** The signed-in login (what Firebase's `User` used to be). */
+export interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  phoneNumber: string | null;
+  isAnonymous: boolean;
+  emailVerified: boolean;
+  providerId: string;
+}
+
+export interface UserCredential {
+  user: User;
+  providerId: string;
+}
+
+interface ServerUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  isAnonymous: boolean;
+  emailVerified: boolean;
+}
 
 interface SignUpData {
   firstName: string;
@@ -29,6 +42,49 @@ interface SignUpData {
   phone: string;
   role?: UserRole;
 }
+
+function toUser(u: ServerUser): User {
+  return { ...u, phoneNumber: null, providerId: u.isAnonymous ? 'anonymous' : 'password' };
+}
+
+// ---------------------------------------------------------------------------
+// Current user, shared by every onAuthStateChanged listener
+// ---------------------------------------------------------------------------
+
+let current: User | null | undefined; // undefined = not loaded yet
+let loading: Promise<User | null> | null = null;
+const listeners = new Set<(user: User | null) => void>();
+
+function setCurrent(user: User | null): void {
+  current = user;
+  for (const cb of listeners) cb(user);
+}
+
+function loadCurrent(): Promise<User | null> {
+  if (!loading) {
+    loading = apiFetch<{ user: ServerUser | null }>('/api/auth/me')
+      .then(({ user }) => (user ? toUser(user) : null))
+      .catch((err) => {
+        if (isBackendUnavailable(err)) {
+          const session = getDemoSession();
+          return session ? createDemoUserCredential(session).user : null;
+        }
+        return null;
+      })
+      .then((user) => {
+        setCurrent(user);
+        return user;
+      })
+      .finally(() => {
+        loading = null;
+      });
+  }
+  return loading;
+}
+
+// ---------------------------------------------------------------------------
+// Demo mode (no database configured)
+// ---------------------------------------------------------------------------
 
 const DEMO_STORAGE_KEY = 'bst_demo_users';
 const DEMO_SESSION_KEY = 'bst_demo_session';
@@ -73,16 +129,9 @@ function createDemoUserCredential(user: DemoUser): UserCredential {
       providerId: 'demo',
       emailVerified: true,
       isAnonymous: false,
-      metadata: {} as User['metadata'],
-      providerData: [],
-      getIdToken: async () => 'demo-token',
-      getIdTokenResult: async () => ({ token: 'demo-token', claims: {}, signInProvider: 'demo', signInSecondFactor: null, expirationTime: '' }),
-      reload: async () => {},
-      delete: async () => {},
-      toJSON: () => ({}),
-    } as unknown as User,
+    },
     providerId: 'demo',
-  } as UserCredential;
+  };
 }
 
 function setDemoSession(user: DemoUser): void {
@@ -100,52 +149,13 @@ function getDemoSession(): DemoUser | null {
   }
 }
 
-function isFirebaseAvailable(): boolean {
-  if (!isFirebaseConfigured()) return false;
-  try {
-    getAuth();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export async function signUp(
-  email: string,
-  password: string,
-  userData: SignUpData
-): Promise<UserCredential> {
-  if (isFirebaseAvailable()) {
-    try {
-      const credential = await createUserWithEmailAndPassword(getAuth(), email, password);
-      await firebaseUpdateProfile(credential.user, {
-        displayName: `${userData.firstName} ${userData.lastName}`,
-      });
-      await setDoc(doc(getDb(), 'users', credential.user.uid), {
-        uid: credential.user.uid,
-        email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone,
-        role: userData.role || 'passenger',
-        status: 'active',
-        photoURL: '',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        lastLoginAt: serverTimestamp(),
-      });
-      return credential;
-    } catch {
-      // Fall through to demo mode
-    }
-  }
-
+function demoSignUp(email: string, password: string, userData: SignUpData): UserCredential {
   const users = getDemoUsers();
   const key = email.toLowerCase();
   if (users[key]) {
     throw new Error('An account with this email already exists.');
   }
-
+  const now = new Date().toISOString();
   const newUser: DemoUser = {
     uid: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     email,
@@ -156,163 +166,116 @@ export async function signUp(
     role: userData.role || 'passenger',
     photoURL: '',
     status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    lastLoginAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
+    lastLoginAt: now,
   };
-
   users[key] = newUser;
   saveDemoUsers(users);
   setDemoSession(newUser);
-
   return createDemoUserCredential(newUser);
 }
 
-function friendlyAuthError(err: unknown): string {
-  const code = (err as { code?: string })?.code ?? '';
-  switch (code) {
-    case 'auth/invalid-credential':
-    case 'auth/wrong-password':
-    case 'auth/user-not-found':
-    case 'auth/invalid-email':
-      return 'Invalid email or password. Please try again.';
-    case 'auth/user-disabled':
-      return 'This account has been disabled.';
-    case 'auth/too-many-requests':
-      return 'Too many attempts. Please wait a few minutes or reset your password.';
-    case 'auth/network-request-failed':
-      return 'Network error — check your connection and try again.';
-    default:
-      return err instanceof Error ? err.message : 'Sign-in failed. Please try again.';
+function demoSignIn(email: string, password: string): UserCredential {
+  const users = getDemoUsers();
+  const key = email.toLowerCase();
+  const user = users[key];
+  if (!user) throw new Error('No account found with this email.');
+  if (user.password !== password) throw new Error('Invalid password.');
+  user.lastLoginAt = new Date().toISOString();
+  users[key] = user;
+  saveDemoUsers(users);
+  setDemoSession(user);
+  return createDemoUserCredential(user);
+}
+
+function demoUserData(uid: string): AppUser | null {
+  const session = getDemoSession();
+  const user =
+    session && (session.uid === uid || uid.startsWith('demo-'))
+      ? session
+      : Object.values(getDemoUsers()).find((u) => u.uid === uid);
+  if (!user) return null;
+  return {
+    uid: user.uid,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phone: user.phone,
+    role: user.role,
+    status: user.status as 'active',
+    photoURL: user.photoURL,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  } as AppUser;
+}
+
+// ---------------------------------------------------------------------------
+// Public API (same names as before)
+// ---------------------------------------------------------------------------
+
+export async function signUp(
+  email: string,
+  password: string,
+  userData: SignUpData
+): Promise<UserCredential> {
+  try {
+    const { user } = await apiPost<{ user: ServerUser }>('/api/auth/signup', {
+      email,
+      password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      phone: userData.phone,
+      role: userData.role,
+    });
+    const u = toUser(user);
+    setCurrent(u);
+    return { user: u, providerId: 'password' };
+  } catch (err) {
+    if (!isBackendUnavailable(err)) throw err;
   }
+  const credential = demoSignUp(email, password, userData);
+  setCurrent(credential.user);
+  return credential;
 }
 
 export async function signIn(
   email: string,
   password: string
 ): Promise<UserCredential> {
-  let firebaseError: unknown = null;
-
-  if (isFirebaseAvailable()) {
-    let credential: UserCredential | null = null;
-    try {
-      credential = await signInWithEmailAndPassword(getAuth(), email, password);
-    } catch (err) {
-      firebaseError = err;
-    }
-
-    if (credential) {
-      // Recording the login time is best-effort: if Firestore rules block
-      // the write, the user is still signed in.
-      try {
-        await setDoc(
-          doc(getDb(), 'users', credential.user.uid),
-          { lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() },
-          { merge: true }
-        );
-      } catch {
-        // ignore
-      }
-      return credential;
-    }
+  try {
+    const { user } = await apiPost<{ user: ServerUser }>('/api/auth/login', { email, password });
+    const u = toUser(user);
+    setCurrent(u);
+    return { user: u, providerId: 'password' };
+  } catch (err) {
+    if (!isBackendUnavailable(err)) throw err;
   }
-
-  const users = getDemoUsers();
-  const key = email.toLowerCase();
-  const user = users[key];
-
-  if (!user) {
-    // Surface the real Firebase reason instead of a misleading demo-mode message.
-    if (firebaseError) throw new Error(friendlyAuthError(firebaseError));
-    throw new Error('No account found with this email.');
-  }
-  if (user.password !== password) {
-    throw new Error('Invalid password.');
-  }
-
-  user.lastLoginAt = new Date().toISOString();
-  users[key] = user;
-  saveDemoUsers(users);
-  setDemoSession(user);
-
-  return createDemoUserCredential(user);
+  const credential = demoSignIn(email, password);
+  setCurrent(credential.user);
+  return credential;
 }
 
 export async function signInWithGoogle(): Promise<UserCredential> {
-  if (isFirebaseAvailable()) {
-    try {
-      const provider = new GoogleAuthProvider();
-      const credential = await signInWithPopup(getAuth(), provider);
-      const userRef = doc(getDb(), 'users', credential.user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        const names = credential.user.displayName?.split(' ') || ['', ''];
-        await setDoc(userRef, {
-          uid: credential.user.uid,
-          email: credential.user.email,
-          firstName: names[0],
-          lastName: names.slice(1).join(' '),
-          phone: '',
-          role: 'passenger' as UserRole,
-          status: 'active',
-          photoURL: credential.user.photoURL || '',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          lastLoginAt: serverTimestamp(),
-        });
-      } else {
-        await setDoc(userRef, { lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
-      }
-      return credential;
-    } catch {
-      // Fall through to demo mode
-    }
-  }
-
-  const demoUser: DemoUser = {
-    uid: `demo-google-${Date.now()}`,
-    email: 'google-user@demo.com',
-    password: '',
-    firstName: 'Google',
-    lastName: 'User',
-    phone: '',
-    role: 'passenger',
-    photoURL: '',
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    lastLoginAt: new Date().toISOString(),
-  };
-  setDemoSession(demoUser);
-  return createDemoUserCredential(demoUser);
+  throw new Error('Google sign-in is not available. Please sign in with your email and password.');
 }
 
 export async function signOutUser(): Promise<void> {
-  if (isFirebaseAvailable()) {
-    try {
-      await signOut(getAuth());
-    } catch {
-      // Fall through
-    }
+  try {
+    await apiPost('/api/auth/logout');
+  } catch {
+    // Signed out locally either way.
   }
   if (typeof window !== 'undefined') {
     localStorage.removeItem(DEMO_SESSION_KEY);
   }
+  setCurrent(null);
 }
 
 /**
- * Admin flow for onboarding a driver: creates their real Firebase Auth
- * account (so they can actually log in) and a matching users/{uid} doc,
- * without touching the admin's own signed-in session — see
- * getSecondaryAuthInstance()'s docstring in ./config for why a second app
- * instance is needed here.
- */
-/**
- * Creates a real Firebase Auth login for someone an admin is onboarding
- * (driver or operator) without signing the admin out: the account is made
- * on a secondary app instance, then the users/{uid} profile is written from
- * the admin's own session. `extra` is merged into the users doc (e.g. an
- * operator's company details).
+ * Creates a real login for someone an admin is onboarding (driver or
+ * operator) without signing the admin out. `extra` is merged into their
+ * users/{uid} profile (e.g. an operator's company details).
  */
 async function createManagedAccount(
   role: Extract<UserRole, 'driver' | 'operator'>,
@@ -321,33 +284,7 @@ async function createManagedAccount(
   profile: { firstName: string; lastName: string; phone: string },
   extra: Record<string, unknown> = {}
 ): Promise<{ uid: string }> {
-  if (!isFirebaseAvailable()) {
-    throw new Error(`Firebase is not configured — cannot create a real ${role} login.`);
-  }
-  const secondary = secondaryAuth();
-  const credential = await createUserWithEmailAndPassword(secondary, email, password);
-  const uid = credential.user.uid;
-  await signOut(secondary);
-
-  await setDoc(doc(getDb(), 'users', uid), {
-    ...extra,
-    uid,
-    email,
-    role,
-    displayName: `${profile.firstName} ${profile.lastName}`,
-    firstName: profile.firstName,
-    lastName: profile.lastName,
-    phone: profile.phone,
-    status: 'active',
-    photoURL: '',
-    emailVerified: false,
-    active: true,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    lastLoginAt: serverTimestamp(),
-  });
-
-  return { uid };
+  return apiPost<{ uid: string }>('/api/auth/create-account', { role, email, password, profile, extra });
 }
 
 export async function createDriverAccount(
@@ -381,39 +318,33 @@ export async function changePassword(
   currentPassword: string,
   newPassword: string
 ): Promise<void> {
-  const user = getAuth().currentUser;
-  if (!user || !user.email) throw new Error('No authenticated user.');
-  const credential = EmailAuthProvider.credential(user.email, currentPassword);
-  await reauthenticateWithCredential(user, credential);
-  await firebaseUpdatePassword(user, newPassword);
+  await apiPost('/api/auth/change-password', { currentPassword, newPassword });
 }
 
 export async function resetPassword(email: string): Promise<void> {
-  if (isFirebaseAvailable()) {
-    try {
-      await sendPasswordResetEmail(getAuth(), email);
-      return;
-    } catch {
-      // Fall through
-    }
+  try {
+    await apiPost('/api/auth/reset-request', { email });
+  } catch (err) {
+    if (isBackendUnavailable(err)) throw new Error('Password reset is not available in demo mode.');
+    throw err;
   }
-  throw new Error('Password reset is not available in demo mode.');
+}
+
+/** Sets a new password using the token from a password-reset email. */
+export async function confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+  await apiPost('/api/auth/reset-confirm', { token, password: newPassword });
 }
 
 export async function updateProfile(data: {
   displayName?: string;
   photoURL?: string;
 }): Promise<void> {
-  if (isFirebaseAvailable()) {
-    try {
-      const user = getAuth().currentUser;
-      if (!user) throw new Error('No authenticated user');
-      await firebaseUpdateProfile(user, data);
-      await setDoc(doc(getDb(), 'users', user.uid), { ...data, updatedAt: serverTimestamp() }, { merge: true });
-      return;
-    } catch {
-      // Fall through
-    }
+  try {
+    const { user } = await apiPost<{ user: ServerUser }>('/api/auth/profile', data);
+    setCurrent(toUser(user));
+    return;
+  } catch (err) {
+    if (!isBackendUnavailable(err)) throw err;
   }
 
   const session = getDemoSession();
@@ -436,143 +367,64 @@ export async function updateProfile(data: {
 export function onAuthStateChanged(
   callback: (user: User | null) => void
 ): () => void {
-  if (isFirebaseAvailable()) {
-    try {
-      return firebaseOnAuthStateChanged(getAuth(), callback);
-    } catch {
-      // Fall through to demo
-    }
-  }
-
-  const session = getDemoSession();
-  if (session) {
+  listeners.add(callback);
+  if (current !== undefined) {
+    const known = current;
     setTimeout(() => {
-      callback(createDemoUserCredential(session).user as User);
+      if (listeners.has(callback)) callback(known);
     }, 0);
   } else {
-    setTimeout(() => callback(null), 0);
+    void loadCurrent();
   }
-
-  return () => {};
+  return () => {
+    listeners.delete(callback);
+  };
 }
 
 /**
- * Firestore rules for `vehicles`/`settings`/`bookings` require
- * request.auth != null — a signed-out visitor otherwise gets a silent
- * permission-denied on the public quotes/checkout flow. This gives them an
- * anonymous Firebase session (stable uid, no credentials) so those reads
- * and their own booking's create/read succeed without forcing a real
- * account. Requires Anonymous sign-in enabled in the Firebase console
- * (Authentication → Sign-in method).
- *
- * IMPORTANT: Firebase Auth restores a persisted session (e.g. an admin's
- * login) asynchronously after page load — `auth.currentUser` can read
- * `null` for a moment even when a real session is about to be restored.
- * Checking it synchronously here previously caused a real signed-in
- * session to occasionally be raced and overwritten by a fresh anonymous
- * one (Firebase Auth persistence is shared across tabs in the same
- * browser, so this could silently sign an admin out everywhere). Waiting
- * for the first onAuthStateChanged callback guarantees restoration has
- * finished before deciding whether an anonymous session is needed.
+ * Makes sure the visitor has a session so the public quotes/checkout flow
+ * can read prices and save their booking without an account: returns the
+ * signed-in user, or starts a guest session.
  */
 export async function ensureAuthSession(): Promise<User | null> {
-  if (!isFirebaseAvailable()) return getCurrentUser();
+  const existing = current !== undefined ? current : await loadCurrent();
+  if (existing) return existing;
   try {
-    const auth = getAuth();
-    const restored = await new Promise<User | null>((resolve) => {
-      const unsubscribe = firebaseOnAuthStateChanged(auth, (user) => {
-        unsubscribe();
-        resolve(user);
-      });
-    });
-    if (restored) return restored;
-    const credential = await signInAnonymously(auth);
-    return credential.user;
+    const { user } = await apiPost<{ user: ServerUser }>('/api/auth/guest');
+    const u = toUser(user);
+    setCurrent(u);
+    return u;
   } catch (err) {
-    console.error('ensureAuthSession: anonymous sign-in failed —', err);
-    return getAuth().currentUser;
+    console.error('ensureAuthSession: could not start a guest session —', err);
+    return null;
   }
 }
 
 export function getCurrentUser(): User | null {
-  if (isFirebaseAvailable()) {
-    try {
-      return getAuth().currentUser;
-    } catch {
-      // Fall through
-    }
-  }
-
+  if (current) return current;
   const session = getDemoSession();
-  if (session) {
-    return createDemoUserCredential(session).user as User;
-  }
-  return null;
+  return session ? createDemoUserCredential(session).user : null;
 }
 
 export async function getUserData(uid: string): Promise<AppUser | null> {
-  if (isFirebaseAvailable()) {
-    try {
-      const userSnap = await getDoc(doc(getDb(), 'users', uid));
-      if (userSnap.exists()) {
-        return { uid: userSnap.id, ...userSnap.data() } as AppUser;
-      }
-    } catch {
-      // Fall through to demo
-    }
+  if (uid.startsWith('demo-')) return demoUserData(uid);
+  try {
+    const doc = await getDocument<AppUser & { id: string }>('users', uid);
+    if (!doc) return null;
+    const { id, ...rest } = doc;
+    return { ...rest, uid: id } as AppUser;
+  } catch (err) {
+    if (isBackendUnavailable(err)) return demoUserData(uid);
+    return null;
   }
-
-  const session = getDemoSession();
-  if (session && (session.uid === uid || uid.startsWith('demo-'))) {
-    return {
-      uid: session.uid,
-      email: session.email,
-      firstName: session.firstName,
-      lastName: session.lastName,
-      phone: session.phone,
-      role: session.role,
-      status: session.status as 'active',
-      photoURL: session.photoURL,
-      createdAt: session.createdAt,
-      updatedAt: session.updatedAt,
-    } as AppUser;
-  }
-
-  const users = getDemoUsers();
-  const user = users[uid] || Object.values(users).find((u) => u.uid === uid);
-  if (user) {
-    return {
-      uid: user.uid,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
-      role: user.role,
-      status: user.status as 'active',
-      photoURL: user.photoURL,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    } as AppUser;
-  }
-
-  return null;
 }
 
 export async function createGuestBooking(
   bookingData: Record<string, unknown>
 ): Promise<string> {
-  if (isFirebaseAvailable()) {
-    try {
-      const { addDoc, collection } = await import('firebase/firestore');
-      const docRef = await addDoc(collection(getDb(), 'guest_bookings'), {
-        ...bookingData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      return docRef.id;
-    } catch {
-      // Fall through
-    }
+  try {
+    return await addDocument('guest_bookings', bookingData);
+  } catch {
+    return `guest-${Date.now()}`;
   }
-  return `guest-${Date.now()}`;
 }

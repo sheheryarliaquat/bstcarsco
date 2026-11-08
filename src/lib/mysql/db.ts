@@ -34,6 +34,10 @@ function getConnectionOptions(): mysql.ConnectionOptions {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    charset: "utf8mb4",
+    // Store and read DATETIME values as UTC.
+    timezone: "Z",
+    dateStrings: true,
   };
 }
 
@@ -52,5 +56,34 @@ export async function query<T = unknown>(
     return rows as T[];
   } finally {
     await connection.end();
+  }
+}
+
+export type Db = mysql.Connection;
+
+/**
+ * Open one short-lived connection for a whole request, run `fn` with it and
+ * always close it. Use this when a request makes several queries.
+ */
+export async function withConnection<T>(fn: (db: Db) => Promise<T>): Promise<T> {
+  const connection = await mysql.createConnection(getConnectionOptions());
+  try {
+    await connection.query("SET time_zone = '+00:00'");
+    return await fn(connection);
+  } finally {
+    await connection.end();
+  }
+}
+
+/** Run `fn` inside a transaction: everything is saved, or nothing is. */
+export async function inTransaction<T>(db: Db, fn: () => Promise<T>): Promise<T> {
+  await db.beginTransaction();
+  try {
+    const result = await fn();
+    await db.commit();
+    return result;
+  } catch (err) {
+    await db.rollback().catch(() => {});
+    throw err;
   }
 }

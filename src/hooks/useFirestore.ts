@@ -8,8 +8,9 @@ import {
   onSnapshotListener,
   queryDocumentsWithPagination,
   type QueryCondition,
+  type QueryDocumentSnapshot,
+  type DocumentData,
 } from '@/lib/firebase/firestore';
-import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 export function useDocument<T>(
   collectionName: string,

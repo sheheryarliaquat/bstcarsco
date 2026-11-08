@@ -1,22 +1,35 @@
-import {
-  ref,
-  uploadBytes,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-  listAll,
-  getMetadata,
-  type UploadTask,
-} from 'firebase/storage';
-import { storage as getStorage } from './config';
+// File uploads for the site — now stored in the GoDaddy MySQL database
+// through /api/files (see src/app/api/files/route.ts), not Firebase Storage.
+// Same function names as before; returned URLs point at /api/files/<path>.
+
+import { apiFetch, ApiError } from '@/lib/api-client';
+
+function fileUrl(path: string): string {
+  return '/api/files/' + path.split('/').map(encodeURIComponent).join('/');
+}
+
+function toBlob(file: File | Blob | ArrayBuffer): Blob {
+  return file instanceof Blob ? file : new Blob([file]);
+}
+
+function formFor(path: string, file: File | Blob | ArrayBuffer): FormData {
+  const form = new FormData();
+  form.append('path', path);
+  const name = file instanceof File ? file.name : path.split('/').pop() || 'file';
+  form.append('file', toBlob(file), name);
+  return form;
+}
 
 export async function uploadFile(
   path: string,
   file: File | Blob | ArrayBuffer
 ): Promise<string> {
-  const storageRef = ref(getStorage(), path);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+  const { url } = await apiFetch<{ url: string }>('/api/files', { method: 'POST', body: formFor(path, file) });
+  return url;
+}
+
+export interface UploadTask {
+  cancel: () => boolean;
 }
 
 export function uploadFileWithProgress(
@@ -26,41 +39,48 @@ export function uploadFileWithProgress(
   onError?: (error: Error) => void,
   onComplete?: (downloadURL: string) => void
 ): UploadTask {
-  const storageRef = ref(getStorage(), path);
-  const uploadTask = uploadBytesResumable(storageRef, file);
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/files');
+  xhr.withCredentials = true;
 
-  uploadTask.on(
-    'state_changed',
-    (snapshot) => {
-      if (onProgress) {
-        const percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        onProgress({
-          bytesTransferred: snapshot.bytesTransferred,
-          totalBytes: snapshot.totalBytes,
-          percentage,
-        });
-      }
-    },
-    (error) => {
-      if (onError) onError(error);
-    },
-    async () => {
-      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-      if (onComplete) onComplete(downloadURL);
+  xhr.upload.onprogress = (e) => {
+    if (onProgress && e.lengthComputable) {
+      onProgress({ bytesTransferred: e.loaded, totalBytes: e.total, percentage: (e.loaded / e.total) * 100 });
     }
-  );
+  };
+  xhr.onload = () => {
+    let body: { url?: string; error?: { code?: string; message?: string } } = {};
+    try {
+      body = JSON.parse(xhr.responseText || '{}');
+    } catch {
+      // leave empty
+    }
+    if (xhr.status >= 200 && xhr.status < 300 && body.url) {
+      onComplete?.(body.url);
+    } else {
+      onError?.(
+        new ApiError(body.error?.code ?? `http-${xhr.status}`, body.error?.message ?? 'Upload failed.', xhr.status)
+      );
+    }
+  };
+  xhr.onerror = () => onError?.(new ApiError('network-request-failed', 'Upload failed — check your connection.', 0));
+  xhr.onabort = () => onError?.(new ApiError('canceled', 'Upload cancelled.', 0));
+  xhr.send(formFor(path, file));
 
-  return uploadTask;
+  return {
+    cancel: () => {
+      xhr.abort();
+      return true;
+    },
+  };
 }
 
 export async function getFileURL(path: string): Promise<string> {
-  const storageRef = ref(getStorage(), path);
-  return getDownloadURL(storageRef);
+  return fileUrl(path);
 }
 
 export async function deleteFile(path: string): Promise<void> {
-  const storageRef = ref(getStorage(), path);
-  await deleteObject(storageRef);
+  await apiFetch(`/api/files?path=${encodeURIComponent(path)}`, { method: 'DELETE' });
 }
 
 export interface FileItem {
@@ -71,20 +91,6 @@ export interface FileItem {
 }
 
 export async function listFiles(folder: string): Promise<FileItem[]> {
-  const storageRef = ref(getStorage(), folder);
-  const result = await listAll(storageRef);
-
-  const files: FileItem[] = await Promise.all(
-    result.items.map(async (itemRef) => {
-      const metadata = await getMetadata(itemRef);
-      return {
-        name: itemRef.name,
-        fullPath: itemRef.fullPath,
-        size: metadata.size,
-        timeCreated: metadata.timeCreated,
-      };
-    })
-  );
-
-  return files;
+  const { items } = await apiFetch<{ items: FileItem[] }>(`/api/files?folder=${encodeURIComponent(folder)}`);
+  return items;
 }
