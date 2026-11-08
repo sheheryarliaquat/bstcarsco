@@ -1,13 +1,13 @@
 'use client';
 
 import { getDocument } from '@/lib/firebase/firestore';
-import { getAllVehicles, getVehicleRates, type VehicleRate } from './vehicle-service';
-import { calculateDistance, estimateDuration } from './pricing';
+import { getAllVehicles, getVehicleRates, DEFAULT_VEHICLE_RATES, type VehicleRate } from './vehicle-service';
+import { estimateRoadMiles, estimateDuration } from './pricing';
 import { getRouteFares, findRouteFare } from './route-fare-service';
 import { VEHICLE_TYPES } from '@/constants';
 import type { Location, Operator, Quote, VehicleType } from '@/types';
 
-const DEFAULT_RATE: Omit<VehicleRate, 'vehicleType' | 'label'> = {
+const FALLBACK_RATE: Omit<VehicleRate, 'vehicleType' | 'label'> = {
   baseFare: 4.0,
   perMile: 2.0,
   perMinute: 0.3,
@@ -44,7 +44,19 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
       (!search.wheelchairAccessible || v.wheelchairAccessible)
   );
 
-  const distanceMiles = calculateDistance(search.pickup, search.destination);
+  // Estimated road miles (straight line + typical detour) for per-mile pricing.
+  const distanceMiles = estimateRoadMiles(search.pickup, search.destination);
+
+  // The admin's saved rates for a car type, else the defaults from Vehicles & Rates.
+  const rateFor = (type: VehicleType) =>
+    rates?.find((r) => r.vehicleType === type) ??
+    DEFAULT_VEHICLE_RATES.find((r) => r.vehicleType === type) ??
+    FALLBACK_RATE;
+  const mileagePrice = (type: VehicleType, durationMinutes: number) => {
+    const r = rateFor(type);
+    const subtotal = r.baseFare + distanceMiles * r.perMile + durationMinutes * r.perMinute + r.bookingFee;
+    return roundTo2(Math.max(subtotal, r.minimumFare));
+  };
 
   // Fixed fares the admin set for this journey, per car type.
   const fixedByType = new Map<VehicleType, number>();
@@ -53,26 +65,17 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
     if (f) fixedByType.set(t.value, roundTo2(f.price));
   }
 
-  if (eligible.length === 0 && fixedByType.size === 0) return [];
   const operatorCache = new Map<string, Operator | null>();
 
   const quotes: Quote[] = [];
   const fixedIds = new Set<string>();
   for (const vehicle of eligible) {
-    const rate = rates?.find((r) => r.vehicleType === vehicle.vehicleType);
     const durationMinutes = estimateDuration(distanceMiles, vehicle.vehicleType);
-
-    const baseFare = rate?.baseFare ?? DEFAULT_RATE.baseFare;
-    const perMile = rate?.perMile ?? DEFAULT_RATE.perMile;
-    const perMinute = rate?.perMinute ?? DEFAULT_RATE.perMinute;
-    const minimumFare = rate?.minimumFare ?? DEFAULT_RATE.minimumFare;
-    const bookingFee = rate?.bookingFee ?? DEFAULT_RATE.bookingFee;
 
     // An admin-set fixed fare for this route and car type wins over mileage pricing.
     const fixedPrice = fixedByType.get(vehicle.vehicleType);
     const fixed = fixedPrice !== undefined;
-    const subtotal = baseFare + distanceMiles * perMile + durationMinutes * perMinute + bookingFee;
-    const price = fixed ? fixedPrice : roundTo2(Math.max(subtotal, minimumFare));
+    const price = fixed ? fixedPrice : mileagePrice(vehicle.vehicleType, durationMinutes);
     if (fixed) fixedIds.add(vehicle.id);
 
     let operator = operatorCache.get(vehicle.operatorId);
@@ -105,42 +108,54 @@ export async function getAvailableQuotes(search: QuoteSearch): Promise<Quote[]> 
       isHybrid: vehicle.isHybrid,
       price,
       paymentTypes: ['card', 'cash'],
-      features: fixed ? ['Fixed fare'] : [],
+      features: fixed ? ['Fixed fare'] : ['Priced per mile'],
       isLowestPrice: false,
     });
   }
 
-  // When this route has fixed fares, offer exactly the car types the admin priced for it.
-  // A priced type with no registered vehicle is still offered; the booking is made for
-  // that car type and a driver is assigned later from the dispatch board.
+  // A car type with no registered vehicle is still offered: the booking is made
+  // for that car type and a driver is assigned later from the dispatch board.
+  const typeQuote = (vehicleType: VehicleType, price: number, fixed: boolean): Quote | null => {
+    const meta = VEHICLE_TYPES.find((t) => t.value === vehicleType);
+    if (!meta) return null;
+    if (search.wheelchairAccessible && vehicleType !== 'wheelchair_accessible') return null;
+    if (meta.passengerCapacity < search.passengers || meta.luggageCapacity < search.luggage) return null;
+    return {
+      id: `type-${vehicleType}`,
+      bookingId: '',
+      operatorId: '',
+      operatorName: 'BST Cars',
+      vehicleType,
+      vehicleDescription: `${meta.label} - ${meta.passengerCapacity} Seats`,
+      passengerCapacity: meta.passengerCapacity,
+      luggageCapacity: meta.luggageCapacity,
+      rating: 0,
+      totalReviews: 0,
+      estimatedJourneyTime: estimateDuration(distanceMiles, vehicleType),
+      isElectric: vehicleType === 'electric',
+      isHybrid: false,
+      price,
+      paymentTypes: ['card', 'cash'],
+      features: [fixed ? 'Fixed fare' : 'Priced per mile'],
+      isLowestPrice: false,
+    };
+  };
+
   let offered = quotes;
   if (fixedByType.size > 0) {
+    // London route with fixed fares: offer exactly the car types the admin priced for it.
     offered = quotes.filter((q) => fixedIds.has(q.id));
     for (const [vehicleType, price] of fixedByType) {
       if (offered.some((q) => q.vehicleType === vehicleType)) continue;
-      const meta = VEHICLE_TYPES.find((t) => t.value === vehicleType);
-      if (!meta) continue;
-      if (search.wheelchairAccessible && vehicleType !== 'wheelchair_accessible') continue;
-      if (meta.passengerCapacity < search.passengers || meta.luggageCapacity < search.luggage) continue;
-      offered.push({
-        id: `type-${vehicleType}`,
-        bookingId: '',
-        operatorId: '',
-        operatorName: 'BST Cars',
-        vehicleType,
-        vehicleDescription: `${meta.label} - ${meta.passengerCapacity} Seats`,
-        passengerCapacity: meta.passengerCapacity,
-        luggageCapacity: meta.luggageCapacity,
-        rating: 0,
-        totalReviews: 0,
-        estimatedJourneyTime: estimateDuration(distanceMiles, vehicleType),
-        isElectric: vehicleType === 'electric',
-        isHybrid: false,
-        price,
-        paymentTypes: ['card', 'cash'],
-        features: ['Fixed fare'],
-        isLowestPrice: false,
-      });
+      const q = typeQuote(vehicleType, price, true);
+      if (q) offered.push(q);
+    }
+  } else {
+    // Anywhere else in the UK: every car type, priced per mile.
+    for (const t of VEHICLE_TYPES) {
+      if (offered.some((q) => q.vehicleType === t.value)) continue;
+      const q = typeQuote(t.value, mileagePrice(t.value, estimateDuration(distanceMiles, t.value)), false);
+      if (q) offered.push(q);
     }
   }
 
