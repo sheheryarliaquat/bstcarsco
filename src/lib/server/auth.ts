@@ -322,9 +322,20 @@ export function clearLoginFailures(key: string): void {
  * access survives a wiped database. Only someone who can edit the app's
  * secrets can use this. Returns true when it applied.
  */
+/**
+ * The owner's admin email: ADMIN_LOGIN_EMAIL if set, else ADMIN_EMAIL.
+ * (ADMIN_LOGIN_EMAIL exists because GoDaddy kept serving an old ADMIN_EMAIL
+ * value after it was edited; a newly added secret is picked up reliably.)
+ */
+export function ownerEmailSecret(): { value: string; source: string } {
+  const login = process.env.ADMIN_LOGIN_EMAIL?.trim();
+  if (login) return { value: login, source: "ADMIN_LOGIN_EMAIL" };
+  return { value: process.env.ADMIN_EMAIL?.trim() ?? "", source: "ADMIN_EMAIL" };
+}
+
 export async function ensureOwnerAdmin(db: Db, email: string, password: string): Promise<boolean> {
   // Trim: secrets pasted into GoDaddy often pick up a stray space or newline.
-  const secretEmail = process.env.ADMIN_EMAIL?.trim();
+  const secretEmail = ownerEmailSecret().value;
   const secretPassword = process.env.ADMIN_PASSWORD?.trim();
   if (!secretEmail || !secretPassword || secretPassword.length < MIN_PASSWORD_LENGTH) return false;
   let ownerEmail: string;
