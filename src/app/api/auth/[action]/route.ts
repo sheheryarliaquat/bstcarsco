@@ -25,6 +25,7 @@ import {
   endSession,
   ensureOwnerAdmin,
   MIN_PASSWORD_LENGTH,
+  ownerEmailSecret,
   findAuthByEmail,
   findAuthByUid,
   getSession,
@@ -80,7 +81,8 @@ export async function GET(request: Request, { params }: Params) {
     if (action === "status") {
       // Setup check for the owner: is this code live, and are the admin secrets
       // set? Never reveals the password; the email is masked.
-      const rawEmail = process.env.ADMIN_EMAIL ?? "";
+      const owner = ownerEmailSecret();
+      const rawEmail = owner.source === "ADMIN_LOGIN_EMAIL" ? process.env.ADMIN_LOGIN_EMAIL ?? "" : process.env.ADMIN_EMAIL ?? "";
       const rawPassword = process.env.ADMIN_PASSWORD ?? "";
       const email = rawEmail.trim().toLowerCase();
       const at = email.indexOf("@");
@@ -88,7 +90,8 @@ export async function GET(request: Request, { params }: Params) {
       const account = at > 0 ? await findAuthByEmail(db, email) : null;
       const profile = account ? await getDoc(db, "users", account.uid) : null;
       return json({
-        code: "admin-secrets-v3",
+        code: "admin-secrets-v4",
+        adminEmailFrom: owner.source,
         adminEmail: masked,
         adminEmailHadSpaces: rawEmail !== rawEmail.trim(),
         adminPasswordSet: rawPassword.trim().length > 0,
