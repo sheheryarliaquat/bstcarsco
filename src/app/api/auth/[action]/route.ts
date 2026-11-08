@@ -22,6 +22,7 @@ import {
   createAccount,
   endAllSessions,
   endSession,
+  ensureOwnerAdmin,
   findAuthByEmail,
   findAuthByUid,
   getSession,
@@ -110,6 +111,8 @@ export async function POST(request: Request, { params }: Params) {
         const ip = (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim();
         const key = `${email}|${ip}`;
         checkLoginAllowed(key);
+        // The owner's admin login from GoDaddy Secrets (ADMIN_EMAIL / ADMIN_PASSWORD).
+        await ensureOwnerAdmin(db, email, str(body.password));
         const auth = await findAuthByEmail(db, email);
         const ok = auth ? await verifyPassword(str(body.password), auth.password_hash) : false;
         if (!auth || !ok) {

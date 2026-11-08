@@ -68,22 +68,36 @@ export function newId(length = 20): string {
 // Tables
 // ---------------------------------------------------------------------------
 
-const readyTables = new Set<string>();
-let appTablesReady = false;
+// Remembered per request (per connection), not for the life of the server:
+// GoDaddy's "Import SQL" drops every table, and the site must recreate them
+// on the next request instead of failing until it is restarted.
+// CREATE TABLE IF NOT EXISTS is cheap when the table is already there.
+const readyTables = new WeakMap<Db, Set<string>>();
+
+function readySet(db: Db): Set<string> {
+  let set = readyTables.get(db);
+  if (!set) {
+    set = new Set();
+    readyTables.set(db, set);
+  }
+  return set;
+}
 
 export async function ensureAppTables(db: Db): Promise<void> {
-  if (appTablesReady) return;
+  const ready = readySet(db);
+  if (ready.has("__app__")) return;
   for (const sql of APP_TABLES_SQL) await db.query(sql);
   // users is written inside sign-up transactions; create it up front because
   // CREATE TABLE inside a transaction would commit it early in MySQL.
   await ensureCollection(db, "users");
-  appTablesReady = true;
+  ready.add("__app__");
 }
 
 export async function ensureCollection(db: Db, name: string): Promise<void> {
-  if (readyTables.has(name)) return;
+  const ready = readySet(db);
+  if (ready.has(name)) return;
   await db.query(createTableSql(name));
-  readyTables.add(name);
+  ready.add(name);
 }
 
 function parseData(value: unknown): DocData {
