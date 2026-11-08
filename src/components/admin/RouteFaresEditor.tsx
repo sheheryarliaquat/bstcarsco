@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { ArrowLeftRight, CheckCircle, FileSpreadsheet, Plus, Route, Save, Search, Trash2 } from "lucide-react"
+import { ArrowLeftRight, CheckCircle, Download, FileSpreadsheet, Plus, Route, Save, Search, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,15 @@ import {
   parseAreas,
   saveRouteFares,
 } from "@/lib/services/route-fare-service"
-import { mergeRouteFares, parseRouteFareWorkbook } from "@/lib/services/route-fare-import"
+import {
+  isPricingWorkbook,
+  mergeRouteFares,
+  parsePricingWorkbook,
+  parseRouteFareWorkbook,
+  type MileageRate,
+} from "@/lib/services/route-fare-import"
+import { downloadPricingWorkbook } from "@/lib/services/pricing-workbook-export"
+import { DEFAULT_VEHICLE_RATES, getVehicleRates, saveVehicleRates } from "@/lib/services/vehicle-service"
 import type { Location, RouteFare, VehicleType } from "@/types"
 
 const UK_POSTCODE_IN_TEXT = /\b([A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})\b/i
@@ -63,6 +71,9 @@ export function RouteFaresEditor() {
   const [testTo, setTestTo] = useState("")
   const [importType, setImportType] = useState<VehicleType>("saloon")
   const [importing, setImporting] = useState(false)
+  // Per-mile rates from an all-in-one workbook, saved together with the route fares.
+  const [pendingRates, setPendingRates] = useState<MileageRate[] | null>(null)
+  const [downloading, setDownloading] = useState(false)
   const [importNote, setImportNote] = useState<{ ok: boolean; text: string } | null>(null)
 
   async function importWorkbook(file: File) {
@@ -72,6 +83,23 @@ export function RouteFaresEditor() {
       // Loaded on demand so the spreadsheet reader isn't in every admin page.
       const { default: readExcelFile } = await import("read-excel-file/browser")
       const sheets = await readExcelFile(file)
+      const workbook = sheets.map((s) => ({ sheet: s.sheet, data: s.data as unknown[][] }))
+      if (isPricingWorkbook(workbook)) {
+        // All-in-one workbook: every car type's fares (+ per-mile rates) replace what is here.
+        const all = parsePricingWorkbook(workbook, newRouteFareId)
+        setRoutes(all.routes)
+        setPendingRates(all.rates)
+        setDirty(true)
+        setImportNote({
+          ok: true,
+          text:
+            `Read ${all.prices} prices for ${all.vehicleTypes.length} car types (${all.routes.length} routes, ${all.zones} zones)` +
+            (all.rates ? ` and per-mile rates for ${all.rates.length} car types` : "") +
+            `. These replace all current fixed fares${all.rates ? " and per-mile rates" : ""} when you click "Save route fares".` +
+            (all.warnings.length ? ` Note: ${all.warnings.join(" ")}` : ""),
+        })
+        return
+      }
       const result = parseRouteFareWorkbook(
         sheets.map((s) => ({ sheet: s.sheet, data: s.data as unknown[][] })),
         importType,
@@ -171,13 +199,34 @@ export function RouteFaresEditor() {
     setDirty(true)
   }
 
+  async function download() {
+    setDownloading(true)
+    try {
+      const rates = pendingRates ?? (await getVehicleRates().catch(() => null)) ?? DEFAULT_VEHICLE_RATES
+      await downloadPricingWorkbook(routes, rates)
+    } catch (err) {
+      console.error(err)
+      setImportNote({ ok: false, text: "Could not create the spreadsheet. Please try again." })
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   async function save() {
     setSaving(true)
     setStatus(null)
     try {
       await saveRouteFares(routes)
+      if (pendingRates) {
+        await saveVehicleRates(pendingRates)
+        setPendingRates(null)
+      }
       setDirty(false)
-      setStatus("Saved. Customers now see these fares.")
+      setStatus(
+        pendingRates
+          ? "Saved route fares and per-mile rates. Customers now see these prices."
+          : "Saved. Customers now see these fares."
+      )
     } catch (err) {
       console.error(err)
       setStatus("Could not save to the server. Check your connection and admin access, then try again.")
@@ -227,8 +276,10 @@ export function RouteFaresEditor() {
             <FileSpreadsheet className="h-4 w-4 text-[#1E6B44]" /> Import from a spreadsheet
           </p>
           <p className="text-xs text-[#5B6577]">
-            Excel workbook with a &ldquo;Postcodes&rdquo; sheet (postcode → zone) and a &ldquo;Rate List&rdquo; or
-            &ldquo;Rate Matrix&rdquo; sheet. Routes already here get the new price for the chosen car type.
+            Best: one pricing workbook with every car type (&ldquo;Route Fares&rdquo;, &ldquo;Postcodes&rdquo;,
+            &ldquo;Per Mile Rates&rdquo;) — it replaces all prices. Use &ldquo;Download current prices&rdquo; to get it,
+            edit it in Excel and upload it again. Single-car-type files (&ldquo;Rate List&rdquo;) still work with
+            &ldquo;Prices are for&rdquo;.
           </p>
         </div>
         <label className="text-xs font-medium text-[#0F1B2D]">
@@ -245,6 +296,16 @@ export function RouteFaresEditor() {
             ))}
           </select>
         </label>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={download}
+          disabled={downloading || loading}
+          className="h-9 border-[#1E6B44] text-[#1E6B44] hover:bg-[#1E6B44]/5"
+        >
+          <Download className="mr-1.5 h-4 w-4" />
+          {downloading ? "Preparing..." : "Download current prices"}
+        </Button>
         <label
           className={cn(
             "inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md bg-[#1E6B44] px-3 text-sm font-semibold text-white hover:bg-[#1E6B44]/90",
