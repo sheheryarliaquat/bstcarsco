@@ -24,6 +24,11 @@ interface LocationAutocompleteProps {
    * have fixed route fares). null/undefined = any UK address.
    */
   allowedPlaces?: PricedPlace[] | null
+  /**
+   * Places listed first in the dropdown (and by the ▾ button) — e.g. airports
+   * and fixed-price zones — while any other UK address can still be chosen.
+   */
+  featuredPlaces?: PricedPlace[] | null
   disabled?: boolean
 }
 
@@ -146,6 +151,7 @@ export function LocationAutocomplete({
   geoButton = "link",
   id,
   allowedPlaces,
+  featuredPlaces,
   disabled = false,
 }: LocationAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
@@ -159,7 +165,11 @@ export function LocationAutocomplete({
   /** Opened from the ▾ button: list every place, ignoring what is typed. */
   const [showAll, setShowAll] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const restricted = Array.isArray(allowedPlaces)
+  // "enforced": only places in allowedPlaces may be chosen.
+  // "restricted" (list mode): show places first + addresses, with the ▾ list button.
+  const enforced = Array.isArray(allowedPlaces)
+  const listPlaces = enforced ? allowedPlaces : Array.isArray(featuredPlaces) ? featuredPlaces : null
+  const restricted = Array.isArray(listPlaces)
   const placesRef = useRef(allowedPlaces)
   useEffect(() => {
     placesRef.current = allowedPlaces
@@ -214,7 +224,8 @@ export function LocationAutocomplete({
           return {
             description,
             placeId,
-            mainText: parts[0] || item.display_name?.split(",")[0] || "",
+            // The place's own name ("Heathrow Airport") reads better than its road ("Inner Ring West").
+            mainText: item.name || parts[0] || item.display_name?.split(",")[0] || "",
             secondaryText,
             types,
             location: {
@@ -283,8 +294,10 @@ export function LocationAutocomplete({
   // Places (zones) that match what the customer has typed, shown first in the dropdown.
   const placeMatches = restricted
     ? showAll
-      ? allowedPlaces!
-      : allowedPlaces!.filter((p) => placeMatchesText(p, value))
+      ? listPlaces!
+      : value.trim().length >= 2
+        ? listPlaces!.filter((p) => placeMatchesText(p, value)).slice(0, enforced ? undefined : 6)
+        : []
     : []
   const addressMatches = restricted && !showAll && value.trim().length >= 3 ? suggestions : []
 
@@ -484,18 +497,22 @@ export function LocationAutocomplete({
         </>
       )}
 
-      {restricted && showSuggestions && focused && !disabled && (
+      {restricted &&
+        showSuggestions &&
+        focused &&
+        !disabled &&
+        (enforced || showAll || optionCount > 0 || value.trim().length >= 3) && (
         <div
           role="listbox"
           className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-lg border border-[#E2E6EC] bg-white shadow-lg"
         >
-          {allowedPlaces!.length === 0 ? (
+          {listPlaces!.length === 0 ? (
             <p className="p-4 text-center text-sm text-[#5B6577]">No fixed-price journeys from this pick-up.</p>
           ) : (
             <>
               {placeMatches.length > 0 && (
                 <p className="sticky top-0 bg-[#F4F6F9] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5B6577]">
-                  Places with fixed prices
+                  {enforced ? "Places with fixed prices" : "Airports & popular places"}
                 </p>
               )}
               {placeMatches.map((p, i) => {
@@ -527,7 +544,7 @@ export function LocationAutocomplete({
 
               {addressMatches.length > 0 && (
                 <p className="sticky top-0 bg-[#F4F6F9] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5B6577]">
-                  Addresses in these areas
+                  {enforced ? "Addresses in these areas" : "Addresses"}
                 </p>
               )}
               {addressMatches.map((s, j) => {
@@ -555,9 +572,11 @@ export function LocationAutocomplete({
                 )
               })}
 
-              {optionCount === 0 && !loading && (
+              {optionCount === 0 && !loading && (enforced || value.trim().length >= 3) && (
                 <p className="p-4 text-center text-sm text-[#5B6577]">
-                  No covered place matches &ldquo;{value}&rdquo;. Clear the box to see every place we cover.
+                  {enforced
+                    ? <>No covered place matches &ldquo;{value}&rdquo;. Clear the box to see every place we cover.</>
+                    : <>No locations found for &ldquo;{value}&rdquo;.</>}
                 </p>
               )}
               {loading && value.trim().length >= 3 && (
