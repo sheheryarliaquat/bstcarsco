@@ -1,6 +1,7 @@
 // Login API (replaces Firebase Auth). Called by src/lib/firebase/auth.ts.
 //
 //   GET  /api/auth/me               current user, or null
+//   GET  /api/auth/status           setup check: admin secrets present? (no secret values)
 //   POST /api/auth/signup           { email, password, firstName, lastName, phone, role? (passenger|driver) }
 //   POST /api/auth/login            { email, password }
 //   POST /api/auth/logout
@@ -23,6 +24,7 @@ import {
   endAllSessions,
   endSession,
   ensureOwnerAdmin,
+  MIN_PASSWORD_LENGTH,
   findAuthByEmail,
   findAuthByUid,
   getSession,
@@ -75,6 +77,26 @@ async function touchLogin(db: Db, uid: string): Promise<void> {
 export async function GET(request: Request, { params }: Params) {
   const { action } = await params;
   return handle(request, async (db) => {
+    if (action === "status") {
+      // Setup check for the owner: is this code live, and are the admin secrets
+      // set? Never reveals the password; the email is masked.
+      const rawEmail = process.env.ADMIN_EMAIL ?? "";
+      const rawPassword = process.env.ADMIN_PASSWORD ?? "";
+      const email = rawEmail.trim().toLowerCase();
+      const at = email.indexOf("@");
+      const masked = at > 0 ? `${email[0]}***${email.slice(at)}` : email ? "(not a valid email)" : null;
+      const account = at > 0 ? await findAuthByEmail(db, email) : null;
+      const profile = account ? await getDoc(db, "users", account.uid) : null;
+      return json({
+        code: "admin-secrets-v3",
+        adminEmail: masked,
+        adminEmailHadSpaces: rawEmail !== rawEmail.trim(),
+        adminPasswordSet: rawPassword.trim().length > 0,
+        adminPasswordLongEnough: rawPassword.trim().length >= MIN_PASSWORD_LENGTH,
+        adminAccountExists: Boolean(account),
+        adminAccountRole: (profile?.role as string | undefined) ?? null,
+      });
+    }
     if (action !== "me") throw new StoreError(404, "not-found", "Unknown action.");
     const session = await getSession(db, request);
     return json({ user: session ? await userPayload(db, session) : null });
