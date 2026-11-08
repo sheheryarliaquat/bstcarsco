@@ -47,6 +47,8 @@ The app is configured with the `@/*` alias to `src/*` and the root project is in
 
 ## Important project-specific behavior
 
+- GoDaddy's "Import SQL" button DROPS EVERY TABLE before running the file — never use it for small fixes or to change data. The site recreates missing tables automatically on the next request.
+- The owner's admin login comes from GoDaddy Secrets `ADMIN_EMAIL` + `ADMIN_PASSWORD` (see `ensureOwnerAdmin` in `src/lib/server/auth.ts`); logging in with them creates or restores that admin account.
 - The database is optional in some environments. When DB_* variables are missing the API answers `backend-unavailable` and auth and booking flows degrade to demo/local behavior, as before.
 - The project uses app-router metadata and global styles from `src/app/layout.tsx` and `src/app/globals.css`.
 - `next dev` may add the Next.js warning block at the top of this file; keep it intact so the repo stays consistent with the installed Next version.

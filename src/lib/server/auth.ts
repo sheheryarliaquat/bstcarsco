@@ -309,3 +309,56 @@ export function recordLoginFailure(key: string): void {
 export function clearLoginFailures(key: string): void {
   failures.delete(key);
 }
+
+// ---------------------------------------------------------------------------
+// Owner admin account from GoDaddy Secrets
+// ---------------------------------------------------------------------------
+
+/**
+ * The site owner's admin login is defined by two secrets set in
+ * GoDaddy -> Settings -> Secrets: ADMIN_EMAIL and ADMIN_PASSWORD.
+ * Logging in with exactly those details creates that admin account if it
+ * doesn't exist, or (re)sets its password and admin role if it does — so
+ * access survives a wiped database. Only someone who can edit the app's
+ * secrets can use this. Returns true when it applied.
+ */
+export async function ensureOwnerAdmin(db: Db, email: string, password: string): Promise<boolean> {
+  const secretEmail = process.env.ADMIN_EMAIL;
+  const secretPassword = process.env.ADMIN_PASSWORD;
+  if (!secretEmail || !secretPassword || secretPassword.length < MIN_PASSWORD_LENGTH) return false;
+  let ownerEmail: string;
+  try {
+    ownerEmail = normalizeEmail(secretEmail);
+  } catch {
+    return false;
+  }
+  if (email !== ownerEmail) return false;
+  const a = Buffer.from(sha256(password), "hex");
+  const b = Buffer.from(sha256(secretPassword), "hex");
+  if (!crypto.timingSafeEqual(a, b)) return false;
+
+  await ensureAppTables(db);
+  const existing = await findAuthByEmail(db, email);
+  if (!existing) {
+    await createAccount(db, { email, password, role: "admin", firstName: "Admin", lastName: "", phone: "" });
+    return true;
+  }
+  if (!(await verifyPassword(password, existing.password_hash))) {
+    // Someone else may have registered this email: take the account over and
+    // sign out every existing session before it becomes an admin.
+    await setPassword(db, existing.uid, password);
+    await endAllSessions(db, existing.uid);
+  }
+  await db.query("UPDATE `auth_users` SET `disabled` = 0 WHERE `uid` = ?", [existing.uid]);
+  const profile: Record<string, unknown> =
+    (await getDoc(db, "users", existing.uid)) ?? { uid: existing.uid, email, createdAt: new Date().toISOString() };
+  const role = profile.role === "super_admin" ? "super_admin" : "admin";
+  await putDoc(db, "users", existing.uid, {
+    ...profile,
+    role,
+    status: "active",
+    active: true,
+    updatedAt: new Date().toISOString(),
+  });
+  return true;
+}
