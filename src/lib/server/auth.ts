@@ -323,8 +323,9 @@ export function clearLoginFailures(key: string): void {
  * secrets can use this. Returns true when it applied.
  */
 export async function ensureOwnerAdmin(db: Db, email: string, password: string): Promise<boolean> {
-  const secretEmail = process.env.ADMIN_EMAIL;
-  const secretPassword = process.env.ADMIN_PASSWORD;
+  // Trim: secrets pasted into GoDaddy often pick up a stray space or newline.
+  const secretEmail = process.env.ADMIN_EMAIL?.trim();
+  const secretPassword = process.env.ADMIN_PASSWORD?.trim();
   if (!secretEmail || !secretPassword || secretPassword.length < MIN_PASSWORD_LENGTH) return false;
   let ownerEmail: string;
   try {
@@ -333,10 +334,11 @@ export async function ensureOwnerAdmin(db: Db, email: string, password: string):
     return false;
   }
   if (email !== ownerEmail) return false;
-  const a = Buffer.from(sha256(password), "hex");
+  const a = Buffer.from(sha256(password.trim()), "hex");
   const b = Buffer.from(sha256(secretPassword), "hex");
   if (!crypto.timingSafeEqual(a, b)) return false;
 
+  password = secretPassword;
   await ensureAppTables(db);
   const existing = await findAuthByEmail(db, email);
   if (!existing) {
