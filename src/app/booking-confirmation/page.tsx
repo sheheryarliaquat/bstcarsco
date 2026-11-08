@@ -21,6 +21,7 @@ import {
   User,
   Banknote,
   ShieldCheck,
+  XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,15 +31,14 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { getBookingByIdAnySource } from "@/lib/services/booking-service";
 import { ensureAuthSession } from "@/lib/firebase/auth";
 import { getVehicle } from "@/lib/services/vehicle-service";
-import { getDocument } from "@/lib/firebase/firestore";
-import type { Booking, Operator } from "@/types";
+import { getDocument, onDocumentSnapshot } from "@/lib/firebase/firestore";
+import { BookingStatus, type Booking, type Operator } from "@/types";
 import { format } from "date-fns";
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const paymentMethod = searchParams.get("payment") || "card";
   const bookingId = searchParams.get("bookingId");
-  const isCash = paymentMethod === "cash";
 
   const [booking, setBooking] = useState<Booking | null>(null);
   const [vehicleDescription, setVehicleDescription] = useState<string | null>(null);
@@ -69,8 +69,20 @@ function ConfirmationContent() {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+    // Keep the status current (e.g. when the admin approves a cash booking)
+    // while this page is open. Bookings kept only on this device have no
+    // server copy; for those the poll just finds nothing.
+    const stop = onDocumentSnapshot<Booking>(
+      "bookings",
+      bookingId,
+      (live) => {
+        if (!cancelled && live) setBooking((prev) => (prev ? { ...prev, ...live } : live));
+      },
+      () => undefined
+    );
     return () => {
       cancelled = true;
+      stop();
     };
   }, [bookingId]);
 
@@ -105,6 +117,15 @@ function ConfirmationContent() {
     );
   }
 
+  // Status comes from the booking itself, not the link, so it changes once the admin acts.
+  // Cash or card comes from the saved booking; the link's ?payment= is only a fallback.
+  const isCash = (booking.paymentMethod ?? paymentMethod) === "cash";
+  const status = booking.bookingStatus as BookingStatus | undefined;
+  const awaitingApproval = status === BookingStatus.CashPendingApproval || (isCash && !status);
+  const isCancelled =
+    typeof status === "string" &&
+    (status.startsWith("cancelled") || status === BookingStatus.PaymentFailed || status === BookingStatus.NoShow);
+
   return (
     <div className="min-h-screen bg-[#F4F6F9]">
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
@@ -118,7 +139,7 @@ function ConfirmationContent() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-[#0F1B2D]">
-            {isCash ? "Booking Submitted!" : "Booking Confirmed!"}
+            {awaitingApproval ? "Booking Submitted!" : isCancelled ? "Booking Cancelled" : "Booking Confirmed!"}
           </h1>
           <p className="mt-2 text-[#5B6577]">
             Your booking reference is{" "}
@@ -126,7 +147,33 @@ function ConfirmationContent() {
               {booking.bookingNumber}
             </span>
           </p>
-          {isCash && (
+          {isCancelled && (
+            <div className="mx-auto mt-4 max-w-md rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="flex items-start gap-3">
+                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-red-800">This booking was cancelled</p>
+                  <p className="mt-1 text-sm text-red-700">
+                    Please contact support if you have any questions.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {isCash && !awaitingApproval && !isCancelled && (
+            <div className="mx-auto mt-4 max-w-md rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#168A55]" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#14532D]">Approved</p>
+                  <p className="mt-1 text-sm text-[#166534]">
+                    Your booking is confirmed. Please pay the driver in cash on the day.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {awaitingApproval && (
             <div className="mx-auto mt-4 max-w-md rounded-lg border border-amber-200 bg-amber-50 p-4">
               <div className="flex items-start gap-3">
                 <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
@@ -152,12 +199,14 @@ function ConfirmationContent() {
             </h2>
             <Badge
               className={
-                isCash
+                awaitingApproval
                   ? "bg-amber-100 text-amber-700"
-                  : "bg-[#168A55]/10 text-[#168A55]"
+                  : isCancelled
+                    ? "bg-red-100 text-red-700"
+                    : "bg-[#168A55]/10 text-[#168A55]"
               }
             >
-              {isCash ? "Pending Approval" : "Confirmed"}
+              {awaitingApproval ? "Pending Approval" : isCancelled ? "Cancelled" : "Confirmed"}
             </Badge>
           </div>
 
