@@ -1,4 +1,4 @@
-import { UK_AIRPORTS } from '@/constants';
+import { UK_AIRPORTS, VEHICLE_TYPES } from '@/constants';
 import type { RouteFare, VehicleType } from '@/types';
 
 export interface WorkbookSheet {
@@ -157,4 +157,155 @@ export function mergeRouteFares(existing: RouteFare[], imported: RouteFare[], ve
   const isAirportRoute = (r: RouteFare) =>
     [...r.fromAreas, ...r.toAreas].some((t) => UK_AIRPORTS.some((a) => a.code === t.toUpperCase()));
   return result.sort((a, b) => Number(isAirportRoute(b)) - Number(isAirportRoute(a)));
+}
+
+// ---------------------------------------------------------------------------
+// One workbook for all pricing ("BST Cars pricing" workbook)
+// ---------------------------------------------------------------------------
+//
+// Sheets:
+//   Route Fares     From | To | Saloon | Executive | Estate | MPV | Minibus | Electric | Wheelchair Accessible
+//   Postcodes       Postcode / Place | Zone
+//   Per Mile Rates  Car type | Base fare | Per mile | Per minute | Minimum fare | Booking fee
+// The route fares in the file replace the whole fixed-fare list; the per-mile
+// rates (if present) replace the Vehicles & Rates settings.
+
+export interface MileageRate {
+  vehicleType: VehicleType;
+  label: string;
+  baseFare: number;
+  perMile: number;
+  perMinute: number;
+  minimumFare: number;
+  bookingFee: number;
+}
+
+export interface PricingWorkbookResult extends RouteFareImportResult {
+  vehicleTypes: VehicleType[];
+  rates: MileageRate[] | null;
+}
+
+function vehicleTypeForHeader(header: string): VehicleType | null {
+  const h = header.toLowerCase().replace(/[^a-z]/g, '');
+  if (!h) return null;
+  const found = VEHICLE_TYPES.find((t) => {
+    const label = t.label.toLowerCase().replace(/[^a-z]/g, '');
+    const value = t.value.replace(/[^a-z]/g, '');
+    return h === label || h === value || (h.startsWith('wheelchair') && t.value === 'wheelchair_accessible');
+  });
+  return found?.value ?? null;
+}
+
+function routeFareSheet(sheets: WorkbookSheet[]): WorkbookSheet | undefined {
+  return findSheet(sheets, 'Route Fares', 'Rate List', 'Rates');
+}
+
+function typeColumns(sheet: WorkbookSheet): { headerRow: number; columns: { index: number; type: VehicleType }[] } {
+  const headerRow = sheet.data.findIndex((r) => cell(r[0]).toLowerCase() === 'from' && cell(r[1]).toLowerCase() === 'to');
+  if (headerRow < 0) return { headerRow, columns: [] };
+  const columns: { index: number; type: VehicleType }[] = [];
+  sheet.data[headerRow].forEach((h, index) => {
+    if (index < 2) return;
+    const type = vehicleTypeForHeader(cell(h));
+    if (type && !columns.some((c) => c.type === type)) columns.push({ index, type });
+  });
+  return { headerRow, columns };
+}
+
+/** True for the all-in-one layout: a route fares sheet with a price column per car type. */
+export function isPricingWorkbook(sheets: WorkbookSheet[]): boolean {
+  const sheet = routeFareSheet(sheets);
+  return Boolean(sheet && typeColumns(sheet).columns.length >= 1);
+}
+
+function parseMileageRates(sheets: WorkbookSheet[], warnings: string[]): MileageRate[] | null {
+  const sheet = findSheet(sheets, 'Per Mile Rates', 'Per-Mile Rates', 'Mileage Rates');
+  if (!sheet) return null;
+  const headerRow = sheet.data.findIndex((r) => /car type|vehicle/i.test(cell(r[0])));
+  if (headerRow < 0) {
+    warnings.push('"Per Mile Rates" sheet has no "Car type" header row, so per-mile rates were not changed.');
+    return null;
+  }
+  const headers = sheet.data[headerRow].map((h) => cell(h).toLowerCase());
+  const col = (re: RegExp) => headers.findIndex((h) => re.test(h));
+  const cols = {
+    baseFare: col(/base/),
+    perMile: col(/per\s*mile/),
+    perMinute: col(/per\s*min/),
+    minimumFare: col(/minimum|min\.?\s*fare/),
+    bookingFee: col(/booking/),
+  };
+  if (Object.values(cols).some((i) => i < 0)) {
+    warnings.push('"Per Mile Rates" needs columns Base fare, Per mile, Per minute, Minimum fare and Booking fee; per-mile rates were not changed.');
+    return null;
+  }
+  const rates: MileageRate[] = [];
+  for (const row of sheet.data.slice(headerRow + 1)) {
+    const type = vehicleTypeForHeader(cell(row[0]));
+    if (!type) continue;
+    const values = {
+      baseFare: num(row[cols.baseFare]),
+      perMile: num(row[cols.perMile]),
+      perMinute: num(row[cols.perMinute]),
+      minimumFare: num(row[cols.minimumFare]),
+      bookingFee: num(row[cols.bookingFee]),
+    };
+    if (Object.values(values).some((v) => v === null || v < 0)) {
+      warnings.push(`Per-mile rates for "${cell(row[0])}" are incomplete or negative and were skipped.`);
+      continue;
+    }
+    const label = VEHICLE_TYPES.find((t) => t.value === type)?.label ?? type;
+    rates.push({ vehicleType: type, label, ...(values as Record<keyof typeof values, number>) });
+  }
+  if (rates.length === 0) {
+    warnings.push('"Per Mile Rates" has no usable rows, so per-mile rates were not changed.');
+    return null;
+  }
+  const missing = VEHICLE_TYPES.filter((t) => !rates.some((r) => r.vehicleType === t.value));
+  if (missing.length) {
+    warnings.push(`No per-mile rates for ${missing.map((m) => m.label).join(', ')}; the site's default rates are used for them.`);
+  }
+  return rates;
+}
+
+/**
+ * Parse the all-in-one pricing workbook: every car type's fixed fares (one
+ * column each) and the per-mile rates. Each price column goes through the
+ * same parser as a single-car-type upload.
+ */
+export function parsePricingWorkbook(sheets: WorkbookSheet[], newId: () => string): PricingWorkbookResult {
+  const sheet = routeFareSheet(sheets);
+  if (!sheet) throw new Error('The workbook needs a "Route Fares" sheet.');
+  const { headerRow, columns } = typeColumns(sheet);
+  if (columns.length === 0) {
+    throw new Error('The "Route Fares" sheet needs a header row: From | To | Saloon | Executive | … (one column per car type).');
+  }
+  const postcodes = findSheet(sheets, 'Postcodes', 'Zones');
+  const warnings: string[] = [];
+  let routes: RouteFare[] = [];
+  let prices = 0;
+  const zones = new Set<string>();
+  const vehicleTypes: VehicleType[] = [];
+
+  for (const { index, type } of columns) {
+    const rows = sheet.data.slice(headerRow + 1).map((r) => [r[0], r[1], r[index]]);
+    if (!rows.some((r) => num(r[2]) !== null && (num(r[2]) as number) > 0)) continue; // empty column
+    const single: WorkbookSheet[] = [
+      ...(postcodes ? [postcodes] : []),
+      { sheet: 'Rate List', data: [['From', 'To', 'Rate'], ...rows] },
+    ];
+    const result = parseRouteFareWorkbook(single, type, newId);
+    routes = mergeRouteFares(routes, result.routes, type);
+    prices += result.prices;
+    warnings.push(...result.warnings);
+    for (const r of result.routes) {
+      zones.add(r.fromLabel);
+      zones.add(r.toLabel);
+    }
+    vehicleTypes.push(type);
+  }
+  if (vehicleTypes.length === 0) throw new Error('No prices found in the "Route Fares" sheet.');
+
+  const rates = parseMileageRates(sheets, warnings);
+  return { routes, zones: zones.size, prices, warnings: [...new Set(warnings)], vehicleTypes, rates };
 }
