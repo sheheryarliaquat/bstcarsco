@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { User } from 'firebase/auth';
+import type { User } from '@/lib/firebase/auth';
 import {
   signIn as authSignIn,
   signUp as authSignUp,

@@ -61,7 +61,7 @@ import {
   toMysqlDatetime,
   toPlain,
   upsertSql,
-} from "./mysql-migration/sql";
+} from "../src/lib/mysql/schema";
 
 // ---------------------------------------------------------------------------
 // Options

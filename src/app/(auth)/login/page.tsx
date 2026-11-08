@@ -13,14 +13,12 @@ import {
   EyeOff,
   Loader2,
   AlertCircle,
-  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { signIn, signInWithGoogle, getUserData } from "@/lib/firebase/auth";
+import { signIn, getUserData } from "@/lib/firebase/auth";
 
 const ROLE_ROUTES: Record<string, string> = {
   passenger: "/passenger/dashboard",
@@ -46,7 +44,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
   const {
@@ -86,27 +83,6 @@ export default function LoginPage() {
     }
   }
 
-  async function handleGoogleSignIn() {
-    setGoogleLoading(true);
-    setError("");
-    try {
-      const result = await signInWithGoogle();
-      const userData = await getUserData(result.user.uid);
-      const role = userData?.role || "passenger";
-      router.push(ROLE_ROUTES[role] || "/passenger/dashboard");
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "An unexpected error occurred";
-      if (message.includes("popup-closed-by-user")) {
-        setError("");
-      } else {
-        setError("Failed to sign in with Google. Please try again.");
-      }
-    } finally {
-      setGoogleLoading(false);
-    }
-  }
-
   return (
     <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
       <div className="mb-6 text-center">
@@ -122,28 +98,6 @@ export default function LoginPage() {
           {error}
         </div>
       )}
-
-      <Button
-        type="button"
-        variant="outline"
-        className="mb-4 h-11 w-full border-[#E2E6EC] text-[#0F1B2D] hover:bg-[#F4F6F9]"
-        onClick={handleGoogleSignIn}
-        disabled={googleLoading}
-      >
-        {googleLoading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Globe className="mr-2 h-4 w-4" />
-        )}
-        Sign in with Google
-      </Button>
-
-      <div className="relative mb-4">
-        <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-[#5B6577]">
-          or continue with email
-        </span>
-      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>

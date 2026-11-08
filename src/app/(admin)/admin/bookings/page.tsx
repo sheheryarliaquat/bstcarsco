@@ -135,7 +135,7 @@ export default function AdminBookingsPage() {
     }
 
     return result
-  }, [search, statusFilter, paymentFilter])
+  }, [bookings, search, statusFilter, paymentFilter])
 
   const totalPages = Math.ceil(filtered.length / pageSize)
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
@@ -293,7 +293,7 @@ export default function AdminBookingsPage() {
       sortable: true,
       render: (row) => (
         <span className="font-semibold text-[#0F1B2D]">
-          £{(row.total as number).toFixed(2)}
+          £{Number(row.total ?? 0).toFixed(2)}
         </span>
       ),
     },

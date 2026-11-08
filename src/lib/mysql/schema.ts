@@ -1,5 +1,5 @@
 /**
- * Pure helpers for turning Firebase data into MySQL statements.
+ * MySQL table definitions shared by the website and scripts/export-firebase-to-mysql.ts.
  * No Firebase or network access here, so this file can be tested on its own.
  *
  * Table layout (one table per Firestore collection):
@@ -224,3 +224,50 @@ export function documentRow(
 export function pruneSql(table: string, runId: string): string {
   return `DELETE FROM ${escapeId(table)} WHERE \`synced_at\` <> ${escape(runId)};\n`;
 }
+
+// ---------------------------------------------------------------------------
+// Tables used only by the website (created automatically on first use)
+// ---------------------------------------------------------------------------
+
+export const SESSIONS_TABLE_SQL = `CREATE TABLE IF NOT EXISTS \`sessions\` (
+  \`token_hash\` CHAR(64) NOT NULL,
+  \`uid\` VARCHAR(128) NOT NULL,
+  \`anonymous\` TINYINT(1) NOT NULL DEFAULT 0,
+  \`created_at\` DATETIME(3) NOT NULL,
+  \`expires_at\` DATETIME(3) NOT NULL,
+  PRIMARY KEY (\`token_hash\`),
+  KEY \`idx_uid\` (\`uid\`),
+  KEY \`idx_expires_at\` (\`expires_at\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+`;
+
+export const PASSWORD_RESETS_TABLE_SQL = `CREATE TABLE IF NOT EXISTS \`password_resets\` (
+  \`token_hash\` CHAR(64) NOT NULL,
+  \`uid\` VARCHAR(128) NOT NULL,
+  \`created_at\` DATETIME(3) NOT NULL,
+  \`expires_at\` DATETIME(3) NOT NULL,
+  \`used_at\` DATETIME(3) NULL,
+  PRIMARY KEY (\`token_hash\`),
+  KEY \`idx_uid\` (\`uid\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+`;
+
+export const FILES_TABLE_SQL = `CREATE TABLE IF NOT EXISTS \`files\` (
+  \`path\` VARCHAR(512) NOT NULL,
+  \`content\` LONGBLOB NOT NULL,
+  \`content_type\` VARCHAR(255) NOT NULL,
+  \`size_bytes\` BIGINT NOT NULL,
+  \`owner_uid\` VARCHAR(128) NULL,
+  \`created_at\` DATETIME(3) NOT NULL,
+  \`updated_at\` DATETIME(3) NOT NULL,
+  PRIMARY KEY (\`path\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+`;
+
+/** Tables the website needs besides one-per-collection. */
+export const APP_TABLES_SQL = [
+  AUTH_USERS_TABLE_SQL,
+  SESSIONS_TABLE_SQL,
+  PASSWORD_RESETS_TABLE_SQL,
+  FILES_TABLE_SQL,
+];

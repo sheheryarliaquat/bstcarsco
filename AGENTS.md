@@ -27,11 +27,13 @@ The app is configured with the `@/*` alias to `src/*` and the root project is in
 
 - `src/app/`: route structure and page-level UI. Route groups such as `(admin)`, `(auth)`, `(driver)`, `(operator)`, and `(passenger)` are intentional and should be preserved.
 - `src/components/`: shared UI. Reuse existing components in `src/components/ui/` and other feature folders before creating one-off solutions.
-- `src/lib/firebase/`: the Firebase integration layer. Prefer these wrappers over direct SDK imports in page or component code.
+- `src/lib/firebase/`: the data/login/file wrappers. Despite the folder name, these now call the site's own API (`src/app/api/{db,auth,files}`) which stores everything in the GoDaddy-hosted MySQL database — Firebase is no longer used by the website. Prefer these wrappers in page or component code.
+- `src/lib/server/`: server-only code for that API — `docstore.ts` (one MySQL table per collection, JSON documents), `auth.ts` (scrypt passwords, session cookies), `access.ts` (who may read/write what; the port of the old firestore.rules/storage.rules — update it whenever you add a collection), `files.ts`.
+- `src/lib/mysql/`: MySQL connection (`db.ts`, env vars DB_* injected by GoDaddy) and table definitions (`schema.ts`).
 - `src/lib/services/`: business logic and collection-specific accessors such as booking and user service methods.
 - `src/hooks/`: client-side composable hooks such as `useAuth` and `useFirestore`.
 - `src/types/`: shared domain types.
-- `functions/src/index.ts`: Firebase Cloud Functions backend; keep server-side logic there instead of scattering backend code into the Next app.
+- `functions/src/index.ts`: old Firebase Cloud Functions code, not used by the website. New server-side logic goes in Next.js route handlers under `src/app/api/`.
 
 ## Conventions to follow
 
@@ -45,7 +47,7 @@ The app is configured with the `@/*` alias to `src/*` and the root project is in
 
 ## Important project-specific behavior
 
-- Firebase is optional in some environments. Auth and booking flows are designed to degrade to demo/local behavior when Firebase is not configured or when writes fail.
+- The database is optional in some environments. When DB_* variables are missing the API answers `backend-unavailable` and auth and booking flows degrade to demo/local behavior, as before.
 - The project uses app-router metadata and global styles from `src/app/layout.tsx` and `src/app/globals.css`.
 - `next dev` may add the Next.js warning block at the top of this file; keep it intact so the repo stays consistent with the installed Next version.
 
