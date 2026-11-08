@@ -25,6 +25,17 @@ export interface VehicleRate {
   bookingFee: number;
 }
 
+/** Per-mile rates used until the admin saves their own in Vehicles & Rates. */
+export const DEFAULT_VEHICLE_RATES: VehicleRate[] = [
+  { vehicleType: 'saloon', label: 'Saloon', baseFare: 3.0, perMile: 1.8, perMinute: 0.25, minimumFare: 5.0, bookingFee: 1.0 },
+  { vehicleType: 'executive', label: 'Executive', baseFare: 5.0, perMile: 2.5, perMinute: 0.35, minimumFare: 8.0, bookingFee: 1.5 },
+  { vehicleType: 'estate', label: 'Estate', baseFare: 3.5, perMile: 2.0, perMinute: 0.28, minimumFare: 6.0, bookingFee: 1.0 },
+  { vehicleType: 'mpv', label: 'MPV (6 Seater)', baseFare: 5.0, perMile: 2.2, perMinute: 0.30, minimumFare: 8.0, bookingFee: 1.5 },
+  { vehicleType: 'minibus', label: 'Minibus (8 Seater)', baseFare: 7.0, perMile: 2.8, perMinute: 0.40, minimumFare: 12.0, bookingFee: 2.0 },
+  { vehicleType: 'electric', label: 'Electric', baseFare: 3.0, perMile: 1.6, perMinute: 0.22, minimumFare: 5.0, bookingFee: 1.0 },
+  { vehicleType: 'wheelchair_accessible', label: 'Wheelchair Accessible', baseFare: 4.0, perMile: 2.0, perMinute: 0.28, minimumFare: 6.0, bookingFee: 1.0 },
+]
+
 export async function createVehicle(
   data: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> {

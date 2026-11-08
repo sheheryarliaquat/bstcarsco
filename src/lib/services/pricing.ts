@@ -82,6 +82,16 @@ export function calculateDistance(pickup: Location, destination: Location): numb
   return haversineDistance(pickup.latitude, pickup.longitude, destination.latitude, destination.longitude)
 }
 
+/**
+ * Roads are rarely straight: UK road distance is typically about 25% longer
+ * than the straight-line distance, so per-mile prices use this estimate.
+ */
+export const ROAD_DISTANCE_FACTOR = 1.25
+
+export function estimateRoadMiles(pickup: Location, destination: Location): number {
+  return Math.round(calculateDistance(pickup, destination) * ROAD_DISTANCE_FACTOR * 10) / 10
+}
+
 export function estimateDuration(distanceMiles: number, vehicleType: VehicleType): number {
   const speedMap: Record<VehicleType, number> = {
     saloon: 20,
@@ -92,8 +102,14 @@ export function estimateDuration(distanceMiles: number, vehicleType: VehicleType
     electric: 20,
     wheelchair_accessible: 18,
   }
-  const avgSpeedMph = speedMap[vehicleType] || 20
-  return Math.max(Math.round((distanceMiles / avgSpeedMph) * 60), 5)
+  const citySpeedMph = speedMap[vehicleType] || 20
+  // The first ~10 miles at town speed, the rest of a long journey at a
+  // motorway/A-road average, so a London–Manchester trip isn't timed (and
+  // charged per minute) as if it were all city driving.
+  const cityMiles = Math.min(distanceMiles, 10)
+  const openRoadMiles = Math.max(distanceMiles - 10, 0)
+  const minutes = (cityMiles / citySpeedMph) * 60 + (openRoadMiles / 45) * 60
+  return Math.max(Math.round(minutes), 5)
 }
 
 export function applyPromoCode(

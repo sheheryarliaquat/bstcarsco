@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, Baby, Calendar, Clock, Plane, UserCheck } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -15,14 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { LocationAutocomplete } from "./LocationAutocomplete"
-import {
-  getDropoffPlaces,
-  getPickupPlaces,
-  getRouteFares,
-  locationInPlaces,
-} from "@/lib/services/route-fare-service"
-import { ensureAuthSession } from "@/lib/firebase/auth"
-import type { Location, RouteFare, TripType, SpecialRequirements } from "@/types"
+import type { Location, TripType, SpecialRequirements } from "@/types"
 import { format } from "date-fns"
 
 function generateTimeOptions() {
@@ -75,37 +68,10 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
   const [meetGreet, setMeetGreet] = useState(initial?.specialRequirements?.meetAndGreet ?? false)
   const [flightNumber, setFlightNumber] = useState(initial?.specialRequirements?.flightNumber ?? "")
   const [dateOpen, setDateOpen] = useState(false)
-  const [routeFares, setRouteFares] = useState<RouteFare[] | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    // Route fares live in Firestore `settings`, which needs a (possibly anonymous)
-    // session — same as the quotes page. Without it a visitor gets no price list.
-    ensureAuthSession()
-      .catch(() => null)
-      .then(() => getRouteFares())
-      .then((r) => !cancelled && setRouteFares(r))
-      .catch(() => !cancelled && setRouteFares([]))
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  // Only offer journeys the admin has priced. With no route fares set up, any address is allowed.
-  const pickupPlaces = useMemo(() => (routeFares ? getPickupPlaces(routeFares) : []), [routeFares])
-  const priceListOnly = pickupPlaces.length > 0
-  const dropoffPlaces = useMemo(
-    () => (routeFares && pickup ? getDropoffPlaces(routeFares, pickup) : []),
-    [routeFares, pickup]
-  )
-
-  // A new pick-up can rule out the drop-off already chosen.
+  // Any UK address can be booked: London routes in the admin's price list get
+  // their fixed fare on the quotes page, everywhere else is priced per mile.
   function handlePickupSelect(loc: Location) {
     setPickup(loc)
-    if (priceListOnly && routeFares && destination && !locationInPlaces(destination, getDropoffPlaces(routeFares, loc))) {
-      setDestination(null)
-      setDestinationText("")
-    }
   }
 
   function handlePickupText(text: string) {
@@ -189,7 +155,6 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
           value={pickupText}
           onChange={handlePickupText}
           onLocationSelect={handlePickupSelect}
-          allowedPlaces={priceListOnly ? pickupPlaces : null}
           placeholder="e.g. SW1A 2AA or 10 Downing Street"
           icon="MapPin"
           geoButton="icon"
@@ -201,9 +166,7 @@ export function BookingSearch({ onSearch, initial, className }: BookingSearchPro
           value={destinationText}
           onChange={handleDestinationText}
           onLocationSelect={setDestination}
-          allowedPlaces={priceListOnly ? dropoffPlaces : null}
-          disabled={priceListOnly && !pickup}
-          placeholder={priceListOnly && !pickup ? "Choose pick-up first" : "e.g. Heathrow Terminal 5"}
+          placeholder="e.g. Heathrow Terminal 5"
           icon="Plane"
           geoButton="icon"
           className="col-span-2"
