@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Settings,
   Save,
@@ -13,13 +13,22 @@ import {
   Clock,
   AlertTriangle,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { VEHICLE_TYPES, PRICING_DEFAULTS } from "@/constants"
+import { VEHICLE_TYPES } from "@/constants"
 import { RouteFaresEditor } from "@/components/admin/RouteFaresEditor"
 import { ExtrasPricingEditor } from "@/components/admin/ExtrasPricingEditor"
-import type { PricingRule } from "@/types"
+import {
+  DEFAULT_PRICING_SETTINGS,
+  getPricingSettings,
+  savePricingSettings,
+} from "@/lib/services/pricing-settings-service"
+import {
+  DEFAULT_VEHICLE_RATES,
+  getVehicleRates,
+  saveVehicleRates,
+  type VehicleRate,
+} from "@/lib/services/vehicle-service"
 
 interface Surcharges {
   night: number
@@ -34,28 +43,83 @@ interface CommissionSettings {
   flatFee: number
 }
 
-const INITIAL_VEHICLE_PRICING: Record<string, { baseFare: number; perMile: number; perMinute: number; minimumFare: number }> = {
-  saloon: { baseFare: 3.5, perMile: 1.8, perMinute: 0.3, minimumFare: 5.0 },
-  executive: { baseFare: 5.0, perMile: 2.2, perMinute: 0.35, minimumFare: 8.0 },
-  estate: { baseFare: 3.5, perMile: 1.8, perMinute: 0.3, minimumFare: 5.5 },
-  mpv: { baseFare: 4.0, perMile: 2.0, perMinute: 0.3, minimumFare: 6.0 },
-  minibus: { baseFare: 5.0, perMile: 2.5, perMinute: 0.4, minimumFare: 8.0 },
-  electric: { baseFare: 2.5, perMile: 1.4, perMinute: 0.2, minimumFare: 4.5 },
-  wheelchair_accessible: { baseFare: 3.0, perMile: 1.5, perMinute: 0.25, minimumFare: 4.5 },
+type RateField = "baseFare" | "perMile" | "perMinute" | "minimumFare"
+
+/** Make sure every car type has a row, keeping saved values (and booking fees) as they are. */
+function withAllVehicleTypes(saved: VehicleRate[] | null): VehicleRate[] {
+  const list = saved && saved.length > 0 ? saved : DEFAULT_VEHICLE_RATES
+  const byType = new Map(list.map((r) => [r.vehicleType, r]))
+  const merged = VEHICLE_TYPES.map((vt) => {
+    const existing = byType.get(vt.value)
+    if (existing) return existing
+    return DEFAULT_VEHICLE_RATES.find((d) => d.vehicleType === vt.value) ?? {
+      vehicleType: vt.value,
+      label: vt.label,
+      baseFare: 0,
+      perMile: 0,
+      perMinute: 0,
+      minimumFare: 0,
+      bookingFee: 0,
+    }
+  })
+  // Keep any saved rows for car types not in the list above.
+  for (const r of list) if (!merged.some((m) => m.vehicleType === r.vehicleType)) merged.push(r)
+  return merged
 }
 
 export default function AdminPricingPage() {
-  const [commission, setCommission] = useState<CommissionSettings>({ percent: 15, flatFee: 0.5 })
-  const [surcharges, setSurcharges] = useState<Surcharges>({
-    night: 20,
-    weekend: 10,
-    peak: 25,
-    airport: 5,
-    congestion: 15,
-  })
-  const [vehiclePricing, setVehiclePricing] = useState(INITIAL_VEHICLE_PRICING)
-  const [minimumFare, setMinimumFare] = useState(5.0)
-  const [saved, setSaved] = useState(false)
+  const [commission, setCommission] = useState<CommissionSettings>(DEFAULT_PRICING_SETTINGS.commission)
+  const [surcharges, setSurcharges] = useState<Surcharges>(DEFAULT_PRICING_SETTINGS.surcharges)
+  const [rates, setRates] = useState<VehicleRate[]>(() => withAllVehicleTypes(null))
+  const [minimumFare, setMinimumFare] = useState(DEFAULT_PRICING_SETTINGS.globalMinimumFare)
+  const [loading, setLoading] = useState(true)
+  const [dirty, setDirty] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([
+      getPricingSettings(),
+      getVehicleRates().catch((err) => {
+        console.error("Could not load vehicle rates", err)
+        return null
+      }),
+    ]).then(([settings, savedRates]) => {
+      if (cancelled) return
+      setCommission(settings.commission)
+      setSurcharges(settings.surcharges)
+      setMinimumFare(settings.globalMinimumFare)
+      setRates(withAllVehicleTypes(savedRates))
+      setLoading(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Any edit marks the page as having unsaved changes.
+  function edit<T>(setter: (v: T) => void) {
+    return (v: T) => {
+      setter(v)
+      setDirty(true)
+      setStatus(null)
+    }
+  }
+  const editCommission = edit(setCommission)
+  const editSurcharges = edit(setSurcharges)
+  const editMinimumFare = edit(setMinimumFare)
+
+  function updateRate(vehicleType: string, field: RateField, value: number) {
+    setRates((prev) => prev.map((r) => (r.vehicleType === vehicleType ? { ...r, [field]: value } : r)))
+    setDirty(true)
+    setStatus(null)
+  }
+
+  const vehiclePricing = useMemo(
+    () => Object.fromEntries(rates.map((r) => [r.vehicleType, r])) as Record<string, VehicleRate>,
+    [rates]
+  )
 
   const [previewDistance, setPreviewDistance] = useState("")
   const [previewVehicle, setPreviewVehicle] = useState("saloon")
@@ -76,9 +140,31 @@ export default function AdminPricingPage() {
     return { base, distanceCharge, timeCharge, subtotal, nightCharge, commissionAmount, total }
   }, [previewDistance, previewVehicle, vehiclePricing, minimumFare, surcharges, commission])
 
-  function handleSave() {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  async function handleSave() {
+    setSaving(true)
+    setStatus(null)
+    try {
+      const clean = (n: number) => (Number.isFinite(n) && n >= 0 ? n : 0)
+      await Promise.all([
+        savePricingSettings({ commission, surcharges, globalMinimumFare: minimumFare }),
+        saveVehicleRates(
+          rates.map((r) => ({
+            ...r,
+            baseFare: clean(r.baseFare),
+            perMile: clean(r.perMile),
+            perMinute: clean(r.perMinute),
+            minimumFare: clean(r.minimumFare),
+          }))
+        ),
+      ])
+      setDirty(false)
+      setStatus({ ok: true, text: "Saved. Your changes are stored and will still be here after a refresh." })
+    } catch (err) {
+      console.error(err)
+      setStatus({ ok: false, text: "Could not save. Check your connection and admin login, then try again." })
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -88,11 +174,20 @@ export default function AdminPricingPage() {
           <h1 className="text-2xl font-bold text-[#0F1B2D]">Pricing</h1>
           <p className="text-sm text-[#5B6577]">Configure platform pricing rules and surcharges</p>
         </div>
-        <Button onClick={handleSave} className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90">
+        <Button
+          onClick={handleSave}
+          disabled={loading || saving || !dirty}
+          className="bg-[#1F4FD8] text-white hover:bg-[#1F4FD8]/90"
+        >
           <Save className="mr-1.5 h-4 w-4" />
-          {saved ? "Saved!" : "Save Settings"}
+          {loading ? "Loading..." : saving ? "Saving..." : dirty ? "Save Settings" : "Saved"}
         </Button>
       </div>
+      {status && (
+        <p role="status" className={status.ok ? "text-sm text-green-700" : "text-sm text-red-700"}>
+          {status.text}
+        </p>
+      )}
 
       {/* Fixed point-to-point fares per car type */}
       <RouteFaresEditor />
@@ -113,7 +208,7 @@ export default function AdminPricingPage() {
               <Input
                 type="number"
                 value={commission.percent}
-                onChange={(e) => setCommission({ ...commission, percent: Number(e.target.value) })}
+                onChange={(e) => editCommission({ ...commission, percent: Number(e.target.value) })}
                 className="h-9"
                 min={0}
                 max={50}
@@ -124,7 +219,7 @@ export default function AdminPricingPage() {
               <Input
                 type="number"
                 value={commission.flatFee}
-                onChange={(e) => setCommission({ ...commission, flatFee: Number(e.target.value) })}
+                onChange={(e) => editCommission({ ...commission, flatFee: Number(e.target.value) })}
                 className="h-9"
                 min={0}
                 step={0.25}
@@ -148,7 +243,7 @@ export default function AdminPricingPage() {
                 <Input
                   type="number"
                   value={surcharges.night}
-                  onChange={(e) => setSurcharges({ ...surcharges, night: Number(e.target.value) })}
+                  onChange={(e) => editSurcharges({ ...surcharges, night: Number(e.target.value) })}
                   className="h-9"
                   min={0}
                   max={100}
@@ -161,7 +256,7 @@ export default function AdminPricingPage() {
                 <Input
                   type="number"
                   value={surcharges.weekend}
-                  onChange={(e) => setSurcharges({ ...surcharges, weekend: Number(e.target.value) })}
+                  onChange={(e) => editSurcharges({ ...surcharges, weekend: Number(e.target.value) })}
                   className="h-9"
                   min={0}
                   max={100}
@@ -174,7 +269,7 @@ export default function AdminPricingPage() {
                 <Input
                   type="number"
                   value={surcharges.peak}
-                  onChange={(e) => setSurcharges({ ...surcharges, peak: Number(e.target.value) })}
+                  onChange={(e) => editSurcharges({ ...surcharges, peak: Number(e.target.value) })}
                   className="h-9"
                   min={0}
                   max={100}
@@ -187,7 +282,7 @@ export default function AdminPricingPage() {
                 <Input
                   type="number"
                   value={surcharges.airport}
-                  onChange={(e) => setSurcharges({ ...surcharges, airport: Number(e.target.value) })}
+                  onChange={(e) => editSurcharges({ ...surcharges, airport: Number(e.target.value) })}
                   className="h-9"
                   min={0}
                 />
@@ -199,7 +294,7 @@ export default function AdminPricingPage() {
                 <Input
                   type="number"
                   value={surcharges.congestion}
-                  onChange={(e) => setSurcharges({ ...surcharges, congestion: Number(e.target.value) })}
+                  onChange={(e) => editSurcharges({ ...surcharges, congestion: Number(e.target.value) })}
                   className="h-9"
                   min={0}
                 />
@@ -215,6 +310,9 @@ export default function AdminPricingPage() {
           <Car className="h-5 w-5 text-[#0F1B2D]" />
           <h3 className="text-base font-bold text-[#0F1B2D]">Vehicle Category Base Pricing</h3>
         </div>
+        <p className="-mt-2 mb-4 text-xs text-[#5B6577]">
+          These are the per-mile rates customers are charged outside the fixed London routes (same as Vehicles &amp; Rates).
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -241,12 +339,7 @@ export default function AdminPricingPage() {
                         <Input
                           type="number"
                           value={vp[field]}
-                          onChange={(e) =>
-                            setVehiclePricing({
-                              ...vehiclePricing,
-                              [vt.value]: { ...vp, [field]: Number(e.target.value) },
-                            })
-                          }
+                          onChange={(e) => updateRate(vt.value, field, Number(e.target.value))}
                           className="h-8 w-24 text-sm"
                           min={0}
                           step={0.1}
@@ -264,7 +357,7 @@ export default function AdminPricingPage() {
           <Input
             type="number"
             value={minimumFare}
-            onChange={(e) => setMinimumFare(Number(e.target.value))}
+            onChange={(e) => editMinimumFare(Number(e.target.value))}
             className="h-8 w-24 text-sm"
             min={0}
           />
