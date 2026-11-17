@@ -243,6 +243,15 @@ export interface Booking {
   createdAt: string;
   updatedAt: string;
   cancellationReason?: string;
+  /** Contact details entered at checkout (guests have no account email). */
+  passengerDetails?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+  /** Set by the server once the booking-confirmed email has gone out. */
+  confirmationEmailSentAt?: string;
 }
 
 export interface Quote {

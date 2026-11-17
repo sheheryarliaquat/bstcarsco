@@ -115,6 +115,7 @@ function CheckoutContent() {
   const {
     register,
     handleSubmit,
+    getValues,
     watch,
     formState: { errors },
   } = useForm<PassengerFormData>({
@@ -168,8 +169,15 @@ function CheckoutContent() {
         // Proceed as guest.
       }
 
+      const contact = getValues();
       const bookingData: Omit<Booking, 'bookingNumber' | 'createdAt' | 'updatedAt'> = {
         passengerId,
+        passengerDetails: {
+          firstName: contact.firstName.trim(),
+          lastName: contact.lastName.trim(),
+          email: contact.email.trim(),
+          phone: contact.phone.trim(),
+        },
         operatorId: quote.operatorId,
         driverId: "",
         // "type-…" quotes are a car type with no specific vehicle yet (assigned at dispatch).
