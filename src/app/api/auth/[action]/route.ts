@@ -2,6 +2,7 @@
 //
 //   GET  /api/auth/me               current user, or null
 //   GET  /api/auth/status           setup check: admin secrets present? (no secret values)
+//   GET  /api/auth/mail-status      setup check: SMTP secrets present, and can the site log in? (sends nothing)
 //   POST /api/auth/signup           { email, password, firstName, lastName, phone, role? (passenger|driver) }
 //   POST /api/auth/login            { email, password }
 //   POST /api/auth/logout
@@ -40,7 +41,7 @@ import {
 } from "@/lib/server/auth";
 import { ensureAppTables, getDoc, newId, putDoc, StoreError } from "@/lib/server/docstore";
 import { handle, json, readJson } from "@/lib/server/http";
-import { sendMail } from "@/lib/server/mail";
+import { checkMail, sendMail } from "@/lib/server/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +100,9 @@ export async function GET(request: Request, { params }: Params) {
         adminAccountExists: Boolean(account),
         adminAccountRole: (profile?.role as string | undefined) ?? null,
       });
+    }
+    if (action === "mail-status") {
+      return json({ code: "booking-email-v1", ...(await checkMail()) });
     }
     if (action !== "me") throw new StoreError(404, "not-found", "Unknown action.");
     const session = await getSession(db, request);
