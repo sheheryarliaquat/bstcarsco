@@ -10,6 +10,7 @@
 
 import { inTransaction } from "@/lib/mysql/db";
 import { Access } from "@/lib/server/access";
+import { becameConfirmed, sendBookingConfirmedEmail } from "@/lib/server/booking-emails";
 import { getSession } from "@/lib/server/auth";
 import {
   applyUpdate,
@@ -100,6 +101,9 @@ export async function POST(request: Request, { params }: Params) {
           await ensureCollection(db, op.collection);
         }
 
+        // Bookings this write confirms; the customer is emailed once it commits.
+        const confirmedBookings: string[] = [];
+
         const ids = await inTransaction(db, async () => {
           const out: string[] = [];
           for (const op of ops) {
@@ -117,6 +121,7 @@ export async function POST(request: Request, { params }: Params) {
               const next = applyUpdate(existing, asData(op.data));
               if (!(await access.canUpdate(collection, id, existing, next))) throw denied();
               await putDoc(db, collection, id, next);
+              if (collection === "bookings" && becameConfirmed(existing, next)) confirmedBookings.push(id);
             } else {
               // add, or set (replace): Firestore checks "update" rules when the document exists.
               const data = asData(op.data);
@@ -126,12 +131,16 @@ export async function POST(request: Request, { params }: Params) {
                 : await access.canCreate(collection, id, data);
               if (!allowed) throw denied();
               await putDoc(db, collection, id, data);
+              if (collection === "bookings" && becameConfirmed(existing, data)) confirmedBookings.push(id);
             }
             access.forget(collection, id);
             out.push(id);
           }
           return out;
         });
+        for (const bookingId of confirmedBookings) {
+          await sendBookingConfirmedEmail(db, bookingId);
+        }
         return json({ ids });
       }
 
