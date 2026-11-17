@@ -1,9 +1,8 @@
 // Booking emails to the customer (server only).
 //
 // Called by the data API (src/app/api/db/[action]/route.ts) after a write
-// commits: whenever a booking's status becomes "confirmed" — the admin
-// approving a cash booking, or a card booking saved as already paid — the
-// customer gets a confirmation email with the journey and price.
+// commits: when an admin accepts a booking (its status becomes "confirmed"),
+// the customer gets a confirmation email with the journey and price.
 // Uses the SMTP settings described in ./mail.ts; without them nothing is sent.
 
 import type { Db } from "@/lib/mysql/db";

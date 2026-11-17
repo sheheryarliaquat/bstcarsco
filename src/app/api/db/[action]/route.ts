@@ -101,7 +101,8 @@ export async function POST(request: Request, { params }: Params) {
           await ensureCollection(db, op.collection);
         }
 
-        // Bookings this write confirms; the customer is emailed once it commits.
+        // Bookings an admin accepts (moves to "confirmed") in this write; the
+        // customer is emailed once it commits. New bookings are not emailed here.
         const confirmedBookings: string[] = [];
 
         const ids = await inTransaction(db, async () => {
@@ -121,7 +122,9 @@ export async function POST(request: Request, { params }: Params) {
               const next = applyUpdate(existing, asData(op.data));
               if (!(await access.canUpdate(collection, id, existing, next))) throw denied();
               await putDoc(db, collection, id, next);
-              if (collection === "bookings" && becameConfirmed(existing, next)) confirmedBookings.push(id);
+              if (collection === "bookings" && becameConfirmed(existing, next) && (await access.isAdmin())) {
+                confirmedBookings.push(id);
+              }
             } else {
               // add, or set (replace): Firestore checks "update" rules when the document exists.
               const data = asData(op.data);
@@ -131,7 +134,9 @@ export async function POST(request: Request, { params }: Params) {
                 : await access.canCreate(collection, id, data);
               if (!allowed) throw denied();
               await putDoc(db, collection, id, data);
-              if (collection === "bookings" && becameConfirmed(existing, data)) confirmedBookings.push(id);
+              if (collection === "bookings" && existing && becameConfirmed(existing, data) && (await access.isAdmin())) {
+                confirmedBookings.push(id);
+              }
             }
             access.forget(collection, id);
             out.push(id);
