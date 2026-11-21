@@ -1,7 +1,7 @@
 // Booking emails to the customer (server only).
 //
 // Called by the data API (src/app/api/db/[action]/route.ts) after a write
-// commits: when an admin accepts a booking (its status becomes "confirmed"),
+// commits: when an admin accepts a booking (approves it, or assigns a driver),
 // the customer gets a confirmation email with the journey and price.
 // Uses the SMTP settings described in ./mail.ts; without them nothing is sent.
 
@@ -9,11 +9,35 @@ import type { Db } from "@/lib/mysql/db";
 import { getDoc, putDoc, type DocData } from "@/lib/server/docstore";
 import { isMailConfigured, sendMail } from "@/lib/server/mail";
 
-const CONFIRMED = "confirmed";
+// Statuses that mean the booking has been accepted and is going ahead.
+// Card bookings are created already "confirmed", so for them the admin's
+// first action is usually assigning a driver (straight to "driver_assigned");
+// cash bookings can also be dispatched without pressing Approve first.
+// Any of these counts as the admin accepting the booking.
+const ACCEPTED = new Set([
+  "confirmed",
+  "operator_pending",
+  "driver_searching",
+  "driver_assigned",
+  "driver_accepted",
+  "driver_en_route",
+  "driver_arrived",
+  "passenger_onboard",
+  "trip_started",
+]);
 
-/** True when this write moved the booking into "confirmed". */
+/**
+ * True when this write changed the booking's status to an accepted one and
+ * the customer hasn't been emailed yet (the email goes out once per booking).
+ */
 export function becameConfirmed(before: DocData | null, after: DocData): boolean {
-  return after.bookingStatus === CONFIRMED && before?.bookingStatus !== CONFIRMED;
+  const status = str(after.bookingStatus);
+  return (
+    ACCEPTED.has(status) &&
+    before?.bookingStatus !== status &&
+    !before?.confirmationEmailSentAt &&
+    !after.confirmationEmailSentAt
+  );
 }
 
 function str(v: unknown): string {
@@ -167,7 +191,7 @@ export async function sendBookingConfirmedEmail(db: Db, bookingId: string): Prom
       return;
     }
     const booking = await getDoc(db, "bookings", bookingId);
-    if (!booking || booking.bookingStatus !== CONFIRMED || booking.confirmationEmailSentAt) return;
+    if (!booking || !ACCEPTED.has(str(booking.bookingStatus)) || booking.confirmationEmailSentAt) return;
 
     const { email, name } = await recipient(db, booking);
     if (!email) {
