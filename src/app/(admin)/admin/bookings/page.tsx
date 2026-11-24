@@ -30,7 +30,7 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { BOOKING_STATUSES, PAYMENT_STATUSES, UK_CITIES } from "@/constants"
 import type { Booking, Operator, User as AppUser } from "@/types"
 import { BookingStatus } from "@/types"
-import { listenToAllBookings, updateBookingStatus } from "@/lib/services/booking-service"
+import { listenToAllBookings, updateBooking, updateBookingStatus } from "@/lib/services/booking-service"
 import { getVehicle } from "@/lib/services/vehicle-service"
 import { listenToDrivers } from "@/lib/services/driver-service"
 import { getDocument } from "@/lib/firebase/firestore"
@@ -52,6 +52,7 @@ export default function AdminBookingsPage() {
   const [expandedRow, setExpandedRow] = useState<string | null>(null)
   const [cashActionBooking, setCashActionBooking] = useState<BookingRow | null>(null)
   const [cashActionType, setCashActionType] = useState<"approve" | "reject">("approve")
+  const [acceptBooking, setAcceptBooking] = useState<BookingRow | null>(null)
   const [bookings, setBookings] = useState<BookingRow[]>([])
   const [passengerNames, setPassengerNames] = useState<Record<string, string>>({})
   const [operatorNames, setOperatorNames] = useState<Record<string, string>>({})
@@ -196,6 +197,12 @@ export default function AdminBookingsPage() {
   function handleCashAction(booking: BookingRow, action: "approve" | "reject") {
     setCashActionBooking(booking)
     setCashActionType(action)
+  }
+
+  async function confirmAccept() {
+    if (!acceptBooking) return
+    await updateBooking(acceptBooking.id, { adminAcceptedAt: new Date().toISOString() })
+    setAcceptBooking(null)
   }
 
   async function confirmCashAction() {
@@ -536,6 +543,19 @@ export default function AdminBookingsPage() {
                                   </Button>
                                 </>
                               )}
+                              {booking.bookingStatus === ("confirmed" as string) &&
+                                !booking.adminAcceptedAt &&
+                                !booking.confirmationEmailSentAt && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="border-green-300 bg-green-50 text-green-700 hover:bg-green-100"
+                                  onClick={(e) => { e.stopPropagation(); setAcceptBooking(booking) }}
+                                >
+                                  <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                                  Accept
+                                </Button>
+                              )}
                               {booking.bookingStatus !== ("cancelled_by_admin" as string) &&
                                 booking.bookingStatus !== ("trip_completed" as string) &&
                                 booking.bookingStatus !== ("cash_pending_approval" as string) && (
@@ -659,6 +679,16 @@ export default function AdminBookingsPage() {
         confirmText="Cancel Booking"
         variant="destructive"
         onConfirm={() => setCancelBooking(null)}
+      />
+
+      <ConfirmDialog
+        open={!!acceptBooking}
+        onOpenChange={(open) => { if (!open) setAcceptBooking(null) }}
+        title="Accept Booking"
+        description={`Accept booking ${acceptBooking?.bookingNumber}? The rider will be sent a booking confirmation email.`}
+        confirmText="Accept"
+        variant="default"
+        onConfirm={confirmAccept}
       />
 
       <ConfirmDialog
