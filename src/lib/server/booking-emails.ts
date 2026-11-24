@@ -3,11 +3,11 @@
 // Called by the data API (src/app/api/db/[action]/route.ts) after a write
 // commits: when an admin accepts a booking (approves it, or assigns a driver),
 // the customer gets a confirmation email with the journey and price.
-// Uses the SMTP settings described in ./mail.ts; without them nothing is sent.
+// Sent through ./mail.ts (GoDaddy email gateway, or SMTP as a fallback).
 
 import type { Db } from "@/lib/mysql/db";
 import { getDoc, putDoc, type DocData } from "@/lib/server/docstore";
-import { isMailConfigured, sendMail } from "@/lib/server/mail";
+import { sendMail } from "@/lib/server/mail";
 
 // Statuses that mean the booking has been accepted and is going ahead.
 // Card bookings are created already "confirmed", so for them the admin's
@@ -189,10 +189,6 @@ function buildEmail(booking: DocData, name: string) {
  */
 export async function sendBookingConfirmedEmail(db: Db, bookingId: string): Promise<void> {
   try {
-    if (!isMailConfigured()) {
-      console.warn(`[booking-email] SMTP is not configured; no confirmation sent for booking ${bookingId}.`);
-      return;
-    }
     const booking = await getDoc(db, "bookings", bookingId);
     if (!booking || !ACCEPTED.has(str(booking.bookingStatus)) || booking.confirmationEmailSentAt) return;
 
