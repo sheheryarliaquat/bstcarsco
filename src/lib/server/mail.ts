@@ -1,11 +1,17 @@
-// Outgoing email (server only), used for password-reset links.
+// Outgoing email (server only): booking confirmations and password-reset links.
 //
-// Sends through any SMTP server (e.g. GoDaddy / Microsoft 365 / Gmail
-// mailbox) when these are set in GoDaddy -> Settings -> Secrets:
+// On GoDaddy Node.js Hosting, mail goes through the platform's built-in email
+// gateway (./email-gateway.ts) — no SMTP login needed, sent from the app's
+// address on bstcars.co. Replies go to SMTP_FROM (e.g. booking@bstcars.co)
+// when that secret is set.
+//
+// Where the gateway isn't available (e.g. running locally), it falls back to
+// an SMTP server when these are set in GoDaddy -> Settings -> Secrets:
 //   SMTP_HOST, SMTP_PORT (default 587), SMTP_USER, SMTP_PASS, SMTP_FROM
-// Without them, emails are not sent and a warning is logged instead.
+// With neither, emails are not sent and a warning is logged instead.
 
 import nodemailer from "nodemailer";
+import { GatewayUnavailableError, isGatewayReachable, sendViaGateway } from "@/lib/server/email-gateway";
 
 export function isMailConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
@@ -38,6 +44,11 @@ export async function checkMail(): Promise<Record<string, unknown>> {
     smtpFrom: process.env.SMTP_FROM || null,
     configured: isMailConfigured(),
   };
+  if (await isGatewayReachable()) {
+    return { ...info, gateway: "reachable", sendsVia: "godaddy-email-gateway", login: "ok" };
+  }
+  info.gateway = "not reachable";
+  info.sendsVia = isMailConfigured() ? "smtp" : "none";
   if (!isMailConfigured()) return { ...info, login: "skipped: SMTP_HOST, SMTP_USER or SMTP_PASS is missing" };
   try {
     await createTransport().verify();
@@ -53,8 +64,27 @@ export async function checkMail(): Promise<Record<string, unknown>> {
 }
 
 export async function sendMail(to: string, subject: string, text: string, html: string): Promise<boolean> {
+  const replyTo = process.env.SMTP_FROM?.trim() || process.env.SMTP_USER?.trim() || undefined;
+  try {
+    try {
+      await sendViaGateway({ to, subject, text, html, from: replyTo, replyTo });
+    } catch (err) {
+      // The gateway rejects a sender it hasn't verified with HTTP 400; retry
+      // with the app's own sender address (replies still go to replyTo).
+      if (replyTo && (err as { status?: number }).status === 400) {
+        console.warn(`[mail] gateway rejected sender ${replyTo}; sending from the app's default address.`, err);
+        await sendViaGateway({ to, subject, text, html, replyTo });
+      } else {
+        throw err;
+      }
+    }
+    return true;
+  } catch (err) {
+    if (!(err instanceof GatewayUnavailableError)) throw err;
+  }
+
   if (!isMailConfigured()) {
-    console.warn(`[mail] SMTP is not configured; email "${subject}" to ${to} was not sent.`);
+    console.warn(`[mail] No email gateway or SMTP settings; email "${subject}" to ${to} was not sent.`);
     return false;
   }
   await createTransport().sendMail({

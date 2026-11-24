@@ -102,7 +102,7 @@ export async function GET(request: Request, { params }: Params) {
       });
     }
     if (action === "mail-status") {
-      return json({ code: "booking-email-v1", ...(await checkMail()) });
+      return json({ code: "booking-email-v2", ...(await checkMail()) });
     }
     if (action !== "me") throw new StoreError(404, "not-found", "Unknown action.");
     const session = await getSession(db, request);
