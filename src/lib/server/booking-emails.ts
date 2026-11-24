@@ -32,9 +32,12 @@ const ACCEPTED = new Set([
  */
 export function becameConfirmed(before: DocData | null, after: DocData): boolean {
   const status = str(after.bookingStatus);
+  // The admin pressed "Accept" on a booking that was already "confirmed"
+  // (card bookings are created that way), so the status itself didn't change.
+  const justAccepted = Boolean(after.adminAcceptedAt) && !before?.adminAcceptedAt;
   return (
     ACCEPTED.has(status) &&
-    before?.bookingStatus !== status &&
+    (before?.bookingStatus !== status || justAccepted) &&
     !before?.confirmationEmailSentAt &&
     !after.confirmationEmailSentAt
   );

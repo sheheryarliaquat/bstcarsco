@@ -252,6 +252,8 @@ export interface Booking {
   };
   /** Set by the server once the booking-confirmed email has gone out. */
   confirmationEmailSentAt?: string;
+  /** When an admin pressed Accept on the booking (triggers the confirmation email). */
+  adminAcceptedAt?: string;
 }
 
 export interface Quote {
